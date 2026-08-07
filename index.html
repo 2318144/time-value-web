@@ -491,11 +491,19 @@
       </div>
 
       <div class="grain-size-guide">
-        粒の大きさ：
-        <span class="grain-size-sample" style="width:6px;height:6px"></span>1点
-        〜
-        <span class="grain-size-sample" style="width:17px;height:17px"></span>5点
-        ／ 色：価値の項目
+        粒の大きさ：思い出価値の合計点（25点満点）を5段階で表現
+        <br>
+        <span class="grain-size-sample" style="width:6px;height:6px"></span>1〜5点
+        ／
+        <span class="grain-size-sample" style="width:10px;height:10px"></span>6〜10点
+        ／
+        <span class="grain-size-sample" style="width:15px;height:15px"></span>11〜15点
+        ／
+        <span class="grain-size-sample" style="width:21px;height:21px"></span>16〜20点
+        ／
+        <span class="grain-size-sample" style="width:28px;height:28px"></span>21〜25点
+        <br>
+        色：代表となる価値の項目
       </div>
 
       <div class="score-box">
@@ -2546,50 +2554,314 @@ function showAIResult(result) {
       return grains.slice(-MAX_VISIBLE_GRAINS);
     }
 
+    function getTotalScoreGrainSize(totalScore) {
+      const score = Math.max(0, Math.min(25, Number(totalScore || 0)));
+
+      // 思い出全体の合計点を5段階に分ける。
+      // 価値が高いほど、粒を大きくして差を分かりやすくする。
+      if (score >= 21) return 20; // 21〜25点：最大
+      if (score >= 16) return 15; // 16〜20点：大
+      if (score >= 11) return 10; // 11〜15点：中
+      if (score >= 6)  return 5; // 6〜10点：小
+      return 6;                   // 0〜5点：最小
+    }
+
+    /*
+      自然な砂の積もり方
+      ------------------
+      ・砂は中央のくびれ付近から落ちる想定
+      ・各粒について複数の落下候補位置を試す
+      ・床または既に積もった粒に接する高さまで落とす
+      ・最も低く安定する位置を選ぶことで、中央が高い山状の堆積を作る
+      ・色 = 代表となる価値項目
+      ・大きさ = 思い出全体の合計点（25点満点を5段階）
+    */
+
+    function getBottomChamberHalfWidth(y, chamberWidth, chamberHeight) {
+      /*
+        砂時計の下部は、下ほど広く、上（くびれ）ほど狭い。
+        y は底面から粒中心までの高さ。
+      */
+      const bottomHalfWidth = chamberWidth * 0.38;
+      const neckHalfWidth = chamberWidth * 0.055;
+
+      const t = Math.max(
+        0,
+        Math.min(1, y / Math.max(chamberHeight, 1))
+      );
+
+      return bottomHalfWidth -
+        (bottomHalfWidth - neckHalfWidth) * t;
+    }
+
+    function getSettledYAtX(x, radius, placedGrains) {
+      /*
+        指定した x に粒を真上から落としたとき、
+        床または既存粒に接触して止まる高さを求める。
+      */
+      let settledY = radius;
+
+      placedGrains.forEach(function(other) {
+        const dx = x - other.x;
+        const contactDistance = radius + other.radius;
+
+        if (Math.abs(dx) >= contactDistance) {
+          return;
+        }
+
+        const verticalDistance = Math.sqrt(
+          Math.max(
+            0,
+            contactDistance * contactDistance - dx * dx
+          )
+        );
+
+        const supportedY = other.y + verticalDistance;
+
+        if (supportedY > settledY) {
+          settledY = supportedY;
+        }
+      });
+
+      return settledY;
+    }
+
+    function isInsideBottomChamber(
+      x,
+      y,
+      radius,
+      chamberWidth,
+      chamberHeight
+    ) {
+      /*
+        粒全体が砂時計の下部の内側に入るか確認する。
+      */
+      const centerX = chamberWidth / 2;
+
+      if (
+        y - radius < 0 ||
+        y + radius > chamberHeight
+      ) {
+        return false;
+      }
+
+      const halfWidth = getBottomChamberHalfWidth(
+        y + radius,
+        chamberWidth,
+        chamberHeight
+      );
+
+      return (
+        x - radius >= centerX - halfWidth &&
+        x + radius <= centerX + halfWidth
+      );
+    }
+
+    function findNaturalGrainPosition(
+      radius,
+      placedGrains,
+      seed,
+      chamberWidth,
+      chamberHeight
+    ) {
+      const centerX = chamberWidth / 2;
+
+      /*
+        実際の砂は中央から落ち、山の斜面を転がって
+        左右の低い場所へ移動する。
+        そこで中央付近を起点に複数の候補 x を調べる。
+      */
+      const randomOffset =
+        (seededRandom(seed) - 0.5) * chamberWidth * 0.12;
+
+      const dropX = centerX + randomOffset;
+
+      const maxSearch = chamberWidth * 0.34;
+      const step = Math.max(2.5, radius * 0.34);
+
+      const candidates = [];
+
+      // 中央付近を最初の候補にする
+      candidates.push(dropX);
+
+      // 左右へ少しずつ探索して、斜面を転がる動きを近似する
+      for (let distance = step; distance <= maxSearch; distance += step) {
+        const directionFirst =
+          seededRandom(seed + Math.round(distance * 10)) > 0.5
+            ? 1
+            : -1;
+
+        candidates.push(dropX + distance * directionFirst);
+        candidates.push(dropX - distance * directionFirst);
+      }
+
+      let best = null;
+
+      candidates.forEach(function(candidateX, candidateIndex) {
+        const x = Math.max(
+          radius,
+          Math.min(chamberWidth - radius, candidateX)
+        );
+
+        const y = getSettledYAtX(
+          x,
+          radius,
+          placedGrains
+        );
+
+        if (
+          !isInsideBottomChamber(
+            x,
+            y,
+            radius,
+            chamberWidth,
+            chamberHeight
+          )
+        ) {
+          return;
+        }
+
+        /*
+          基本は「より低い位置」を選ぶ。
+          ただし中央から遠くなりすぎないよう少しだけ補正し、
+          平らではなく自然な山を作る。
+        */
+        const distanceFromDrop =
+          Math.abs(x - dropX) / Math.max(chamberWidth, 1);
+
+        const centerDistance =
+          Math.abs(x - centerX) / Math.max(chamberWidth, 1);
+
+        const score =
+          y +
+          distanceFromDrop * 5 +
+          centerDistance * 1.5 +
+          candidateIndex * 0.0001;
+
+        if (!best || score < best.score) {
+          best = {
+            x,
+            y,
+            score
+          };
+        }
+      });
+
+      /*
+        候補が見つからない場合は中央付近へ配置。
+        大量の粒で上部まで満杯になった場合の保険。
+      */
+      if (!best) {
+        const fallbackX = centerX;
+        const fallbackY = Math.min(
+          chamberHeight - radius,
+          getSettledYAtX(
+            fallbackX,
+            radius,
+            placedGrains
+          )
+        );
+
+        return {
+          x: fallbackX,
+          y: fallbackY
+        };
+      }
+
+      return best;
+    }
+
     function renderValueSand() {
       const bottomSand = document.getElementById("bottomSand");
       if (!bottomSand) return;
 
       bottomSand.innerHTML = "";
 
-      const memoriesOldestFirst = [...memories].reverse();
+      const chamberWidth =
+        bottomSand.clientWidth || 190;
 
-      memoriesOldestFirst.slice(-MAX_VISIBLE_GRAINS).forEach(function(memory, index) {
+      const chamberHeight =
+        bottomSand.clientHeight || 144;
 
+      const memoriesOldestFirst =
+        [...memories]
+          .reverse()
+          .slice(-MAX_VISIBLE_GRAINS);
+
+      const placedGrains = [];
+
+      memoriesOldestFirst.forEach(function(memory, index) {
+
+        // 色：5項目の中で代表となる価値
         const criterion =
           memory.primaryCriterion ||
-          getPrimaryCriterion(memory, memory.userPriority || "");
+          getPrimaryCriterion(
+            memory,
+            memory.userPriority || ""
+          );
 
-        const score = Number(
+        // 大きさ：思い出全体の合計点
+        const totalValueScore = Number(
           memory.totalScore ??
           memory.score ??
           0
         );
 
-        const rowHeight = 16;
-        const grainsPerRow = 11;
-        const row = Math.floor(index / grainsPerRow);
-        const col = index % grainsPerRow;
+        const size =
+          getTotalScoreGrainSize(totalValueScore);
 
-        const bottom = 8 + row * rowHeight;
-        const center = 95;
-        const spread = 65 - Math.min(bottom / 144,1) * 55;
-        const ratio = grainsPerRow===1 ? 0 : (col/(grainsPerRow-1))*2-1;
+        const radius = size / 2;
 
-        const grain = document.createElement("span");
-        grain.className = "value-grain " + criterion;
+        /*
+          同じ保存データなら再描画してもほぼ同じ積もり方になるよう、
+          index と点数から決定的な seed を作る。
+        */
+        const seed =
+          (index + 1) * 101 +
+          Math.round(totalValueScore) * 17 +
+          CRITERIA_ORDER.indexOf(criterion) * 29;
 
-        let size = 8;
-        if(score>=21) size=20;
-        else if(score>=16) size=17;
-        else if(score>=11) size=14;
-        else if(score>=6) size=11;
+        const position = findNaturalGrainPosition(
+          radius,
+          placedGrains,
+          seed,
+          chamberWidth,
+          chamberHeight
+        );
 
-        grain.style.width=size+"px";
-        grain.style.height=size+"px";
-        grain.style.left=(center+ratio*spread)+"px";
-        grain.style.bottom=bottom+"px";
-        grain.title=(CRITERIA_LABELS[criterion]||"")+"："+score+" /25";
+        placedGrains.push({
+          x: position.x,
+          y: position.y,
+          radius: radius
+        });
+
+        const grain =
+          document.createElement("span");
+
+        grain.className =
+          "value-grain " + criterion;
+
+        grain.style.width =
+          size + "px";
+
+        grain.style.height =
+          size + "px";
+
+        grain.style.left =
+          position.x + "px";
+
+        /*
+          .value-grain は translate(-50%, 50%) を使っているため、
+          bottom に粒中心の高さを指定する。
+        */
+        grain.style.bottom =
+          position.y + "px";
+
+        grain.title =
+          (CRITERIA_LABELS[criterion] || "") +
+          " ／ 思い出価値：" +
+          totalValueScore +
+          " / 25";
 
         bottomSand.appendChild(grain);
       });

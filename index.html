@@ -1,1 +1,2993 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>時間の価値 可視化アプリ</title>
+  <meta name="description" content="写真と文脈から思い出の価値を可視化する研究用アプリ">
 
+  <!--
+    時間の価値 可視化アプリ
+    ・写真、メモ、撮影日時、撮影場所、予定を利用
+    ・5項目、25点満点で1つの思い出を評価
+    ・プロフィールと過去の思い出履歴による個人適応に対応
+  -->
+
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+
+  <style>
+    :root {
+      --page-background: var(--page-background);
+      --card-background: #ffffff;
+      --text-main: #333333;
+      --text-sub: #666666;
+      --border-color: #cccccc;
+      --primary-color: #2f80ed;
+      --profile-background: #f3f7ff;
+      --learning-background: #f7fff7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f4f6f9;
+    }
+
+    .main {
+      padding: 18px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #555;
+      font-size: 14px;
+    }
+
+    .hourglass {
+      width: 190px;
+      height: 320px;
+      margin: 20px auto;
+      position: relative;
+      clip-path: polygon(
+        15% 0%, 85% 0%,
+        55% 45%, 55% 55%,
+        85% 100%, 15% 100%,
+        45% 55%, 45% 45%
+      );
+      border: 4px solid #555;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .top-sand {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 45%;
+      background: linear-gradient(to bottom, #f7df94, #d6a84f);
+      clip-path: inset(0% 0 0 0);
+      transition: clip-path 1s linear;
+    }
+
+    .bottom-sand {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 45%;
+      background: linear-gradient(
+        to top,
+        rgba(237, 224, 190, 0.35),
+        rgba(255, 255, 255, 0)
+      );
+      overflow: hidden;
+      transition: height 0.8s;
+    }
+
+    .value-grain {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, 50%);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.22),
+        inset 0 0 2px rgba(255, 255, 255, 0.55);
+      transition:
+        left 0.65s ease,
+        bottom 0.65s ease,
+        width 0.35s ease,
+        height 0.35s ease;
+    }
+
+    .value-grain.emotion {
+      background: #ef5350;
+    }
+
+    .value-grain.learning {
+      background: #42a5f5;
+    }
+
+    .value-grain.rarity {
+      background: #fbc02d;
+    }
+
+    .value-grain.relationship {
+      background: #66bb6a;
+    }
+
+    .value-grain.future {
+      background: #ab47bc;
+    }
+
+    .sand-legend {
+      max-width: 430px;
+      margin: 10px auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px 11px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .sand-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .sand-legend-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .grain-size-guide {
+      max-width: 430px;
+      margin: 0 auto 14px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.75);
+      color: #666;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .grain-size-sample {
+      display: inline-block;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin: 0 3px;
+      background: #888;
+    }
+
+    .neck-sand {
+      position: absolute;
+      top: 47%;
+      left: 49%;
+      width: 4px;
+      height: 32px;
+      background: #c49a4a;
+      animation: fall 1s infinite;
+    }
+
+    .neck-sand.stop {
+      display: none;
+    }
+
+    @keyframes fall {
+      0% {
+        height: 0;
+        opacity: 0;
+      }
+
+      50% {
+        height: 32px;
+        opacity: 1;
+      }
+
+      100% {
+        height: 0;
+        opacity: 0;
+      }
+    }
+
+    .score-box,
+    .form-box,
+    .ai-result-box,
+    .debug-box {
+      background: white;
+      border-radius: 14px;
+      padding: 15px;
+      margin: 15px 0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-box,
+    .ai-result-box,
+    .debug-box {
+      text-align: left;
+    }
+
+    .ai-result-box {
+      display: none;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    textarea {
+      height: 70px;
+    }
+
+    .preview-area {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .preview-area img {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .photo-count {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    .history-item {
+      background: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: #eee;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .main-button {
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .score-line {
+      margin: 6px 0;
+    }
+
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .priority-option {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fafafa;
+      font-weight: normal;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .priority-option input {
+      width: auto;
+      margin-right: 6px;
+    }
+
+    .criteria-note {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .debug-text {
+      font-size: 13px;
+      color: #333;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .history-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 16px;
+      justify-content: center;
+    }
+
+    .history-filter button {
+      border: 1px solid #c8c8c8;
+      border-radius: 20px;
+      padding: 8px 14px;
+      background: #ffffff;
+      color: #333;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .history-filter button.active {
+      background: #2f80ed;
+      color: #ffffff;
+      border-color: #2f80ed;
+      font-weight: bold;
+    }
+
+    .history-filter button:active {
+      transform: scale(0.97);
+    }
+
+    .history-empty {
+      color: #777;
+      text-align: center;
+      padding: 18px 8px;
+    }
+
+    .primary-criterion {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 14px;
+      background: #eef4ff;
+      color: #245fa8;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .profile-result-box {
+      background: #f3f7ff;
+      border: 1px solid #cbdcff;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 12px 0 18px;
+    }
+
+    .profile-result-box h4 {
+      margin: 0 0 8px;
+      color: #245fa8;
+    }
+
+    .profile-result-row {
+      margin: 5px 0;
+    }
+
+    .profile-result-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .learning-result-box {
+      background: #f7fff7;
+      border: 1px solid #bfe3bf;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 12px 0 18px;
+    }
+
+    .learning-result-box h4 {
+      margin: 0 0 8px;
+      color: #277a27;
+    }
+
+    .learning-result-row {
+      margin: 5px 0;
+    }
+
+    .learning-result-difference {
+      font-weight: bold;
+      color: #277a27;
+    }
+
+    .learning-profile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .learning-profile-item {
+      background: #ffffff;
+      border: 1px solid #d9ead9;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <ons-page>
+    <ons-toolbar>
+      <div class="center">時間の価値 可視化</div>
+      <div class="right">
+        <ons-toolbar-button onclick="openProfileDialog()" aria-label="プロフィール設定">
+          <ons-icon icon="md-settings"></ons-icon>
+        </ons-toolbar-button>
+      </div>
+    </ons-toolbar>
+
+    <!-- メイン画面 -->
+    <div class="main" id="appMain">
+      <h1>記憶を砂に変える</h1>
+      <p>上の砂は残りの人生時間、下の砂はAIが評価した思い出の価値を表します。</p>
+
+      <div class="hourglass" aria-label="5項目の価値を色と粒の大きさで表した砂時計">
+        <div class="top-sand" id="topSand"></div>
+        <div class="neck-sand" id="neckSand"></div>
+        <div class="bottom-sand" id="bottomSand"></div>
+      </div>
+
+      <div class="sand-legend" aria-label="砂の色の凡例">
+        <span class="sand-legend-item">
+          <span class="sand-legend-dot" style="background:#ef5350"></span>感情
+        </span>
+        <span class="sand-legend-item">
+          <span class="sand-legend-dot" style="background:#42a5f5"></span>学び
+        </span>
+        <span class="sand-legend-item">
+          <span class="sand-legend-dot" style="background:#fbc02d"></span>希少性
+        </span>
+        <span class="sand-legend-item">
+          <span class="sand-legend-dot" style="background:#66bb6a"></span>人間関係
+        </span>
+        <span class="sand-legend-item">
+          <span class="sand-legend-dot" style="background:#ab47bc"></span>将来への影響
+        </span>
+      </div>
+
+      <div class="grain-size-guide">
+        粒の大きさ：
+        <span class="grain-size-sample" style="width:6px;height:6px"></span>1点
+        〜
+        <span class="grain-size-sample" style="width:17px;height:17px"></span>5点
+        ／ 色：価値の項目
+      </div>
+
+      <div class="score-box">
+        <p>残り時間</p>
+        <h2 id="timeText">10:00</h2>
+
+        <p>思い出価値</p>
+        <h2><span id="totalScore">0</span> 点</h2>
+        <p id="message">まだ価値の砂はたまっていません</p>
+      </div>
+
+      <div class="form-box">
+        <label>写真を複数選択</label>
+        <input type="file" accept="image/*" id="photoInput" multiple>
+
+        <div class="photo-count" id="photoCount">選択された写真：0枚</div>
+        <div class="preview-area" id="previewArea"></div>
+
+        <label>カテゴリ</label>
+        <select id="category">
+          <option value="勉強">勉強</option>
+          <option value="遊び">遊び</option>
+          <option value="旅行">旅行</option>
+          <option value="アルバイト">アルバイト</option>
+          <option value="家族">家族</option>
+          <option value="挑戦">挑戦</option>
+        </select>
+
+        <label>思い出メモ</label>
+        <textarea id="memo" placeholder="例：友達と旅行に行き、印象に残る時間を過ごした"></textarea>
+
+        <label>この思い出で最も大切な要素</label>
+        <p class="criteria-note">
+          AI評価だけでなく、あなた自身が重視した要素を選択してください。
+        </p>
+
+        <div class="priority-grid" id="priorityGrid">
+          <label class="priority-option">
+            <input type="radio" name="userPriority" value="emotion">
+            感情
+          </label>
+
+          <label class="priority-option">
+            <input type="radio" name="userPriority" value="learning">
+            学び
+          </label>
+
+          <label class="priority-option">
+            <input type="radio" name="userPriority" value="rarity">
+            希少性
+          </label>
+
+          <label class="priority-option">
+            <input type="radio" name="userPriority" value="relationship">
+            人間関係
+          </label>
+
+          <label class="priority-option">
+            <input type="radio" name="userPriority" value="future">
+            将来への影響
+          </label>
+        </div>
+
+        <label>Googleカレンダー</label>
+        <div class="history-item">
+          <p><b>現在の状態</b></p>
+          <p id="calendarStatus">未連携</p>
+
+          <ons-button modifier="large" onclick="connectCalendar()">
+            Googleカレンダーと連携
+          </ons-button>
+        </div>
+
+        <ons-button modifier="large" class="main-button" onclick="testServerConnection()">
+          サーバー接続確認
+        </ons-button>
+
+        <ons-button modifier="large" class="main-button" onclick="addMemoryByAI()">
+          思い出を評価して砂に変える
+        </ons-button>
+
+        <ons-button modifier="large quiet" class="main-button" onclick="resetValueData()">
+          価値の砂をリセット
+        </ons-button>
+
+        <ons-button modifier="large quiet" class="main-button" onclick="resetTimer()">
+          残り時間をリセット
+        </ons-button>
+      </div>
+
+      <div class="debug-box">
+        <h3>接続状態</h3>
+        <div class="debug-text" id="debugText">まだ接続確認していません。</div>
+      </div>
+
+      <div class="debug-box">
+        <h3>写真情報</h3>
+        <div class="debug-text" id="photoDebug">まだ写真を選択していません。</div>
+      </div>
+
+      <div class="ai-result-box" id="aiResultBox">
+        <h3>AI評価結果</h3>
+        <div id="aiResultText"></div>
+      </div>
+
+      <h3>記録一覧</h3>
+
+      <div class="history-filter" id="historyFilter">
+        <button type="button" class="active" data-filter="all" onclick="setHistoryFilter('all')">
+          すべて
+        </button>
+
+        <button type="button" data-filter="emotion" onclick="setHistoryFilter('emotion')">
+          感情
+        </button>
+
+        <button type="button" data-filter="learning" onclick="setHistoryFilter('learning')">
+          学び
+        </button>
+
+        <button type="button" data-filter="rarity" onclick="setHistoryFilter('rarity')">
+          希少性
+        </button>
+
+        <button type="button" data-filter="relationship" onclick="setHistoryFilter('relationship')">
+          人間関係
+        </button>
+
+        <button type="button" data-filter="future" onclick="setHistoryFilter('future')">
+          将来への影響
+        </button>
+      </div>
+
+      <div id="history"></div>
+    </div>
+  </ons-page>
+
+  <!-- プロフィール設定ダイアログ -->
+  <ons-dialog id="profileDialog" cancelable>
+    <div style="padding: 20px; min-width: 280px;">
+      <h3 style="margin-top: 0;">プロフィール設定</h3>
+      <p class="criteria-note">
+        AIが思い出の価値を判断する際の参考情報として使用します。
+      </p>
+
+      <label for="userBirthday">誕生日</label>
+      <input
+        type="date"
+        id="userBirthday"
+      >
+
+      <label for="userAge">現在の年齢</label>
+      <input
+        type="number"
+        id="userAge"
+        placeholder="誕生日から自動計算"
+        readonly
+      >
+
+      <label for="userGender">性別</label>
+      <select id="userGender">
+        <option value="">選択してください</option>
+        <option value="男性">男性</option>
+        <option value="女性">女性</option>
+        <option value="その他">その他</option>
+        <option value="回答しない">回答しない</option>
+      </select>
+
+      <label for="userJob">職業</label>
+      <select id="userJob">
+        <option value="">選択してください</option>
+        <option value="学生">学生</option>
+        <option value="会社員">会社員</option>
+        <option value="公務員">公務員</option>
+        <option value="自営業">自営業</option>
+        <option value="パート・アルバイト">パート・アルバイト</option>
+        <option value="専業主婦・専業主夫">専業主婦・専業主夫</option>
+        <option value="無職">無職</option>
+        <option value="その他">その他</option>
+      </select>
+
+      <ons-button modifier="large" class="main-button" onclick="saveProfile()">
+        保存
+      </ons-button>
+
+      <ons-button modifier="large quiet" class="main-button" onclick="closeProfileDialog()">
+        閉じる
+      </ons-button>
+    </div>
+  </ons-dialog>
+
+  <script>
+    // ==============================
+    // 定数
+    // ==============================
+    const AI_SERVER_ROOT = "https://time-value-ai-server-1.onrender.com";
+    const AI_SERVER_URL = "https://time-value-ai-server-1.onrender.com/analyze";
+
+    const CLIENT_ID = "952243324721-45kvm26hm2o97ccjl53al2b1arq8l8ok.apps.googleusercontent.com";
+    const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+    const MAX_VALUE_SCORE = 500;
+    const TOTAL_LIFE_TIME = 10 * 60;
+    const MAX_HISTORY_FOR_AI = 20;
+
+    const APP_TIME_ZONE = "Asia/Tokyo";
+
+    const STORAGE_KEYS = {
+      memories: "memories",
+      totalScore: "totalScore",
+      userProfile: "userProfile",
+      remainingTime: "remainingTime"
+    };
+
+    const CRITERIA_LABELS = {
+      emotion: "感情",
+      learning: "学び",
+      rarity: "希少性",
+      relationship: "人間関係",
+      future: "将来への影響"
+    };
+
+    const CRITERIA_ORDER = [
+      "emotion",
+      "learning",
+      "rarity",
+      "relationship",
+      "future"
+    ];
+
+    // 1つの思い出 = 1粒
+    // 色は主な評価、粒の大きさは合計点(25点満点)
+    const MAX_VISIBLE_GRAINS = 420;
+
+    // ==============================
+    // 状態変数
+    // ==============================
+    let memories = readStorageJson(
+      STORAGE_KEYS.memories,
+      []
+    );
+
+    let totalScore = Number(
+      localStorage.getItem(STORAGE_KEYS.totalScore)
+    ) || 0;
+
+    let userProfile = readStorageJson(
+      STORAGE_KEYS.userProfile,
+      {
+        birthday: "",
+        age: "",
+        gender: "",
+        job: ""
+      }
+    );
+
+    let savedTime =
+      localStorage.getItem(STORAGE_KEYS.remainingTime);
+    let remainingTime = savedTime !== null ? Number(savedTime) : TOTAL_LIFE_TIME;
+
+    let latestCalendarEvents = [];
+    let selectedPhotoContexts = [];
+
+    const calendarEventsCache = new Map();
+    const locationNameCache = new Map();
+
+    let isCalendarConnected = false;
+
+    // 記録一覧の表示フィルター
+    let currentHistoryFilter = "all";
+
+    // ==============================
+    // 初期化
+    // ==============================
+    window.onload = function() {
+      updateDebug(
+        "状態：アプリ起動完了<br>" +
+        "AIサーバー：接続確認前<br>" +
+        "Googleカレンダー：初期化中"
+      );
+      refreshProfileAge();
+
+      const birthdayInput =
+        document.getElementById("userBirthday");
+
+      if (birthdayInput) {
+        birthdayInput.addEventListener("input", updateAgePreview);
+        birthdayInput.addEventListener("change", updateAgePreview);
+      }
+
+      updateDisplay();
+      startTimer();
+      initializeGoogleCalendarApi();
+    };
+
+    function initializeGoogleCalendarApi() {
+      gapi.load("client", async function() {
+        await gapi.client.init({
+          discoveryDocs: [
+            "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+          ]
+        });
+
+        updateDebug(
+          "状態：アプリ起動完了<br>" +
+          "AIサーバー：接続確認前<br>" +
+          "Googleカレンダー：初期化完了"
+        );
+      });
+    }
+
+    // ==============================
+    // プロフィール設定
+    // ==============================
+    function calculateAgeFromBirthday(birthdayValue) {
+      if (!birthdayValue) {
+        return "";
+      }
+
+      const birthday = new Date(birthdayValue + "T00:00:00");
+      const today = new Date();
+
+      if (isNaN(birthday.getTime()) || birthday > today) {
+        return "";
+      }
+
+      let age = today.getFullYear() - birthday.getFullYear();
+
+      const birthdayThisYear = new Date(
+        today.getFullYear(),
+        birthday.getMonth(),
+        birthday.getDate()
+      );
+
+      if (today < birthdayThisYear) {
+        age--;
+      }
+
+      return Math.max(age, 0);
+    }
+
+    function refreshProfileAge() {
+      if (!userProfile.birthday) {
+        return;
+      }
+
+      const currentAge = calculateAgeFromBirthday(userProfile.birthday);
+
+      if (currentAge !== "") {
+        userProfile.age = currentAge;
+
+        localStorage.setItem(
+          STORAGE_KEYS.userProfile,
+          JSON.stringify(userProfile)
+        );
+      }
+    }
+
+    function updateAgePreview() {
+      const birthdayValue =
+        document.getElementById("userBirthday").value;
+
+      document.getElementById("userAge").value =
+        calculateAgeFromBirthday(birthdayValue);
+    }
+
+    function openProfileDialog() {
+      refreshProfileAge();
+
+      document.getElementById("userBirthday").value =
+        userProfile.birthday || "";
+
+      document.getElementById("userAge").value =
+        userProfile.age || "";
+
+      document.getElementById("userGender").value =
+        userProfile.gender || "";
+
+      document.getElementById("userJob").value =
+        userProfile.job || "";
+
+      document.getElementById("profileDialog").show();
+    }
+
+    function closeProfileDialog() {
+      document.getElementById("profileDialog").hide();
+    }
+
+    function saveProfile() {
+      const birthdayValue =
+        document.getElementById("userBirthday").value;
+
+      const genderValue =
+        document.getElementById("userGender").value;
+
+      const jobValue =
+        document.getElementById("userJob").value;
+
+      if (!birthdayValue) {
+        ons.notification.alert("誕生日を入力してください");
+        return;
+      }
+
+      const calculatedAge =
+        calculateAgeFromBirthday(birthdayValue);
+
+      if (calculatedAge === "") {
+        ons.notification.alert("正しい誕生日を入力してください");
+        return;
+      }
+
+      userProfile = {
+        birthday: birthdayValue,
+        age: calculatedAge,
+        gender: genderValue,
+        job: jobValue
+      };
+
+      localStorage.setItem(
+        STORAGE_KEYS.userProfile,
+        JSON.stringify(userProfile)
+      );
+
+      closeProfileDialog();
+
+      ons.notification.toast(
+        "プロフィールを保存しました",
+        { timeout: 1500 }
+      );
+    }
+
+    // ==============================
+    // Googleカレンダー
+    // ==============================
+    async function connectCalendar() {
+      try {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+
+          callback: async function(response) {
+            if (response.error) {
+              console.log(response);
+              ons.notification.alert("Google連携に失敗しました");
+              return;
+            }
+
+            gapi.client.setToken(response);
+            isCalendarConnected = true;
+
+            document.getElementById("calendarStatus").innerHTML = "連携済み";
+
+            const events = await getTodayEvents();
+            latestCalendarEvents = events;
+
+            displayCalendarEvents(events);
+
+            if (selectedPhotoContexts.length > 0) {
+              await refreshSelectedPhotoCalendarEvents();
+            }
+
+            ons.notification.toast(
+              "Googleカレンダーと連携しました",
+              { timeout: 2000 }
+            );
+          }
+        });
+
+        tokenClient.requestAccessToken();
+
+      } catch (e) {
+        console.error(e);
+        ons.notification.alert(e.message);
+      }
+    }
+
+    async function getTodayEvents() {
+      const today = new Date();
+
+      const start = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+
+      const end = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + 1
+      );
+
+      const response = await gapi.client.calendar.events.list({
+        calendarId: "primary",
+        timeMin: start.toISOString(),
+        timeMax: end.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        orderBy: "startTime"
+      });
+
+      return response.result.items || [];
+    }
+
+    async function getEventsForDate(dateValue) {
+      if (!isCalendarConnected || !gapi.client.getToken()) {
+        return [];
+      }
+
+      const date = new Date(dateValue);
+
+      if (isNaN(date.getTime())) {
+        return [];
+      }
+
+      const cacheKey = createDateKey(date);
+
+      if (calendarEventsCache.has(cacheKey)) {
+        return calendarEventsCache.get(cacheKey);
+      }
+
+      const start = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        0,
+        0,
+        0,
+        0
+      );
+
+      const end = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1,
+        0,
+        0,
+        0,
+        0
+      );
+
+      try {
+        const response = await gapi.client.calendar.events.list({
+          calendarId: "primary",
+          timeMin: start.toISOString(),
+          timeMax: end.toISOString(),
+          showDeleted: false,
+          singleEvents: true,
+          orderBy: "startTime"
+        });
+
+        const events = response.result.items || [];
+        calendarEventsCache.set(cacheKey, events);
+
+        return events;
+
+      } catch (error) {
+        console.error("撮影日のカレンダー取得エラー:", error);
+        return [];
+      }
+    }
+
+    function createDateKey(dateValue) {
+      const date = new Date(dateValue);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    function findRelatedCalendarEventFromList(photoDate, events) {
+      if (!photoDate || !Array.isArray(events) || events.length === 0) {
+        return null;
+      }
+
+      const photoTime = new Date(photoDate);
+
+      if (isNaN(photoTime.getTime())) {
+        return null;
+      }
+
+      for (const event of events) {
+        if (!event.start || !event.end) {
+          continue;
+        }
+
+        if (event.start.dateTime && event.end.dateTime) {
+          const start = new Date(event.start.dateTime);
+          const end = new Date(event.end.dateTime);
+
+          if (photoTime >= start && photoTime <= end) {
+            return event;
+          }
+        }
+
+        if (event.start.date && event.end.date) {
+          const start = new Date(`${event.start.date}T00:00:00`);
+          const end = new Date(`${event.end.date}T00:00:00`);
+
+          if (photoTime >= start && photoTime < end) {
+            return event;
+          }
+        }
+      }
+
+      let nearestEvent = null;
+      let nearestDifference = Infinity;
+
+      for (const event of events) {
+        if (!event.start?.dateTime) {
+          continue;
+        }
+
+        const eventStart = new Date(event.start.dateTime);
+        const difference = Math.abs(photoTime.getTime() - eventStart.getTime());
+
+        if (difference <= 6 * 60 * 60 * 1000 && difference < nearestDifference) {
+          nearestDifference = difference;
+          nearestEvent = event;
+        }
+      }
+
+      return nearestEvent;
+    }
+
+    async function refreshSelectedPhotoCalendarEvents() {
+      if (!isCalendarConnected || selectedPhotoContexts.length === 0) {
+        return;
+      }
+
+      for (const context of selectedPhotoContexts) {
+        if (!context.takenDate) {
+          context.relatedEvent = null;
+          continue;
+        }
+
+        const events = await getEventsForDate(context.takenDate);
+
+        context.relatedEvent = findRelatedCalendarEventFromList(
+          context.takenDate,
+          events
+        );
+      }
+
+      updatePhotoDebug();
+    }
+
+    function displayCalendarEvents(events) {
+      let html = "連携済み<br><br><b>今日の予定</b><br>";
+
+      if (events.length === 0) {
+        html += "今日の予定はありません";
+      } else {
+        events.forEach(function(event) {
+          const title = event.summary || "タイトルなし";
+
+          html += "・" + title + "<br>";
+
+          if (event.start.dateTime && event.end.dateTime) {
+            html +=
+              "時間：" +
+              formatTime(event.start.dateTime) +
+              " ～ " +
+              formatTime(event.end.dateTime) +
+              "<br><br>";
+          } else {
+            html += "時間：終日<br><br>";
+          }
+        });
+      }
+
+      document.getElementById("calendarStatus").innerHTML = html;
+    }
+
+    function formatTime(dateTime) {
+      if (!dateTime) {
+        return "時刻不明";
+      }
+
+      const date = new Date(dateTime);
+
+      if (isNaN(date.getTime())) {
+        return String(dateTime);
+      }
+
+      return new Intl.DateTimeFormat("ja-JP", {
+        timeZone: APP_TIME_ZONE,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(date);
+    }
+
+    // ==============================
+    // 写真EXIF・プレビュー
+    // ==============================
+    async function getPhotoInfo(file) {
+      try {
+        const exif = await exifr.parse(file, {
+          tiff: true,
+          ifd0: true,
+          exif: true,
+          gps: true,
+          interop: true,
+          xmp: true,
+          icc: true,
+          iptc: true
+        });
+
+        console.log("EXIF情報:", exif);
+
+        if (!exif) {
+          return createEmptyPhotoInfo(file, "EXIF情報なし");
+        }
+
+        const takenDate =
+          exif.DateTimeOriginal ||
+          exif.CreateDate ||
+          exif.ModifyDate ||
+          exif.DateTimeDigitized ||
+          null;
+
+        const latitude = exif.latitude || exif.GPSLatitude || null;
+        const longitude = exif.longitude || exif.GPSLongitude || null;
+
+        const locationName =
+          latitude !== null && longitude !== null
+            ? await getLocationName(latitude, longitude)
+            : null;
+
+        return {
+          fileName: file.name,
+          fileType: file.type || "不明",
+          fileSize: file.size,
+          takenDate: takenDate ? new Date(takenDate) : null,
+          takenDateJST: takenDate ? formatFullDateTimeJST(takenDate) : null,
+          dateSource: takenDate
+            ? "写真内のEXIF撮影日時"
+            : "撮影日時を取得できません",
+          latitude,
+          longitude,
+          locationName,
+          gpsSource:
+            latitude !== null && longitude !== null
+              ? "写真内のGPS情報"
+              : "位置情報を取得できません",
+          make: exif.Make || null,
+          model: exif.Model || null,
+          lens: exif.LensModel || null,
+          orientation: exif.Orientation || null,
+          width: exif.ExifImageWidth || exif.ImageWidth || null,
+          height: exif.ExifImageHeight || exif.ImageHeight || null,
+          rawExif: simplifyExif(exif)
+        };
+
+      } catch (error) {
+        console.log("EXIF取得エラー:", error);
+        return createEmptyPhotoInfo(file, "EXIF取得エラー");
+      }
+    }
+
+    function createEmptyPhotoInfo(file, reason) {
+      return {
+        fileName: file.name,
+        fileType: file.type || "不明",
+        fileSize: file.size,
+        takenDate: null,
+        takenDateJST: null,
+        dateSource: reason,
+        latitude: null,
+        longitude: null,
+        locationName: null,
+        gpsSource: "位置情報を取得できません",
+        make: null,
+        model: null,
+        lens: null,
+        orientation: null,
+        width: null,
+        height: null,
+        rawExif: {}
+      };
+    }
+
+    function simplifyExif(exif) {
+      const result = {};
+      const keys = [
+        "DateTimeOriginal",
+        "CreateDate",
+        "ModifyDate",
+        "DateTimeDigitized",
+        "latitude",
+        "longitude",
+        "GPSLatitude",
+        "GPSLongitude",
+        "Make",
+        "Model",
+        "LensModel",
+        "Orientation",
+        "ExifImageWidth",
+        "ExifImageHeight",
+        "ImageWidth",
+        "ImageHeight"
+      ];
+
+      keys.forEach(function(key) {
+        if (exif && exif[key] !== undefined && exif[key] !== null) {
+          result[key] = exif[key];
+        }
+      });
+
+      return result;
+    }
+
+    document.getElementById("photoInput").addEventListener("change", async function(event) {
+      const files = event.target.files;
+      const previewArea = document.getElementById("previewArea");
+      const photoDebug = document.getElementById("photoDebug");
+
+      previewArea.innerHTML = "";
+      selectedPhotoContexts = [];
+
+      if (photoDebug) {
+        photoDebug.innerHTML = "写真情報を取得中...";
+      }
+
+      document.getElementById("photoCount").textContent =
+        "選択された写真：" + files.length + "枚";
+
+      for (const file of files) {
+        const photoInfo = await getPhotoInfo(file);
+
+        let relatedEvent = null;
+
+        if (photoInfo.takenDate && isCalendarConnected) {
+          const eventsOnPhotoDate = await getEventsForDate(photoInfo.takenDate);
+
+          relatedEvent = findRelatedCalendarEventFromList(
+            photoInfo.takenDate,
+            eventsOnPhotoDate
+          );
+        }
+
+        selectedPhotoContexts.push({
+          fileName: photoInfo.fileName,
+          fileType: photoInfo.fileType,
+          fileSize: photoInfo.fileSize,
+          takenDate: photoInfo.takenDate,
+          takenDateJST: photoInfo.takenDateJST,
+          dateSource: photoInfo.dateSource,
+          latitude: photoInfo.latitude,
+          longitude: photoInfo.longitude,
+          locationName: photoInfo.locationName,
+          gpsSource: photoInfo.gpsSource,
+          make: photoInfo.make,
+          model: photoInfo.model,
+          lens: photoInfo.lens,
+          orientation: photoInfo.orientation,
+          width: photoInfo.width,
+          height: photoInfo.height,
+          relatedEvent: relatedEvent,
+          rawExif: photoInfo.rawExif
+        });
+
+        updatePhotoDebug();
+        previewPhoto(file, previewArea);
+      }
+    });
+
+    function previewPhoto(file, previewArea) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        previewArea.appendChild(img);
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // ==============================
+    // 緯度・経度から場所名を取得
+    // ==============================
+    async function getLocationName(latitude, longitude) {
+      if (latitude === null || longitude === null) {
+        return null;
+      }
+
+      const cacheKey =
+        Number(latitude).toFixed(5) + "," +
+        Number(longitude).toFixed(5);
+
+      if (locationNameCache.has(cacheKey)) {
+        return locationNameCache.get(cacheKey);
+      }
+
+      try {
+        const url =
+          "https://nominatim.openstreetmap.org/reverse" +
+          "?format=jsonv2" +
+          "&lat=" + encodeURIComponent(latitude) +
+          "&lon=" + encodeURIComponent(longitude) +
+          "&zoom=14" +
+          "&addressdetails=1" +
+          "&accept-language=ja";
+
+        const response = await fetch(url, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("位置名取得エラー：" + response.status);
+        }
+
+        const data = await response.json();
+        const address = data.address || {};
+
+        const prefecture =
+          address.province ||
+          address.state ||
+          "";
+
+        const municipality =
+          address.city ||
+          address.town ||
+          address.village ||
+          address.municipality ||
+          "";
+
+        const district =
+          address.city_district ||
+          address.suburb ||
+          address.quarter ||
+          "";
+
+        const parts = [
+          prefecture,
+          municipality,
+          district
+        ].filter(Boolean);
+
+        const locationName =
+          parts.length > 0
+            ? parts.join("") + "付近"
+            : data.display_name
+              ? data.display_name + "付近"
+              : "位置名を取得できません";
+
+        locationNameCache.set(cacheKey, locationName);
+
+        return locationName;
+
+      } catch (error) {
+        console.error("位置名取得エラー:", error);
+        return "位置名を取得できません";
+      }
+    }
+
+    function updatePhotoDebug() {
+      const photoDebug = document.getElementById("photoDebug");
+
+      if (!photoDebug) {
+        return;
+      }
+
+      if (selectedPhotoContexts.length === 0) {
+        photoDebug.innerHTML = "まだ写真を選択していません。";
+        return;
+      }
+
+      let html = "";
+
+      selectedPhotoContexts.forEach(function(context, index) {
+        html += "<div class='history-item'>";
+
+        html += "<b>写真" + (index + 1) + "</b><br>";
+        html += "ファイル名：" + escapeHtml(context.fileName) + "<br><br>";
+
+        html += "<b>撮影日時</b><br>";
+        html += (
+          context.takenDate
+            ? formatFullDateTimeJST(context.takenDate)
+            : "取得できません"
+        ) + "<br><br>";
+
+        html += "<b>撮影場所</b><br>";
+        html += escapeHtml(
+          context.locationName || "取得できません"
+        ) + "<br><br>";
+
+        html += "<b>カレンダー照合</b><br>";
+
+        if (!isCalendarConnected) {
+          html += "Googleカレンダー未連携<br>";
+        } else if (context.relatedEvent) {
+          html += "関連予定：" +
+            escapeHtml(
+              context.relatedEvent.summary || "タイトルなし"
+            ) +
+            "<br>";
+
+          if (
+            context.relatedEvent.start?.dateTime &&
+            context.relatedEvent.end?.dateTime
+          ) {
+            html += "予定時間：" +
+              formatTime(context.relatedEvent.start.dateTime) +
+              " ～ " +
+              formatTime(context.relatedEvent.end.dateTime) +
+              "<br>";
+          } else {
+            html += "予定時間：終日<br>";
+          }
+        } else {
+          html += "撮影日の関連予定：なし<br>";
+        }
+
+        html += "</div>";
+      });
+
+      photoDebug.innerHTML = html;
+    }
+
+    // ==============================
+    // 日時を日本時間で表示
+    // ==============================
+    function formatFullDateTimeJST(dateValue) {
+      if (!dateValue) {
+        return "取得できません";
+      }
+
+      const date = new Date(dateValue);
+
+      if (isNaN(date.getTime())) {
+        return String(dateValue);
+      }
+
+      const parts = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: APP_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).formatToParts(date);
+
+      const values = {};
+
+      parts.forEach(function(part) {
+        values[part.type] = part.value;
+      });
+
+      return (
+        values.year + "/" +
+        values.month + "/" +
+        values.day + " " +
+        values.hour + ":" +
+        values.minute + ":" +
+        values.second +
+        "（日本時間）"
+      );
+    }
+
+    function formatDateTimeForAI(dateValue) {
+      if (!dateValue) {
+        return null;
+      }
+
+      const date = new Date(dateValue);
+
+      if (isNaN(date.getTime())) {
+        return String(dateValue);
+      }
+
+      const weekday = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: APP_TIME_ZONE,
+        weekday: "short"
+      }).format(date);
+
+      const dateText = new Intl.DateTimeFormat("ja-JP", {
+        timeZone: APP_TIME_ZONE,
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(date);
+
+      return dateText + "（" + weekday + "・日本時間）";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeRegExp(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function formatScoreReason(reason) {
+      if (!reason || String(reason).trim() === "") {
+        return "<p>評価理由を取得できませんでした。</p>";
+      }
+
+      let text = String(reason)
+        .replace(/\bemotion\b\s*[:：]?/gi, "感情：")
+        .replace(/\blearning\b\s*[:：]?/gi, "学び：")
+        .replace(/\bmeaning\b\s*[:：]?/gi, "学び：")
+        .replace(/\brarity\b\s*[:：]?/gi, "希少性：")
+        .replace(/\brelationship\b\s*[:：]?/gi, "人間関係：")
+        .replace(/\bfuture\b\s*[:：]?/gi, "将来への影響：")
+        .replace(/\bfutureImpact\b\s*[:：]?/gi, "将来への影響：");
+
+      const labels = [
+        "感情",
+        "学び",
+        "希少性",
+        "人間関係",
+        "将来への影響"
+      ];
+
+      const labelPattern = labels
+        .map(function(label) {
+          return escapeRegExp(label);
+        })
+        .join("|");
+
+      const reasonMap = {};
+
+      labels.forEach(function(label) {
+        const pattern = new RegExp(
+          escapeRegExp(label) +
+          "\\s*[:：]\\s*([\\s\\S]*?)(?=(?:" +
+          labelPattern +
+          ")\\s*[:：]|$)",
+          "i"
+        );
+
+        const match = text.match(pattern);
+
+        if (match && match[1] && match[1].trim() !== "") {
+          reasonMap[label] = match[1].trim();
+        }
+      });
+
+      const orderedHtml = labels
+        .filter(function(label) {
+          return reasonMap[label];
+        })
+        .map(function(label) {
+          return (
+            "<p class=\"score-reason-line\">" +
+            "<b>" + label + "：</b><br>" +
+            escapeHtml(reasonMap[label]) +
+            "</p>"
+          );
+        })
+        .join("");
+
+      if (orderedHtml) {
+        return orderedHtml;
+      }
+
+      text = text
+        .replace(/感情\s*[:：]/g, "\n感情：")
+        .replace(/学び\s*[:：]/g, "\n学び：")
+        .replace(/希少性\s*[:：]/g, "\n希少性：")
+        .replace(/人間関係\s*[:：]/g, "\n人間関係：")
+        .replace(/将来への影響\s*[:：]/g, "\n将来への影響：")
+        .trim();
+
+      return "<p>" + escapeHtml(text).replace(/\n/g, "<br>") + "</p>";
+    }
+
+    // ==============================
+    // サーバー接続確認
+    // ==============================
+    function extractServerVersion(responseText) {
+      const text = String(responseText || "");
+
+      const match =
+        text.match(/Version:\s*([^<\n]+)/i) ||
+        text.match(/serverVersion["']?\s*[:：]\s*["']([^"']+)/i);
+
+      return match && match[1]
+        ? match[1].trim()
+        : "取得できません";
+    }
+
+    function translateConnectionError(error) {
+      const message = String(error?.message || error || "");
+
+      if (/failed to fetch/i.test(message)) {
+        return "サーバーから応答を受け取れませんでした";
+      }
+
+      if (/network/i.test(message)) {
+        return "ネットワーク通信に失敗しました";
+      }
+
+      if (/timeout/i.test(message)) {
+        return "接続が時間切れになりました";
+      }
+
+      return message || "原因を取得できませんでした";
+    }
+
+    async function testServerConnection() {
+      try {
+        updateDebug(
+          "状態：接続確認中<br>" +
+          "AIサーバー：応答を確認しています"
+        );
+
+        const response = await fetch(AI_SERVER_ROOT);
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(
+            "サーバーがエラーを返しました（状態コード：" +
+            response.status +
+            "）"
+          );
+        }
+
+        const serverVersion = extractServerVersion(responseText);
+
+        updateDebug(
+          "状態：接続済み<br>" +
+          "AIサーバー：正常に動作しています<br>" +
+          "通信結果：成功<br>" +
+          "状態コード：" + response.status + "<br>" +
+          "サーバーバージョン：" + escapeHtml(serverVersion)
+        );
+
+        ons.notification.toast(
+          "AIサーバーとの接続を確認しました",
+          { timeout: 1500 }
+        );
+
+      } catch (error) {
+        updateDebug(
+          "状態：接続できません<br>" +
+          "AIサーバー：応答なし<br>" +
+          "原因：" + escapeHtml(translateConnectionError(error)) + "<br>" +
+          "確認事項：Renderのサーバーが起動しているか確認してください"
+        );
+
+        ons.notification.alert(
+          "AIサーバーに接続できませんでした"
+        );
+      }
+    }
+
+    // ==============================
+    // AIによる思い出評価
+    // ==============================
+    async function addMemoryByAI() {
+      const files = document.getElementById("photoInput").files;
+      const memo = document.getElementById("memo").value;
+      const category = document.getElementById("category").value;
+      const selectedPriority = document.querySelector(
+        'input[name="userPriority"]:checked'
+      );
+
+      if (files.length === 0) {
+        ons.notification.alert("思い出を判断する写真を1枚以上選択してください");
+        return;
+      }
+
+      if (memo.trim() === "") {
+        ons.notification.alert("思い出メモを入力してください");
+        return;
+      }
+
+      if (!selectedPriority) {
+        ons.notification.alert("最も大切な要素を1つ選択してください");
+        return;
+      }
+
+      const userPriority = selectedPriority.value;
+
+      try {
+        setLoading(true);
+        updateDebug(
+          "状態：思い出を評価中<br>" +
+          "AIサーバー：写真と情報を送信しています"
+        );
+
+        const rawAIResult = await analyzeWithAI(
+          files,
+          category,
+          memo,
+          userPriority
+        );
+
+        const aiResult = normalizeAIResult(rawAIResult);
+
+        console.log("AI結果:", aiResult);
+
+        updateDebug(
+          "状態：評価完了<br>" +
+          "AIサーバー：正常に評価しました<br>" +
+          "思い出タイトル：" + escapeHtml(aiResult.memoryTitle) + "<br>" +
+          "思い出価値：" + aiResult.totalScore + " / 25<br>" +
+          "重視した要素：" +
+          escapeHtml(CRITERIA_LABELS[userPriority])
+        );
+
+        const memory = {
+          category,
+          memo,
+          photoCount: files.length,
+
+          // 評価時にAIへ送信した本人情報を記録
+          userProfile: {
+            birthday: userProfile.birthday,
+            age: userProfile.age,
+            gender: userProfile.gender,
+            job: userProfile.job
+          },
+
+          userPriority,
+          userPriorityLabel: CRITERIA_LABELS[userPriority],
+
+          memoryTitle: aiResult.memoryTitle,
+          memorySummary: aiResult.memorySummary,
+          contextMeaning: aiResult.contextMeaning,
+          valueReason: aiResult.valueReason,
+
+          emotion: aiResult.emotion,
+          learning: aiResult.learning,
+          relationship: aiResult.relationship,
+          future: aiResult.future,
+          rarity: aiResult.rarity,
+
+          score: aiResult.totalScore,
+          totalScore: aiResult.totalScore,
+          reason: aiResult.reason,
+          usedMemoryHistory:
+            aiResult.usedMemoryHistory,
+
+          historyReferenceReason:
+            aiResult.historyReferenceReason,
+
+          /*
+            今回の評価で使用した過去履歴情報を保存する。
+            サーバーが未対応の場合は空のまま保存される。
+          */
+          historyCountUsed: Number(
+            rawAIResult.historyCountUsed || 0
+          ),
+
+          learnedValueProfile:
+            rawAIResult.learnedValueProfile || null,
+
+          comparison: {
+            baseline:
+              rawAIResult.baseline || null,
+
+            withProfile:
+              rawAIResult.withProfile || null,
+
+            withLearnedHistory:
+              rawAIResult.withLearnedHistory || null,
+
+            profileDifference:
+              rawAIResult.profileDifference || null,
+
+            learningDifference:
+              rawAIResult.learningDifference || null,
+
+            totalDifference:
+              rawAIResult.totalDifference || null
+          },
+
+          // 5項目のうち最も高かった評価項目
+          primaryCriterion: getPrimaryCriterion(aiResult, userPriority),
+
+          photoContexts: selectedPhotoContexts,
+          date: new Date().toLocaleString("ja-JP")
+        };
+
+        memories.unshift(memory);
+        totalScore += aiResult.totalScore;
+
+        localStorage.setItem(
+          STORAGE_KEYS.memories,
+          JSON.stringify(memories)
+        );
+        localStorage.setItem(
+          STORAGE_KEYS.totalScore,
+          String(totalScore)
+        );
+
+        showAIResult(rawAIResult);
+        clearInputForm();
+        updateDisplay();
+
+        ons.notification.toast(
+          "1つの思い出を価値の砂に変えました",
+          { timeout: 1800 }
+        );
+
+      } catch (error) {
+        console.error(error);
+
+        updateDebug(
+          "状態：評価できません<br>" +
+          "AIサーバー：処理中にエラーが発生しました<br>" +
+          "エラー内容：" +
+          escapeHtml(translateConnectionError(error)) + "<br>" +
+          "確認事項：サーバー設定とRenderの記録を確認してください"
+        );
+
+        ons.notification.alert("思い出のAI評価に失敗しました");
+
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function analyzeWithAI(files, category, memo, userPriority) {
+      refreshProfileAge();
+
+      const formData = new FormData();
+
+      Array.from(files).forEach(function(file) {
+        formData.append("photos", file);
+      });
+
+      formData.append("category", category);
+      formData.append("memo", memo);
+      formData.append("userPriority", userPriority);
+      formData.append(
+        "userPriorityLabel",
+        CRITERIA_LABELS[userPriority] || userPriority
+      );
+
+      formData.append("evaluationUnit", "memory");
+      formData.append("maxMemoryScore", "25");
+      formData.append(
+        "userProfile",
+        JSON.stringify(userProfile)
+      );
+
+      /*
+        過去の思い出を最大20件、AIサーバーへ送信する。
+        写真そのものではなく、保存済みの評価結果・メモ・理由を送る。
+      */
+      const memoryHistoryForAI = memories
+        .slice(0, MAX_HISTORY_FOR_AI)
+        .map(function(memory) {
+          return {
+            category: memory.category || "",
+            memo: memory.memo || "",
+            memoryTitle: memory.memoryTitle || "",
+            memorySummary: memory.memorySummary || "",
+            contextMeaning: memory.contextMeaning || "",
+            valueReason: memory.valueReason || "",
+
+            emotion: Number(memory.emotion || 0),
+
+            learning: Number(
+              memory.learning ??
+              memory.meaning ??
+              memory.experience ??
+              0
+            ),
+
+            rarity: Number(
+              memory.rarity ??
+              memory.special ??
+              0
+            ),
+
+            relationship: Number(
+              memory.relationship ??
+              memory.people ??
+              0
+            ),
+
+            future: Number(memory.future || 0),
+
+            totalScore: Number(
+              memory.totalScore ??
+              memory.score ??
+              0
+            ),
+
+            primaryCriterion:
+              memory.primaryCriterion || "",
+
+            userPriority:
+              memory.userPriority || "",
+historyReferenceReason:
+              memory.historyReferenceReason || "",
+
+            correctionReason:
+              memory.correctionReason || "",
+
+            date:
+              memory.date || ""
+          };
+        });
+
+      formData.append(
+        "memoryHistory",
+        JSON.stringify(memoryHistoryForAI)
+      );
+
+      const photoContextsForAI = selectedPhotoContexts.map(function(context) {
+        return {
+          ...context,
+          takenDateJST:
+            context.takenDate
+              ? formatDateTimeForAI(context.takenDate)
+              : null,
+          timeZone: APP_TIME_ZONE
+        };
+      });
+
+      formData.append(
+        "photoContexts",
+        JSON.stringify(photoContextsForAI)
+      );
+
+      const response = await fetch(AI_SERVER_URL, {
+        method: "POST",
+        body: formData
+      });
+
+      const responseText = await response.text();
+
+      console.log("サーバー応答:");
+      console.log(responseText);
+
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status + " : " + responseText);
+      }
+
+      try {
+        const cleanedText = responseText
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```\s*$/, "")
+          .trim();
+
+        return JSON.parse(cleanedText);
+
+      } catch (error) {
+        throw new Error("JSON解析失敗: " + responseText);
+      }
+    }
+
+    function normalizeAIResult(rawResult) {
+      const source =
+        rawResult?.data?.result ||
+        rawResult?.data ||
+        rawResult?.result ||
+        rawResult?.analysis ||
+        rawResult;
+
+      if (!source || typeof source !== "object") {
+        throw new Error("AI結果の形式が正しくありません");
+      }
+
+      const scoreSource =
+        source.score && typeof source.score === "object"
+          ? source.score
+          : source.scores && typeof source.scores === "object"
+            ? source.scores
+            : source;
+
+      const getText = function(...values) {
+        const found = values.find(function(value) {
+          return typeof value === "string" && value.trim() !== "";
+        });
+
+        return found ? found.trim() : "取得できません";
+      };
+
+      const getNumber = function(...values) {
+        const found = values.find(function(value) {
+          return (
+            value !== undefined &&
+            value !== null &&
+            value !== "" &&
+            !Number.isNaN(Number(value))
+          );
+        });
+
+        return found === undefined ? 0 : Number(found);
+      };
+
+      /*
+        新旧のレスポンス形式に対応し、
+        最初に見つかった有効な点数を使用する。
+      */
+      const clampFive = function(...values) {
+        return Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(
+              getNumber(...values)
+            )
+          )
+        );
+      };
+
+      const emotion = clampFive(
+        scoreSource.emotion
+      );
+
+      const relationship = clampFive(
+        scoreSource.relationship,
+        scoreSource.people,
+        scoreSource.connection
+      );
+
+      const learning = clampFive(
+        scoreSource.learning,
+        scoreSource.meaning,
+        scoreSource.meaningLearning,
+        scoreSource.experience
+      );
+
+      const rarity = clampFive(
+        scoreSource.rarity,
+        scoreSource.memory,
+        scoreSource.special
+      );
+
+      const future = clampFive(
+        scoreSource.future,
+        scoreSource.futureImpact,
+        scoreSource.growth
+      );
+
+      /*
+        表示する5項目から合計点を再計算し、
+        項目点と合計点の不一致を防ぐ。
+      */
+      const calculatedTotal =
+        emotion +
+        learning +
+        rarity +
+        relationship +
+        future;
+
+      const totalScore = Math.max(
+        0,
+        Math.min(
+          25,
+          Math.round(calculatedTotal)
+        )
+      );
+
+      const normalized = {
+        memoryTitle: getText(
+          source.memoryTitle,
+          source.memory_title,
+          source.title,
+          source["思い出タイトル"],
+          source["思い出名"]
+        ),
+
+        memorySummary: getText(
+          source.memorySummary,
+          source.memory_summary,
+          source.summary,
+          source.photoSummary,
+          source.photo_summary,
+          source["思い出の概要"],
+          source["写真の意味"]
+        ),
+
+        contextMeaning: getText(
+          source.contextMeaning,
+          source.context_meaning,
+          source.context,
+          source["文脈から見た意味"],
+          source["文脈的な意味"]
+        ),
+
+        valueReason: getText(
+          source.valueReason,
+          source.value_reason,
+          source.timeValueReason,
+          source.time_value_reason,
+          source.value,
+          source["時間価値としての理由"],
+          source["時間価値の理由"]
+        ),
+
+        emotion,
+        relationship,
+        learning,
+        rarity,
+        future,
+        totalScore,
+
+        reason: getText(
+          source.reason,
+          source.scoreReason,
+          source.score_reason,
+          source["評価理由"]
+        ),
+usedMemoryHistory:
+          source.usedMemoryHistory === true,
+
+        historyReferenceReason: getText(
+          source.historyReferenceReason,
+          source.history_reference_reason,
+          source["過去履歴の利用理由"]
+        )
+      };
+
+      if (
+        normalized.memoryTitle === "取得できません" &&
+        normalized.memorySummary !== "取得できません"
+      ) {
+        normalized.memoryTitle = normalized.memorySummary.slice(0, 24);
+      }
+
+      if (
+        normalized.memorySummary === "取得できません" &&
+        normalized.reason !== "取得できません"
+      ) {
+        normalized.memorySummary = normalized.reason;
+      }
+
+      if (
+        normalized.contextMeaning === "取得できません" &&
+        normalized.reason !== "取得できません"
+      ) {
+        normalized.contextMeaning = normalized.reason;
+      }
+
+      if (
+        normalized.valueReason === "取得できません" &&
+        normalized.reason !== "取得できません"
+      ) {
+        normalized.valueReason = normalized.reason;
+      }
+
+
+      return normalized;
+    }
+
+    // ==============================
+    // 表示更新
+    // ==============================
+    function updateDisplay() {
+      updateTimeDisplay();
+      updateValueDisplay();
+      renderHistory();
+    }
+
+    function updateDebug(text) {
+      console.log(text);
+      document.getElementById("debugText").innerHTML = text;
+    }
+
+    function getProfileDisplayValue(value) {
+      if (value === undefined || value === null || String(value).trim() === "") {
+        return "未設定";
+      }
+
+      return String(value);
+    }
+
+    function createProfileResultHtml(profile = userProfile) {
+      const birthdayText =
+        getProfileDisplayValue(profile?.birthday);
+
+      const ageText =
+        getProfileDisplayValue(profile?.age) === "未設定"
+          ? "未設定"
+          : getProfileDisplayValue(profile?.age) + "歳";
+
+      const genderText = getProfileDisplayValue(profile?.gender);
+      const jobText = getProfileDisplayValue(profile?.job);
+
+      return `
+        <div class="profile-result-box">
+          <h4>AIに送信した本人情報</h4>
+          <p class="profile-result-row"><b>誕生日：</b>${escapeHtml(birthdayText)}</p>
+          <p class="profile-result-row"><b>年齢：</b>${escapeHtml(ageText)}</p>
+          <p class="profile-result-row"><b>性別：</b>${escapeHtml(genderText)}</p>
+          <p class="profile-result-row"><b>職業：</b>${escapeHtml(jobText)}</p>
+          <p class="profile-result-note">
+            この欄は、今回の評価時にアプリからAIサーバーへ送信したプロフィール情報を表示しています。
+          </p>
+        </div>
+      `;
+    }
+
+    function formatDifferenceValue(value) {
+      const number = Number(value || 0);
+
+      if (number > 0) {
+        return "+" + number;
+      }
+
+      return String(number);
+    }
+
+    function createLearningComparisonHtml(result) {
+      const baseline = result?.baseline;
+      const withProfile = result?.withProfile;
+      const withHistory = result?.withLearnedHistory;
+      const learningDifference = result?.learningDifference;
+      const learnedProfile = result?.learnedValueProfile;
+
+      if (!baseline || !withProfile || !withHistory) {
+        return `
+          <div class="learning-result-box">
+            <h4>過去の思い出の学習状態</h4>
+            <p class="learning-result-row">
+              過去の思い出はAIサーバーへ送信しています。
+            </p>
+            <p class="profile-result-note">
+              比較結果を表示するには、サーバー側も
+              baseline・withProfile・withLearnedHistoryを
+              返す形式へ変更する必要があります。
+            </p>
+          </div>
+        `;
+      }
+
+      const averages = learnedProfile?.averages || {};
+
+      return `
+        <div class="learning-result-box">
+          <h4>過去の思い出による個人適応</h4>
+
+          <p class="learning-result-row">
+            <b>基本評価：</b>
+            ${Number(baseline.totalScore || 0)} / 25
+          </p>
+
+          <p class="learning-result-row">
+            <b>プロフィールあり：</b>
+            ${Number(withProfile.totalScore || 0)} / 25
+          </p>
+
+          <p class="learning-result-row">
+            <b>プロフィール＋過去の思い出：</b>
+            ${Number(withHistory.totalScore || 0)} / 25
+          </p>
+
+          <p class="learning-result-row learning-result-difference">
+            過去履歴による変化：
+            ${formatDifferenceValue(
+              learningDifference?.totalScore
+            )}点
+          </p>
+
+          <p class="learning-result-row">
+            <b>使用した過去の思い出：</b>
+            ${Number(result.historyCountUsed || 0)}件
+          </p>
+
+          ${
+            learnedProfile
+              ? `
+                <div class="learning-profile-grid">
+                  <div class="learning-profile-item">
+                    感情：${Number(averages.emotion || 0)} / 5
+                  </div>
+
+                  <div class="learning-profile-item">
+                    学び：${Number(
+                      averages.learning ??
+                      averages.meaning ??
+                      0
+                    )} / 5
+                  </div>
+
+                  <div class="learning-profile-item">
+                    希少性：${Number(averages.rarity || 0)} / 5
+                  </div>
+
+                  <div class="learning-profile-item">
+                    人間関係：${Number(averages.relationship || 0)} / 5
+                  </div>
+
+                  <div class="learning-profile-item">
+                    将来への影響：${Number(averages.future || 0)} / 5
+                  </div>
+
+                  <div class="learning-profile-item">
+                    平均合計：${Number(averages.totalScore || 0)} / 25
+                  </div>
+                </div>
+
+                <p class="profile-result-note">
+                  ${escapeHtml(
+                    learnedProfile.summary ||
+                    "過去の思い出から価値傾向を集計しています。"
+                  )}
+                </p>
+              `
+              : ""
+          }
+        </div>
+      `;
+    }
+
+function showAIResult(result) {
+      const box = document.getElementById("aiResultBox");
+      const text = document.getElementById("aiResultText");
+      const normalized = normalizeAIResult(result);
+
+      box.style.display = "block";
+
+      text.innerHTML = `
+
+        <h4>思い出タイトル</h4>
+        <p><b>${escapeHtml(normalized.memoryTitle)}</b></p>
+
+        <h4>思い出の概要</h4>
+        <p>${escapeHtml(normalized.memorySummary)}</p>
+
+        <h4>文脈から分かる意味</h4>
+        <p>${escapeHtml(normalized.contextMeaning)}</p>
+
+        <h4>時間価値としての理由</h4>
+        <p>${escapeHtml(normalized.valueReason)}</p>
+
+        <hr>
+
+        <h3>思い出価値：${normalized.totalScore} / 25</h3>
+        <p class="score-line">感情：${normalized.emotion} / 5</p>
+        <p class="score-line">学び：${normalized.learning} / 5</p>
+        <p class="score-line">希少性：${normalized.rarity} / 5</p>
+        <p class="score-line">人間関係：${normalized.relationship} / 5</p>
+        <p class="score-line">将来への影響：${normalized.future} / 5</p>
+
+        <h4>点数評価の理由</h4>
+        <div>${formatScoreReason(normalized.reason)}</div>
+      `;
+    }
+
+    function updateValueDisplay() {
+      document.getElementById("totalScore").textContent = totalScore;
+
+      renderValueSand();
+
+      const message = document.getElementById("message");
+
+      if (totalScore === 0) {
+        message.textContent = "まだ価値の砂はたまっていません";
+      } else if (totalScore < 100) {
+        message.textContent = "5つの価値が色と粒の大きさで積み重なっています";
+      } else if (totalScore < 250) {
+        message.textContent = "価値の構成が砂の色として見えてきました";
+      } else if (totalScore < 400) {
+        message.textContent = "多様な価値を持つ思い出が積み重なっています";
+      } else {
+        message.textContent = "濃い思い出の価値が砂時計を満たしています";
+      }
+    }
+
+    function getMemoryCriterionScores(memory) {
+      return {
+        emotion: clampCriterionScore(memory?.emotion),
+        learning: clampCriterionScore(
+          memory?.learning ??
+          memory?.meaning ??
+          memory?.experience
+        ),
+        rarity: clampCriterionScore(
+          memory?.rarity ??
+          memory?.special
+        ),
+        relationship: clampCriterionScore(
+          memory?.relationship ??
+          memory?.people
+        ),
+        future: clampCriterionScore(memory?.future)
+      };
+    }
+
+    function clampCriterionScore(value) {
+      return Math.max(
+        0,
+        Math.min(5, Math.round(Number(value || 0)))
+      );
+    }
+
+    function getGrainSize(score) {
+      // 1点=6px、5点=18px。0点は表示しない。
+      return 3 + score * 3;
+    }
+
+    function seededRandom(seed) {
+      const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+      return value - Math.floor(value);
+    }
+
+    function createValueGrains() {
+      const grains = [];
+      const memoriesOldestFirst = [...memories].reverse();
+
+      memoriesOldestFirst.forEach(function(memory, memoryIndex) {
+        const scores = getMemoryCriterionScores(memory);
+
+        CRITERIA_ORDER.forEach(function(criterion, criterionIndex) {
+          const score = scores[criterion];
+
+          if (score <= 0) {
+            return;
+          }
+
+          for (
+            let copyIndex = 0;
+            copyIndex < GRAINS_PER_CRITERION;
+            copyIndex++
+          ) {
+            grains.push({
+              criterion,
+              score,
+              seed:
+                (memoryIndex + 1) * 101 +
+                criterionIndex * 17 +
+                copyIndex * 7
+            });
+          }
+        });
+      });
+
+      // 多数の記録でも描画負荷が増えすぎないよう、古い粒から間引く。
+      return grains.slice(-MAX_VISIBLE_GRAINS);
+    }
+
+    function renderValueSand() {
+      const bottomSand = document.getElementById("bottomSand");
+      if (!bottomSand) return;
+
+      bottomSand.innerHTML = "";
+
+      const memoriesOldestFirst = [...memories].reverse();
+
+      memoriesOldestFirst.slice(-MAX_VISIBLE_GRAINS).forEach(function(memory, index) {
+
+        const criterion =
+          memory.primaryCriterion ||
+          getPrimaryCriterion(memory, memory.userPriority || "");
+
+        const score = Number(
+          memory.totalScore ??
+          memory.score ??
+          0
+        );
+
+        const rowHeight = 16;
+        const grainsPerRow = 11;
+        const row = Math.floor(index / grainsPerRow);
+        const col = index % grainsPerRow;
+
+        const bottom = 8 + row * rowHeight;
+        const center = 95;
+        const spread = 65 - Math.min(bottom / 144,1) * 55;
+        const ratio = grainsPerRow===1 ? 0 : (col/(grainsPerRow-1))*2-1;
+
+        const grain = document.createElement("span");
+        grain.className = "value-grain " + criterion;
+
+        let size = 8;
+        if(score>=21) size=20;
+        else if(score>=16) size=17;
+        else if(score>=11) size=14;
+        else if(score>=6) size=11;
+
+        grain.style.width=size+"px";
+        grain.style.height=size+"px";
+        grain.style.left=(center+ratio*spread)+"px";
+        grain.style.bottom=bottom+"px";
+        grain.title=(CRITERIA_LABELS[criterion]||"")+"："+score+" /25";
+
+        bottomSand.appendChild(grain);
+      });
+    }
+
+    function getPrimaryCriterion(scoreData, preferredCriterion = "") {
+      const scores = {
+        emotion: Number(scoreData?.emotion || 0),
+        learning: Number(
+          scoreData?.learning ??
+          scoreData?.meaning ??
+          scoreData?.experience ??
+          0
+        ),
+        rarity: Number(
+          scoreData?.rarity ??
+          scoreData?.special ??
+          0
+        ),
+        relationship: Number(
+          scoreData?.relationship ??
+          scoreData?.people ??
+          0
+        ),
+        future: Number(scoreData?.future || 0)
+      };
+
+      const criterionOrder = [
+        "emotion",
+        "learning",
+        "rarity",
+        "relationship",
+        "future"
+      ];
+
+      const highestScore = Math.max(
+        ...criterionOrder.map(function(key) {
+          return scores[key];
+        })
+      );
+
+      const highestCriteria = criterionOrder.filter(function(key) {
+        return scores[key] === highestScore;
+      });
+
+      /*
+        同点の場合は、ユーザーが重視した項目が
+        最高点の中にあれば、その項目を代表項目にする。
+      */
+      if (
+        preferredCriterion &&
+        highestCriteria.includes(preferredCriterion)
+      ) {
+        return preferredCriterion;
+      }
+
+      return highestCriteria[0] || "emotion";
+    }
+
+    function setHistoryFilter(filterName) {
+      currentHistoryFilter = filterName;
+
+      document
+        .querySelectorAll("#historyFilter button")
+        .forEach(function(button) {
+          button.classList.toggle(
+            "active",
+            button.dataset.filter === filterName
+          );
+        });
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = document.getElementById("history");
+      history.innerHTML = "";
+
+      if (memories.length === 0) {
+        history.innerHTML =
+          "<p class='history-empty'>まだ思い出の記録はありません。</p>";
+        return;
+      }
+
+      const filteredMemories = memories.filter(function(memory) {
+        if (currentHistoryFilter === "all") {
+          return true;
+        }
+
+        const primaryCriterion =
+          memory.primaryCriterion ||
+          getPrimaryCriterion(
+            memory,
+            memory.userPriority || ""
+          );
+
+        return primaryCriterion === currentHistoryFilter;
+      });
+
+      if (filteredMemories.length === 0) {
+        history.innerHTML =
+          "<p class='history-empty'>" +
+          escapeHtml(
+            CRITERIA_LABELS[currentHistoryFilter] || "選択中"
+          ) +
+          "に該当する記録はありません。</p>";
+        return;
+      }
+
+      filteredMemories.forEach(function(memory) {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        const title =
+          memory.memoryTitle ||
+          memory.summary ||
+          "思い出";
+
+        const summary =
+          memory.memorySummary ||
+          memory.summary ||
+          "なし";
+
+        const emotion = Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(Number(memory.emotion || 0))
+          )
+        );
+
+        const learning = Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(
+              Number(
+                memory.learning ??
+                memory.meaning ??
+                memory.experience ??
+                0
+              )
+            )
+          )
+        );
+
+        const rarity = Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(
+              Number(
+                memory.rarity ??
+                memory.special ??
+                0
+              )
+            )
+          )
+        );
+
+        const relationship = Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(
+              Number(
+                memory.relationship ??
+                memory.people ??
+                0
+              )
+            )
+          )
+        );
+
+        const future = Math.max(
+          0,
+          Math.min(
+            5,
+            Math.round(Number(memory.future || 0))
+          )
+        );
+
+        const score =
+          emotion +
+          learning +
+          rarity +
+          relationship +
+          future;
+
+        const primaryCriterion =
+          memory.primaryCriterion ||
+          getPrimaryCriterion(
+            {
+              emotion,
+              learning,
+              rarity,
+              relationship,
+              future
+            },
+            memory.userPriority || ""
+          );
+
+        div.innerHTML = `
+          <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+
+          <h4>${escapeHtml(title)}</h4>
+
+          <span class="primary-criterion">
+            主な評価：${escapeHtml(
+              CRITERIA_LABELS[primaryCriterion] || "未分類"
+            )}
+          </span>
+
+          <p><b>思い出メモ：</b>${escapeHtml(memory.memo || "なし")}</p>
+          <p><b>思い出の概要：</b>${escapeHtml(summary)}</p>
+          <p><b>文脈的な意味：</b>${escapeHtml(memory.contextMeaning || "なし")}</p>
+          <p><b>時間価値の理由：</b>${escapeHtml(memory.valueReason || "なし")}</p>
+          <p>判断に使用した写真：${Number(memory.photoCount || 0)}枚</p>
+
+
+          <p><b>ユーザーが重視した要素：</b>${escapeHtml(
+            memory.userPriorityLabel ||
+            CRITERIA_LABELS[memory.userPriority] ||
+            "未選択"
+          )}</p>
+
+          ${
+            Number(memory.historyCountUsed || 0) > 0
+              ? `
+                <p>
+                  <b>判断に使用した過去の思い出：</b>
+                  ${Number(memory.historyCountUsed)}件
+                </p>
+              `
+              : ""
+          }
+
+          <p><b>思い出価値：${score} / 25</b></p>
+          <p>感情：${emotion} / 5</p>
+          <p>学び：${learning} / 5</p>
+          <p>希少性：${rarity} / 5</p>
+          <p>人間関係：${relationship} / 5</p>
+          <p>将来への影響：${future} / 5</p>
+
+          <p><b>点数評価の理由：</b></p>
+          <div>${formatScoreReason(memory.reason || "なし")}</div>
+
+          <small>${escapeHtml(memory.date || "")}</small>
+        `;
+
+        history.appendChild(div);
+      });
+    }
+
+    // ==============================
+    // タイマー
+    // ==============================
+    function startTimer() {
+      setInterval(function() {
+        if (remainingTime > 0) {
+          remainingTime--;
+          localStorage.setItem(
+        STORAGE_KEYS.remainingTime,
+        remainingTime
+      );
+        }
+
+        updateTimeDisplay();
+      }, 1000);
+    }
+
+    function updateTimeDisplay() {
+      if (remainingTime < 0) {
+        remainingTime = 0;
+      }
+
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+
+      document.getElementById("timeText").textContent =
+        String(minutes).padStart(2, "0") + ":" +
+        String(seconds).padStart(2, "0");
+
+      const lostPercent = 100 - (remainingTime / TOTAL_LIFE_TIME) * 100;
+
+      document.getElementById("topSand").style.clipPath =
+        "inset(" + lostPercent + "% 0 0 0)";
+
+      const neckSand = document.getElementById("neckSand");
+
+      if (remainingTime === 0) {
+        neckSand.classList.add("stop");
+      } else {
+        neckSand.classList.remove("stop");
+      }
+    }
+
+    // ==============================
+    // 補助関数
+    // ==============================
+    function readStorageJson(key, fallbackValue) {
+      try {
+        const storedValue = localStorage.getItem(key);
+
+        if (!storedValue) {
+          return fallbackValue;
+        }
+
+        const parsedValue = JSON.parse(storedValue);
+
+        return parsedValue ?? fallbackValue;
+
+      } catch (error) {
+        console.error(
+          "保存データの読み込みに失敗しました:",
+          key,
+          error
+        );
+
+        return fallbackValue;
+      }
+    }
+
+    function setLoading(isLoading) {
+      const main = document.getElementById("appMain");
+
+      if (isLoading) {
+        main.classList.add("loading");
+
+        ons.notification.toast(
+          "AIが写真から1つの思い出を評価中です",
+          { timeout: 1200 }
+        );
+
+      } else {
+        main.classList.remove("loading");
+      }
+    }
+
+    function clearInputForm() {
+      document.getElementById("memo").value = "";
+      document.getElementById("photoInput").value = "";
+      document.getElementById("previewArea").innerHTML = "";
+      document.getElementById("photoCount").textContent =
+        "選択された写真：0枚";
+
+      document
+        .querySelectorAll('input[name="userPriority"]')
+        .forEach(function(input) {
+          input.checked = false;
+        });
+
+      selectedPhotoContexts = [];
+
+      const photoDebug = document.getElementById("photoDebug");
+
+      if (photoDebug) {
+        photoDebug.innerHTML = "まだ写真を選択していません。";
+      }
+    }
+
+
+
+    window.addEventListener("resize", function() {
+      renderValueSand();
+    });
+
+    // ==============================
+    // リセット
+    // ==============================
+    function resetValueData() {
+      ons.notification.confirm("価値の砂と記録をリセットしますか？")
+        .then(function(answer) {
+          if (answer === 1) {
+            memories = [];
+            totalScore = 0;
+
+            localStorage.removeItem(STORAGE_KEYS.memories);
+            localStorage.removeItem(STORAGE_KEYS.totalScore);
+
+            document.getElementById("aiResultBox").style.display = "none";
+
+            updateDebug("価値の砂と記録をリセットしました。");
+            updateDisplay();
+          }
+        });
+    }
+
+    function resetTimer() {
+      remainingTime = TOTAL_LIFE_TIME;
+      localStorage.setItem(
+        STORAGE_KEYS.remainingTime,
+        remainingTime
+      );
+
+      updateTimeDisplay();
+      updateDebug("残り時間を10:00にリセットしました。");
+    }
+  </script>
+</body>
+</html>

@@ -132,6 +132,105 @@
       background: #ab47bc;
     }
 
+    .value-grain.zero{
+      background:#9e9e9e;
+      border:1px solid rgba(255,255,255,.6);
+    }
+
+    /* =====================================
+       思い出の形
+       ・通常：砂粒
+       ・3〜5回見返し：石
+       ・6回以上見返し：星
+       ・お気に入り：ハート（最優先）
+       ===================================== */
+
+    .value-grain.shape-sand {
+      border-radius: 50%;
+    }
+
+    .value-grain.shape-stone {
+      border-radius: 0;
+      clip-path: polygon(
+        50% 0%,
+        100% 38%,
+        82% 100%,
+        18% 100%,
+        0% 38%
+      );
+    }
+
+    .value-grain.shape-star {
+      border-radius: 0;
+      clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+      );
+    }
+
+    .value-grain.shape-heart {
+      border-radius: 0;
+      clip-path: polygon(
+        50% 92%,
+        42% 84%,
+        18% 63%,
+        7% 48%,
+        5% 33%,
+        10% 20%,
+        20% 11%,
+        33% 9%,
+        43% 14%,
+        50% 23%,
+        57% 14%,
+        67% 9%,
+        80% 11%,
+        90% 20%,
+        95% 33%,
+        93% 48%,
+        82% 63%,
+        58% 84%
+      );
+    }
+
+    .memory-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .memory-action-button {
+      border: 1px solid #c8c8c8;
+      border-radius: 20px;
+      padding: 8px 12px;
+      background: #ffffff;
+      color: #333333;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .memory-action-button.favorite-active {
+      background: #fff0f3;
+      border-color: #ef9a9a;
+      color: #c62828;
+      font-weight: bold;
+    }
+
+    .memory-behavior-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666666;
+      line-height: 1.5;
+    }
+
     .sand-legend {
       max-width: 430px;
       margin: 10px auto 16px;
@@ -166,6 +265,60 @@
       background: rgba(255, 255, 255, 0.75);
       color: #666;
       font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .period-filter-box {
+      max-width: 430px;
+      margin: 12px auto 14px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+      text-align: left;
+    }
+
+    .period-filter-title {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .period-filter-buttons {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .period-filter-buttons button {
+      border: 1px solid #c8c8c8;
+      border-radius: 20px;
+      padding: 8px 6px;
+      background: #fff;
+      color: #333;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .period-filter-buttons button.active {
+      background: #2f80ed;
+      color: #fff;
+      border-color: #2f80ed;
+      font-weight: bold;
+    }
+
+    .period-filter-selects {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .period-filter-summary {
+      margin-top: 9px;
+      font-size: 12px;
+      color: #666;
       line-height: 1.5;
     }
 
@@ -490,8 +643,32 @@
         </span>
       </div>
 
+      <div class="period-filter-box">
+        <p class="period-filter-title">砂時計に表示する期間</p>
+
+        <div class="period-filter-buttons" id="periodFilterButtons">
+          <button type="button" class="active" data-period="life" onclick="setPeriodMode('life')">人生</button>
+          <button type="button" data-period="year" onclick="setPeriodMode('year')">1年</button>
+          <button type="button" data-period="month" onclick="setPeriodMode('month')">1か月</button>
+        </div>
+
+        <div class="period-filter-selects">
+          <select id="periodYearSelect" onchange="changePeriodSelection()" disabled></select>
+          <select id="periodMonthSelect" onchange="changePeriodSelection()" disabled>
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </div>
+
+        <div class="period-filter-summary" id="periodFilterSummary">
+          人生全体の思い出を表示しています。
+        </div>
+      </div>
+
       <div class="grain-size-guide">
-        粒の大きさ：思い出価値の合計点（25点満点）を5段階で表現
+        粒の大きさ：0点は灰色2px、それ以外は合計点（25点満点）で5段階
         <br>
         <span class="grain-size-sample" style="width:6px;height:6px"></span>1〜5点
         ／
@@ -504,6 +681,8 @@
         <span class="grain-size-sample" style="width:28px;height:28px"></span>21〜25点
         <br>
         色：代表となる価値の項目
+        <br>
+        形：● 0〜2回 ／ 石 3〜5回 ／ ★ 6回以上 ／ ♥ お気に入り
       </div>
 
       <div class="score-box">
@@ -735,7 +914,9 @@
     ];
 
     // 1つの思い出 = 1粒
-    // 色は主な評価、粒の大きさは合計点(25点満点)
+    // 色：主な評価
+    // 大きさ：合計点（25点満点）
+    // 形：お気に入り・見返し回数
     const MAX_VISIBLE_GRAINS = 420;
 
     // ==============================
@@ -775,6 +956,11 @@
     // 記録一覧の表示フィルター
     let currentHistoryFilter = "all";
 
+    // 砂時計の期間フィルター
+    let currentPeriodMode = "life";
+    let selectedPeriodYear = new Date().getFullYear();
+    let selectedPeriodMonth = new Date().getMonth() + 1;
+
     // ==============================
     // 初期化
     // ==============================
@@ -794,6 +980,7 @@
         birthdayInput.addEventListener("change", updateAgePreview);
       }
 
+      initializePeriodFilter();
       updateDisplay();
       startTimer();
       initializeGoogleCalendarApi();
@@ -1830,6 +2017,11 @@
           memo,
           photoCount: files.length,
 
+          // ユーザー行動による形の変化
+          // favorite=true は見返し回数より優先してハート表示
+          favorite: false,
+          viewCount: 0,
+
           // 評価時にAIへ送信した本人情報を記録
           userProfile: {
             birthday: userProfile.birthday,
@@ -1896,6 +2088,7 @@
           primaryCriterion: getPrimaryCriterion(aiResult, userPriority),
 
           photoContexts: selectedPhotoContexts,
+          memoryDate: getPreferredMemoryDateForSave(selectedPhotoContexts),
           date: new Date().toLocaleString("ja-JP")
         };
 
@@ -1913,6 +2106,7 @@
 
         showAIResult(rawAIResult);
         clearInputForm();
+        initializePeriodFilter();
         updateDisplay();
 
         ons.notification.toast(
@@ -2267,6 +2461,166 @@ usedMemoryHistory:
       return normalized;
     }
 
+
+    // ==============================
+    // 砂時計の期間フィルター
+    // ==============================
+    function getPreferredMemoryDateForSave(photoContexts) {
+      if (Array.isArray(photoContexts)) {
+        for (const context of photoContexts) {
+          if (!context?.takenDate) continue;
+          const d = new Date(context.takenDate);
+          if (!isNaN(d.getTime())) return d.toISOString();
+        }
+      }
+      return new Date().toISOString();
+    }
+
+    function getMemoryDate(memory) {
+      if (memory?.memoryDate) {
+        const d = new Date(memory.memoryDate);
+        if (!isNaN(d.getTime())) return d;
+      }
+
+      if (Array.isArray(memory?.photoContexts)) {
+        for (const context of memory.photoContexts) {
+          if (!context?.takenDate) continue;
+          const d = new Date(context.takenDate);
+          if (!isNaN(d.getTime())) return d;
+        }
+      }
+
+      if (memory?.date) {
+        const direct = new Date(memory.date);
+        if (!isNaN(direct.getTime())) return direct;
+
+        const m = String(memory.date).match(
+          /(\d{4})\/(\d{1,2})\/(\d{1,2})\s*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?/
+        );
+        if (m) {
+          const d = new Date(
+            Number(m[1]), Number(m[2]) - 1, Number(m[3]),
+            Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0)
+          );
+          if (!isNaN(d.getTime())) return d;
+        }
+      }
+
+      return null;
+    }
+
+    function getAvailableYears() {
+      const years = memories
+        .map(function(memory) {
+          const d = getMemoryDate(memory);
+          return d ? d.getFullYear() : null;
+        })
+        .filter(Number.isInteger);
+
+      years.push(new Date().getFullYear());
+      return [...new Set(years)].sort(function(a,b){ return b-a; });
+    }
+
+    function initializePeriodFilter() {
+      const yearSelect = document.getElementById("periodYearSelect");
+      const monthSelect = document.getElementById("periodMonthSelect");
+      if (!yearSelect || !monthSelect) return;
+
+      const years = getAvailableYears();
+      if (!years.includes(selectedPeriodYear)) {
+        selectedPeriodYear = years[0];
+      }
+
+      yearSelect.innerHTML = years
+        .map(function(year) {
+          return '<option value="' + year + '">' + year + '年</option>';
+        })
+        .join("");
+
+      yearSelect.value = String(selectedPeriodYear);
+      monthSelect.value = String(selectedPeriodMonth);
+
+      updatePeriodControlState();
+      updatePeriodFilterSummary();
+    }
+
+    function setPeriodMode(mode) {
+      if (!["life","year","month"].includes(mode)) return;
+
+      currentPeriodMode = mode;
+
+      document.querySelectorAll("#periodFilterButtons button")
+        .forEach(function(button) {
+          button.classList.toggle("active", button.dataset.period === mode);
+        });
+
+      updatePeriodControlState();
+      updateValueDisplay();
+    }
+
+    function updatePeriodControlState() {
+      const yearSelect = document.getElementById("periodYearSelect");
+      const monthSelect = document.getElementById("periodMonthSelect");
+      if (!yearSelect || !monthSelect) return;
+
+      yearSelect.disabled = currentPeriodMode === "life";
+      monthSelect.disabled = currentPeriodMode !== "month";
+    }
+
+    function changePeriodSelection() {
+      selectedPeriodYear = Number(
+        document.getElementById("periodYearSelect")?.value || selectedPeriodYear
+      );
+      selectedPeriodMonth = Number(
+        document.getElementById("periodMonthSelect")?.value || selectedPeriodMonth
+      );
+      updateValueDisplay();
+    }
+
+    function getMemoriesForCurrentPeriod() {
+      if (currentPeriodMode === "life") return memories;
+
+      return memories.filter(function(memory) {
+        const d = getMemoryDate(memory);
+        if (!d) return false;
+        if (d.getFullYear() !== selectedPeriodYear) return false;
+
+        if (
+          currentPeriodMode === "month" &&
+          d.getMonth() + 1 !== selectedPeriodMonth
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    function getCurrentPeriodLabel() {
+      if (currentPeriodMode === "year") {
+        return selectedPeriodYear + "年";
+      }
+      if (currentPeriodMode === "month") {
+        return selectedPeriodYear + "年" + selectedPeriodMonth + "月";
+      }
+      return "人生全体";
+    }
+
+    function updatePeriodFilterSummary(periodMemories) {
+      const summary = document.getElementById("periodFilterSummary");
+      if (!summary) return;
+
+      const target = periodMemories || getMemoriesForCurrentPeriod();
+      const score = target.reduce(function(sum, memory) {
+        return sum + Number(memory.totalScore ?? memory.score ?? 0);
+      }, 0);
+
+      summary.textContent =
+        getCurrentPeriodLabel() +
+        "：思い出 " + target.length +
+        "件 ／ 価値合計 " + score + "点";
+    }
+
     // ==============================
     // 表示更新
     // ==============================
@@ -2463,22 +2817,34 @@ function showAIResult(result) {
     }
 
     function updateValueDisplay() {
-      document.getElementById("totalScore").textContent = totalScore;
+      const periodMemories = getMemoriesForCurrentPeriod();
 
-      renderValueSand();
+      const periodTotalScore = periodMemories.reduce(function(sum, memory) {
+        return sum + Number(memory.totalScore ?? memory.score ?? 0);
+      }, 0);
+
+      document.getElementById("totalScore").textContent = periodTotalScore;
+
+      renderValueSand(periodMemories);
+      updatePeriodFilterSummary(periodMemories);
 
       const message = document.getElementById("message");
 
-      if (totalScore === 0) {
-        message.textContent = "まだ価値の砂はたまっていません";
-      } else if (totalScore < 100) {
-        message.textContent = "5つの価値が色と粒の大きさで積み重なっています";
-      } else if (totalScore < 250) {
-        message.textContent = "価値の構成が砂の色として見えてきました";
-      } else if (totalScore < 400) {
-        message.textContent = "多様な価値を持つ思い出が積み重なっています";
+      if (periodMemories.length === 0) {
+        message.textContent =
+          getCurrentPeriodLabel() + "には思い出の記録がありません";
+      } else if (periodTotalScore < 100) {
+        message.textContent =
+          getCurrentPeriodLabel() + "の価値が砂として積み重なっています";
+      } else if (periodTotalScore < 250) {
+        message.textContent =
+          getCurrentPeriodLabel() + "の価値の構成が見えてきました";
+      } else if (periodTotalScore < 400) {
+        message.textContent =
+          getCurrentPeriodLabel() + "には多様な価値が積み重なっています";
       } else {
-        message.textContent = "濃い思い出の価値が砂時計を満たしています";
+        message.textContent =
+          getCurrentPeriodLabel() + "の濃い思い出が砂時計を満たしています";
       }
     }
 
@@ -2559,11 +2925,42 @@ function showAIResult(result) {
 
       // 思い出全体の合計点を5段階に分ける。
       // 価値が高いほど、粒を大きくして差を分かりやすくする。
+      if (score === 0) return 2; // 0点
       if (score >= 21) return 20; // 21〜25点：最大
       if (score >= 16) return 15; // 16〜20点：大
       if (score >= 11) return 10; // 11〜15点：中
-      if (score >= 6)  return 5; // 6〜10点：小
+      if (score >= 6)  return 5;  // 6〜10点：小
       return 6;                   // 0〜5点：最小
+    }
+
+    function getMemoryShape(memory) {
+      /*
+        形の優先順位
+        1. お気に入り → ハート
+        2. 見返し6回以上 → 星
+        3. 見返し3〜5回 → 石
+        4. 見返し0〜2回 → 通常の砂粒
+
+        既存データに favorite / viewCount が無くても動作する。
+      */
+      if (memory?.favorite === true) {
+        return "heart";
+      }
+
+      const viewCount = Math.max(
+        0,
+        Number(memory?.viewCount || 0)
+      );
+
+      if (viewCount >= 6) {
+        return "star";
+      }
+
+      if (viewCount >= 3) {
+        return "stone";
+      }
+
+      return "sand";
     }
 
     /*
@@ -2771,7 +3168,7 @@ function showAIResult(result) {
       return best;
     }
 
-    function renderValueSand() {
+    function renderValueSand(targetMemories = getMemoriesForCurrentPeriod()) {
       const bottomSand = document.getElementById("bottomSand");
       if (!bottomSand) return;
 
@@ -2784,7 +3181,7 @@ function showAIResult(result) {
         bottomSand.clientHeight || 144;
 
       const memoriesOldestFirst =
-        [...memories]
+        [...targetMemories]
           .reverse()
           .slice(-MAX_VISIBLE_GRAINS);
 
@@ -2792,20 +3189,24 @@ function showAIResult(result) {
 
       memoriesOldestFirst.forEach(function(memory, index) {
 
-        // 色：5項目の中で代表となる価値
-        const criterion =
-          memory.primaryCriterion ||
-          getPrimaryCriterion(
-            memory,
-            memory.userPriority || ""
-          );
-
-        // 大きさ：思い出全体の合計点
+        // 合計点
         const totalValueScore = Number(
           memory.totalScore ??
           memory.score ??
           0
         );
+
+        // 色：5項目の中で代表となる価値
+        const criterion =
+          totalValueScore === 0
+            ? "zero"
+            : (
+              memory.primaryCriterion ||
+              getPrimaryCriterion(
+                memory,
+                memory.userPriority || ""
+              )
+            );
 
         const size =
           getTotalScoreGrainSize(totalValueScore);
@@ -2838,8 +3239,13 @@ function showAIResult(result) {
         const grain =
           document.createElement("span");
 
+        const shape = getMemoryShape(memory);
+
         grain.className =
-          "value-grain " + criterion;
+          "value-grain " +
+          criterion +
+          " shape-" +
+          shape;
 
         grain.style.width =
           size + "px";
@@ -2857,11 +3263,25 @@ function showAIResult(result) {
         grain.style.bottom =
           position.y + "px";
 
+        const shapeLabel =
+          shape === "heart"
+            ? "お気に入り"
+            : shape === "star"
+              ? "星"
+              : shape === "stone"
+                ? "石"
+                : "砂粒";
+
         grain.title =
           (CRITERIA_LABELS[criterion] || "") +
           " ／ 思い出価値：" +
           totalValueScore +
-          " / 25";
+          " / 25" +
+          " ／ 形：" +
+          shapeLabel +
+          " ／ 見返し：" +
+          Number(memory.viewCount || 0) +
+          "回";
 
         bottomSand.appendChild(grain);
       });
@@ -2974,6 +3394,20 @@ function showAIResult(result) {
       filteredMemories.forEach(function(memory) {
         const div = document.createElement("div");
         div.className = "history-item";
+
+        const memoryIndex = memories.indexOf(memory);
+        const viewCount = Math.max(0, Number(memory.viewCount || 0));
+        const isFavorite = memory.favorite === true;
+        const currentShape = getMemoryShape(memory);
+
+        const currentShapeLabel =
+          currentShape === "heart"
+            ? "ハート"
+            : currentShape === "star"
+              ? "星"
+              : currentShape === "stone"
+                ? "石"
+                : "砂粒";
 
         const title =
           memory.memoryTitle ||
@@ -3109,11 +3543,110 @@ function showAIResult(result) {
           <p><b>点数評価の理由：</b></p>
           <div>${formatScoreReason(memory.reason || "なし")}</div>
 
+          <div class="memory-action-row">
+            <button
+              type="button"
+              class="memory-action-button ${isFavorite ? "favorite-active" : ""}"
+              onclick="toggleFavorite(${memoryIndex})"
+            >
+              ${isFavorite ? "♥ お気に入り済み" : "♡ お気に入り"}
+            </button>
+
+            <button
+              type="button"
+              class="memory-action-button"
+              onclick="viewMemoryAgain(${memoryIndex})"
+            >
+              思い出を見返す
+            </button>
+          </div>
+
+          <p class="memory-behavior-note">
+            見返し回数：${viewCount}回 ／ 現在の形：${currentShapeLabel}
+            <br>
+            0〜2回＝砂粒、3〜5回＝石、6回以上＝星、
+            お気に入り＝ハート
+          </p>
+
           <small>${escapeHtml(memory.date || "")}</small>
         `;
 
         history.appendChild(div);
       });
+    }
+
+    // ==============================
+    // お気に入り・見返し回数
+    // ==============================
+    function saveMemoriesAndRefresh() {
+      localStorage.setItem(
+        STORAGE_KEYS.memories,
+        JSON.stringify(memories)
+      );
+
+      renderHistory();
+      initializePeriodFilter();
+      updateValueDisplay();
+    }
+
+    function toggleFavorite(index) {
+      if (
+        index < 0 ||
+        index >= memories.length
+      ) {
+        return;
+      }
+
+      memories[index].favorite =
+        memories[index].favorite !== true;
+
+      saveMemoriesAndRefresh();
+
+      ons.notification.toast(
+        memories[index].favorite
+          ? "お気に入りに登録しました。砂の形をハートに変更しました。"
+          : "お気に入りを解除しました。見返し回数に応じた形へ戻しました。",
+        { timeout: 1800 }
+      );
+    }
+
+    function viewMemoryAgain(index) {
+      if (
+        index < 0 ||
+        index >= memories.length
+      ) {
+        return;
+      }
+
+      const currentCount =
+        Math.max(
+          0,
+          Number(memories[index].viewCount || 0)
+        );
+
+      memories[index].viewCount =
+        currentCount + 1;
+
+      const shape = getMemoryShape(memories[index]);
+
+      const shapeLabel =
+        shape === "heart"
+          ? "ハート"
+          : shape === "star"
+            ? "星"
+            : shape === "stone"
+              ? "石"
+              : "砂粒";
+
+      saveMemoriesAndRefresh();
+
+      ons.notification.toast(
+        "見返し回数：" +
+        memories[index].viewCount +
+        "回 ／ 現在の形：" +
+        shapeLabel,
+        { timeout: 1800 }
+      );
     }
 
     // ==============================
@@ -3245,6 +3778,7 @@ function showAIResult(result) {
             document.getElementById("aiResultBox").style.display = "none";
 
             updateDebug("価値の砂と記録をリセットしました。");
+            initializePeriodFilter();
             updateDisplay();
           }
         });

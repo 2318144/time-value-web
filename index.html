@@ -44,7 +44,47 @@
 
     .main {
       padding: 18px;
+      padding-bottom: 104px;
       text-align: center;
+    }
+
+    .app-view { display: none; animation: viewFadeIn 0.2s ease; }
+    .app-view.active { display: block; }
+    @keyframes viewFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .view-heading { margin: 4px 0 6px; font-size: 22px; }
+    .view-description { margin: 0 0 18px; }
+    .settings-card {
+      margin: 14px 0; padding: 16px; border-radius: 14px;
+      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.07); text-align: left;
+    }
+    .settings-card h3 { margin: 0 0 8px; }
+    .bottom-navigation {
+      position: fixed; z-index: 1000; right: 0; bottom: 0; left: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr); min-height: 72px;
+      padding: 6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+      background: rgba(255,255,255,.97); border-top: 1px solid #d9dee7;
+      box-shadow: 0 -3px 14px rgba(30,45,70,.1);
+    }
+    .bottom-nav-button {
+      position: relative; min-width: 0; border: 0; background: transparent;
+      color: #77808d; font: inherit; font-size: 11px; cursor: pointer;
+    }
+    .bottom-nav-button ons-icon { display: block; margin: 0 auto 3px; font-size: 24px; }
+    .bottom-nav-button.active { color: var(--primary-color); font-weight: bold; }
+    .bottom-nav-button.add-button ons-icon {
+      width: 42px; height: 42px; margin-top: -19px; margin-bottom: 2px;
+      border-radius: 50%; background: var(--primary-color); color: #fff;
+      font-size: 29px; line-height: 42px; box-shadow: 0 4px 10px rgba(47,128,237,.35);
+    }
+    @media (min-width: 700px) {
+      .bottom-navigation {
+        left: 50%; width: 700px; transform: translateX(-50%);
+        border-right: 1px solid #d9dee7; border-left: 1px solid #d9dee7;
+        border-radius: 16px 16px 0 0;
+      }
     }
 
     h1 {
@@ -607,15 +647,11 @@
   <ons-page>
     <ons-toolbar>
       <div class="center">時間の価値 可視化</div>
-      <div class="right">
-        <ons-toolbar-button onclick="openProfileDialog()" aria-label="プロフィール設定">
-          <ons-icon icon="md-settings"></ons-icon>
-        </ons-toolbar-button>
-      </div>
     </ons-toolbar>
 
     <!-- メイン画面 -->
     <div class="main" id="appMain">
+      <section class="app-view active" id="homeView" data-view="home">
       <h1>記憶を砂に変える</h1>
       <p>上の砂は残りの人生時間、下の砂はAIが評価した思い出の価値を表します。</p>
 
@@ -647,12 +683,11 @@
         <p class="period-filter-title">砂時計に表示する期間</p>
 
         <div class="period-filter-buttons" id="periodFilterButtons">
-          <button type="button" class="active" data-period="life" onclick="setPeriodMode('life')">人生</button>
-          <button type="button" data-period="year" onclick="setPeriodMode('year')">1年</button>
-          <button type="button" data-period="month" onclick="setPeriodMode('month')">1か月</button>
+          <button type="button" class="active" data-period="life" onclick="setClockDisplayMode('life')">人生</button>
+          <button type="button" data-period="custom" onclick="setClockDisplayMode('custom')">期間指定</button>
         </div>
 
-        <div class="period-filter-selects">
+        <div class="period-filter-selects" style="display:none">
           <select id="periodYearSelect" onchange="changePeriodSelection()" disabled></select>
           <select id="periodMonthSelect" onchange="changePeriodSelection()" disabled>
             <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
@@ -693,7 +728,11 @@
         <h2><span id="totalScore">0</span> 点</h2>
         <p id="message">まだ価値の砂はたまっていません</p>
       </div>
+      </section>
 
+      <section class="app-view" id="addView" data-view="add">
+      <h2 class="view-heading">思い出をためる</h2>
+      <p class="view-description">写真やメモから、思い出の価値をAIで評価します。</p>
       <div class="form-box">
         <label>写真を複数選択</label>
         <input type="file" accept="image/*" id="photoInput" multiple>
@@ -746,7 +785,6 @@
           </label>
         </div>
 
-        <label>Googleカレンダー</label>
         <div class="history-item">
           <p><b>現在の状態</b></p>
           <p id="calendarStatus">未連携</p>
@@ -787,7 +825,11 @@
         <h3>AI評価結果</h3>
         <div id="aiResultText"></div>
       </div>
+      </section>
 
+      <section class="app-view" id="valueView" data-view="value">
+      <h2 class="view-heading">価値を見る</h2>
+      <p class="view-description">期間や価値の種類から、これまでの思い出を振り返れます。</p>
       <h3>記録一覧</h3>
 
       <div class="history-filter" id="historyFilter">
@@ -817,7 +859,81 @@
       </div>
 
       <div id="history"></div>
+      </section>
+
+      <section class="app-view" id="settingsView" data-view="settings">
+        <h2 class="view-heading">設定</h2>
+        <p class="view-description">プロフィールや連携、保存データを管理します。</p>
+        <div class="settings-card">
+          <h3>プロフィール</h3>
+          <p>誕生日・年齢・性別・職業を、AI評価の参考情報として設定します。</p>
+          <ons-button modifier="large" onclick="openProfileDialog()">プロフィールを設定</ons-button>
+        </div>
+        <div class="settings-card" id="calendarSettingsCard"><h3>Googleカレンダー</h3></div>
+        <div class="settings-card">
+          <h3>砂時計の時間</h3>
+          <p>基本は人生の残り時間を表示し、短期表示にも切り替えられます。</p>
+          <label for="timerModeSelect">表示する時間</label>
+          <select id="timerModeSelect" onchange="updateTimerSettingFields()">
+            <option value="life">人生</option>
+            <option value="custom">期間指定</option>
+          </select>
+          <div id="targetAgeField">
+          <label for="targetLifeAgeInput">何歳まで生きたいですか？</label>
+          <input
+            type="number"
+            id="targetLifeAgeInput"
+            min="1"
+            max="150"
+            step="1"
+            inputmode="numeric"
+            placeholder="例：90"
+          >
+          <p class="criteria-note">プロフィールの誕生日から現在の年齢を求め、目標年齢までの残り時間を表示します。</p>
+          </div>
+          <div id="customPeriodField" style="display:none">
+            <label for="customPeriodValue">期間</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <input
+                type="number"
+                id="customPeriodValue"
+                min="1"
+                max="1000"
+                step="1"
+                inputmode="numeric"
+                placeholder="例：3"
+              >
+              <select id="customPeriodUnit">
+                <option value="year">年</option>
+                <option value="month">月</option>
+                <option value="week">週</option>
+                <option value="day">日</option>
+              </select>
+            </div>
+            <p class="criteria-note">例：2年、6か月、3週間、10日</p>
+          </div>
+          <ons-button modifier="large" class="main-button" onclick="saveTimerSettings()">
+            この設定で砂時計を表示する
+          </ons-button>
+        </div>
+        <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
+      </section>
     </div>
+
+    <nav class="bottom-navigation" aria-label="メインメニュー">
+      <button type="button" class="bottom-nav-button active" data-view-target="home" onclick="switchAppView('home')">
+        <ons-icon icon="md-home"></ons-icon><span>ホーム</span>
+      </button>
+      <button type="button" class="bottom-nav-button add-button" data-view-target="add" onclick="switchAppView('add')">
+        <ons-icon icon="md-plus"></ons-icon><span>ためる</span>
+      </button>
+      <button type="button" class="bottom-nav-button" data-view-target="value" onclick="switchAppView('value')">
+        <ons-icon icon="md-hourglass-alt"></ons-icon><span>価値を見る</span>
+      </button>
+      <button type="button" class="bottom-nav-button" data-view-target="settings" onclick="switchAppView('settings')">
+        <ons-icon icon="md-settings"></ons-icon><span>設定</span>
+      </button>
+    </nav>
   </ons-page>
 
   <!-- プロフィール設定ダイアログ -->
@@ -885,7 +1001,7 @@
     const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
     const MAX_VALUE_SCORE = 500;
-    const TOTAL_LIFE_TIME = 10 * 60;
+    const DEFAULT_TIMER_DURATION = 24 * 60 * 60;
     const MAX_HISTORY_FOR_AI = 20;
 
     const APP_TIME_ZONE = "Asia/Tokyo";
@@ -894,7 +1010,15 @@
       memories: "memories",
       totalScore: "totalScore",
       userProfile: "userProfile",
-      remainingTime: "remainingTime"
+      remainingTime: "remainingTime",
+      timerDuration: "timerDuration",
+      timerMode: "timerMode",
+      timerEndAt: "timerEndAt",
+      targetLifeAge: "targetLifeAge",
+      shortTimerMode: "shortTimerMode",
+      shortTimerEndAt: "shortTimerEndAt",
+      shortTimerDuration: "shortTimerDuration",
+      shortTimerValue: "shortTimerValue"
     };
 
     const CRITERIA_LABELS = {
@@ -941,9 +1065,37 @@
       }
     );
 
+    const savedDuration = Number(
+      localStorage.getItem(STORAGE_KEYS.timerDuration)
+    );
+    let totalLifeTime =
+      Number.isFinite(savedDuration) && savedDuration > 0
+        ? savedDuration
+        : DEFAULT_TIMER_DURATION;
+
+    let currentTimerMode =
+      localStorage.getItem(STORAGE_KEYS.timerMode) || "life";
+    let targetLifeAge = Number(
+      localStorage.getItem(STORAGE_KEYS.targetLifeAge)
+    ) || 90;
+    let timerEndAt = Number(
+      localStorage.getItem(STORAGE_KEYS.timerEndAt)
+    ) || 0;
+    let shortTimerMode =
+      localStorage.getItem(STORAGE_KEYS.shortTimerMode) || "week";
+    let shortTimerEndAt = Number(
+      localStorage.getItem(STORAGE_KEYS.shortTimerEndAt)
+    ) || 0;
+    let shortTimerDuration = Number(
+      localStorage.getItem(STORAGE_KEYS.shortTimerDuration)
+    ) || 7 * 24 * 60 * 60;
+    let shortTimerValue = Number(
+      localStorage.getItem(STORAGE_KEYS.shortTimerValue)
+    ) || 1;
+
     let savedTime =
       localStorage.getItem(STORAGE_KEYS.remainingTime);
-    let remainingTime = savedTime !== null ? Number(savedTime) : TOTAL_LIFE_TIME;
+    let remainingTime = savedTime !== null ? Number(savedTime) : totalLifeTime;
 
     let latestCalendarEvents = [];
     let selectedPhotoContexts = [];
@@ -981,10 +1133,212 @@
       }
 
       initializePeriodFilter();
+      organizeAppViews();
+      initializeTimerSettings();
       updateDisplay();
       startTimer();
       initializeGoogleCalendarApi();
     };
+
+    // ==============================
+    // 下部固定メニュー・4画面切替
+    // ==============================
+    function organizeAppViews() {
+      // 期間選択と砂粒の説明は、必ずホーム画面に表示する
+      const homeView = document.getElementById("homeView");
+      const scoreBox = homeView?.querySelector(".score-box");
+      const periodBox = document.querySelector(".period-filter-box");
+      const grainGuide = document.querySelector(".grain-size-guide");
+
+      if (homeView && scoreBox && periodBox) {
+        homeView.insertBefore(periodBox, scoreBox);
+      }
+      if (homeView && scoreBox && grainGuide) {
+        homeView.insertBefore(grainGuide, scoreBox);
+      }
+
+      const calendarCard = document.getElementById("calendarSettingsCard");
+      const calendarBlock = document.getElementById("calendarStatus")?.closest(".history-item");
+      if (calendarCard && calendarBlock) calendarCard.appendChild(calendarBlock);
+
+      const systemCard = document.getElementById("systemSettingsCard");
+      const settingsElements = [
+        document.querySelector('[onclick="testServerConnection()"]'),
+        document.querySelector('[onclick="resetValueData()"]'),
+        document.querySelector('[onclick="resetTimer()"]'),
+        document.getElementById("debugText")?.closest(".debug-box")
+      ];
+      settingsElements.forEach(function(element) {
+        if (systemCard && element) systemCard.appendChild(element);
+      });
+      switchAppView("home", false);
+    }
+
+    function switchAppView(viewName, scrollToTop = true) {
+      const targetView = document.querySelector('[data-view="' + viewName + '"]');
+      if (!targetView) return;
+      document.querySelectorAll(".app-view").forEach(function(view) {
+        view.classList.toggle("active", view === targetView);
+      });
+      document.querySelectorAll(".bottom-nav-button").forEach(function(button) {
+        const isActive = button.dataset.viewTarget === viewName;
+        button.classList.toggle("active", isActive);
+        if (isActive) button.setAttribute("aria-current", "page");
+        else button.removeAttribute("aria-current");
+      });
+      if (viewName === "home") requestAnimationFrame(function() { renderValueSand(); });
+      if (viewName === "value") renderHistory();
+      if (scrollToTop) window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function initializeTimerSettings() {
+      const modeSelect = document.getElementById("timerModeSelect");
+      const ageInput = document.getElementById("targetLifeAgeInput");
+      if (modeSelect) modeSelect.value = currentTimerMode === "life" ? "life" : "custom";
+      if (ageInput) ageInput.value = targetLifeAge;
+      const periodValue = document.getElementById("customPeriodValue");
+      const periodUnit = document.getElementById("customPeriodUnit");
+      if (periodValue) periodValue.value = shortTimerValue;
+      if (periodUnit) periodUnit.value = shortTimerMode;
+      updateTimerSettingFields();
+
+      if (currentTimerMode === "life" && userProfile.birthday) {
+        applyLifeTimer(false);
+      } else if (timerEndAt > 0) {
+        remainingTime = Math.max(0, Math.floor((timerEndAt - Date.now()) / 1000));
+      }
+      setClockDisplayMode(currentTimerMode === "life" ? "life" : "custom", false);
+    }
+
+    function updateTimerSettingFields() {
+      const mode = document.getElementById("timerModeSelect")?.value || "life";
+      const targetField = document.getElementById("targetAgeField");
+      const customField = document.getElementById("customPeriodField");
+      if (targetField) targetField.style.display = mode === "life" ? "block" : "none";
+      if (customField) customField.style.display = mode === "custom" ? "block" : "none";
+    }
+
+    function saveTimerSettings() {
+      const mode = document.getElementById("timerModeSelect")?.value || "life";
+      currentTimerMode = mode;
+      localStorage.setItem(STORAGE_KEYS.timerMode, currentTimerMode);
+
+      if (mode === "life") {
+        if (!userProfile.birthday) {
+          ons.notification.alert("先にプロフィールで誕生日を設定してください。");
+          return;
+        }
+
+        const age = Number(document.getElementById("targetLifeAgeInput")?.value);
+        const currentAge = calculateAgeFromBirthday(userProfile.birthday);
+
+        if (!Number.isInteger(age) || age <= currentAge || age > 150) {
+          ons.notification.alert("現在の年齢より大きい、150歳以下の整数を入力してください。");
+          return;
+        }
+
+        targetLifeAge = age;
+        localStorage.setItem(STORAGE_KEYS.targetLifeAge, targetLifeAge);
+        applyLifeTimer(true);
+      } else {
+        const periodValue = Number(document.getElementById("customPeriodValue")?.value);
+        const periodUnit = document.getElementById("customPeriodUnit")?.value || "day";
+
+        if (!Number.isInteger(periodValue) || periodValue < 1 || periodValue > 1000) {
+          ons.notification.alert("期間は1〜1000の整数で入力してください。");
+          return;
+        }
+
+        const startDate = new Date();
+        const endDate = new Date(startDate);
+        if (periodUnit === "year") endDate.setFullYear(endDate.getFullYear() + periodValue);
+        if (periodUnit === "month") endDate.setMonth(endDate.getMonth() + periodValue);
+        if (periodUnit === "week") endDate.setDate(endDate.getDate() + periodValue * 7);
+        if (periodUnit === "day") endDate.setDate(endDate.getDate() + periodValue);
+
+        totalLifeTime = Math.max(1, Math.floor((endDate - startDate) / 1000));
+        timerEndAt = endDate.getTime();
+        remainingTime = totalLifeTime;
+        shortTimerMode = periodUnit;
+        shortTimerValue = periodValue;
+        shortTimerEndAt = timerEndAt;
+        shortTimerDuration = totalLifeTime;
+        localStorage.setItem(STORAGE_KEYS.shortTimerMode, shortTimerMode);
+        localStorage.setItem(STORAGE_KEYS.shortTimerValue, shortTimerValue);
+        localStorage.setItem(STORAGE_KEYS.shortTimerEndAt, shortTimerEndAt);
+        localStorage.setItem(STORAGE_KEYS.shortTimerDuration, shortTimerDuration);
+        persistTimerState();
+      }
+
+      setClockDisplayMode(mode, true);
+      ons.notification.toast("砂時計の表示時間を設定しました。", { timeout: 1800 });
+      switchAppView("home");
+    }
+
+    function setClockDisplayMode(mode, refresh = true) {
+      if (mode !== "life" && mode !== "custom") return;
+
+      if (mode === "life") {
+        if (!userProfile.birthday && refresh) {
+          ons.notification.alert("人生の砂時計を表示するには、プロフィールで誕生日を設定してください。");
+          return;
+        }
+        if (currentTimerMode !== "life") {
+          shortTimerMode = currentTimerMode;
+          shortTimerEndAt = timerEndAt;
+          shortTimerDuration = totalLifeTime;
+          localStorage.setItem(STORAGE_KEYS.shortTimerMode, shortTimerMode);
+          localStorage.setItem(STORAGE_KEYS.shortTimerEndAt, shortTimerEndAt);
+          localStorage.setItem(STORAGE_KEYS.shortTimerDuration, shortTimerDuration);
+        }
+        currentTimerMode = "life";
+        currentPeriodMode = "life";
+        if (userProfile.birthday) applyLifeTimer(true);
+      } else {
+        currentTimerMode = shortTimerMode;
+        currentPeriodMode = "custom";
+        totalLifeTime = shortTimerDuration;
+        timerEndAt = shortTimerEndAt;
+        remainingTime = timerEndAt > 0
+          ? Math.max(0, Math.floor((timerEndAt - Date.now()) / 1000))
+          : totalLifeTime;
+        persistTimerState();
+      }
+
+      localStorage.setItem(STORAGE_KEYS.timerMode, currentTimerMode);
+      document.querySelectorAll("#periodFilterButtons button").forEach(function(button) {
+        button.classList.toggle("active", button.dataset.period === mode);
+      });
+
+      const modeSelect = document.getElementById("timerModeSelect");
+      if (modeSelect) modeSelect.value = currentTimerMode === "life" ? "life" : "custom";
+      updateTimerSettingFields();
+
+      if (refresh) updateDisplay();
+    }
+
+    function applyLifeTimer(saveState) {
+      const birthday = new Date(userProfile.birthday + "T00:00:00");
+      const targetDate = new Date(
+        birthday.getFullYear() + targetLifeAge,
+        birthday.getMonth(),
+        birthday.getDate()
+      );
+
+      if (isNaN(birthday.getTime()) || targetDate <= new Date()) return false;
+
+      totalLifeTime = Math.max(1, Math.floor((targetDate - birthday) / 1000));
+      timerEndAt = targetDate.getTime();
+      remainingTime = Math.max(0, Math.floor((timerEndAt - Date.now()) / 1000));
+      if (saveState) persistTimerState();
+      return true;
+    }
+
+    function persistTimerState() {
+      localStorage.setItem(STORAGE_KEYS.timerDuration, totalLifeTime);
+      localStorage.setItem(STORAGE_KEYS.timerEndAt, timerEndAt);
+      localStorage.setItem(STORAGE_KEYS.remainingTime, remainingTime);
+    }
 
     function initializeGoogleCalendarApi() {
       gapi.load("client", async function() {
@@ -1113,6 +1467,11 @@
         STORAGE_KEYS.userProfile,
         JSON.stringify(userProfile)
       );
+
+      if (currentTimerMode === "life") {
+        applyLifeTimer(true);
+        updateTimeDisplay();
+      }
 
       closeProfileDialog();
 
@@ -2580,6 +2939,14 @@ usedMemoryHistory:
     function getMemoriesForCurrentPeriod() {
       if (currentPeriodMode === "life") return memories;
 
+      if (currentPeriodMode === "custom") {
+        const startAt = timerEndAt - totalLifeTime * 1000;
+        return memories.filter(function(memory) {
+          const d = getMemoryDate(memory);
+          return d && d.getTime() >= startAt && d.getTime() <= timerEndAt;
+        });
+      }
+
       return memories.filter(function(memory) {
         const d = getMemoryDate(memory);
         if (!d) return false;
@@ -2597,6 +2964,10 @@ usedMemoryHistory:
     }
 
     function getCurrentPeriodLabel() {
+      if (currentPeriodMode === "custom") {
+        const unitLabels = { year: "年", month: "か月", week: "週間", day: "日" };
+        return "設定期間（" + shortTimerValue + (unitLabels[shortTimerMode] || "日") + "）";
+      }
       if (currentPeriodMode === "year") {
         return selectedPeriodYear + "年";
       }
@@ -3654,13 +4025,11 @@ function showAIResult(result) {
     // ==============================
     function startTimer() {
       setInterval(function() {
-        if (remainingTime > 0) {
-          remainingTime--;
-          localStorage.setItem(
-        STORAGE_KEYS.remainingTime,
-        remainingTime
-      );
-        }
+        if (timerEndAt > 0) {
+          remainingTime = Math.max(0, Math.floor((timerEndAt - Date.now()) / 1000));
+        } else if (remainingTime > 0) remainingTime--;
+
+        localStorage.setItem(STORAGE_KEYS.remainingTime, remainingTime);
 
         updateTimeDisplay();
       }, 1000);
@@ -3671,14 +4040,28 @@ function showAIResult(result) {
         remainingTime = 0;
       }
 
-      const minutes = Math.floor(remainingTime / 60);
-      const seconds = remainingTime % 60;
+      const timeText = document.getElementById("timeText");
 
-      document.getElementById("timeText").textContent =
-        String(minutes).padStart(2, "0") + ":" +
-        String(seconds).padStart(2, "0");
+      if (currentTimerMode === "life") {
+        const totalDays = Math.floor(remainingTime / 86400);
+        const years = Math.floor(totalDays / 365.2425);
+        const days = Math.floor(totalDays - years * 365.2425);
+        timeText.textContent = "残り約" + years + "年" + days + "日";
+      } else {
+        const days = Math.floor(remainingTime / 86400);
+        const hours = Math.floor((remainingTime % 86400) / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const seconds = remainingTime % 60;
+        timeText.textContent =
+          (days > 0 ? days + "日 " : "") +
+          String(hours).padStart(2, "0") + ":" +
+          String(minutes).padStart(2, "0") + ":" +
+          String(seconds).padStart(2, "0");
+      }
 
-      const lostPercent = 100 - (remainingTime / TOTAL_LIFE_TIME) * 100;
+      const lostPercent = Math.max(0, Math.min(100,
+        100 - (remainingTime / Math.max(1, totalLifeTime)) * 100
+      ));
 
       document.getElementById("topSand").style.clipPath =
         "inset(" + lostPercent + "% 0 0 0)";
@@ -3785,14 +4168,20 @@ function showAIResult(result) {
     }
 
     function resetTimer() {
-      remainingTime = TOTAL_LIFE_TIME;
-      localStorage.setItem(
-        STORAGE_KEYS.remainingTime,
-        remainingTime
-      );
+      if (currentTimerMode === "life") {
+        applyLifeTimer(true);
+      } else {
+        timerEndAt = Date.now() + totalLifeTime * 1000;
+        remainingTime = totalLifeTime;
+        shortTimerEndAt = timerEndAt;
+        shortTimerDuration = totalLifeTime;
+        localStorage.setItem(STORAGE_KEYS.shortTimerEndAt, shortTimerEndAt);
+        localStorage.setItem(STORAGE_KEYS.shortTimerDuration, shortTimerDuration);
+        persistTimerState();
+      }
 
       updateTimeDisplay();
-      updateDebug("残り時間を10:00にリセットしました。");
+      updateDebug("残り時間を設定した時間にリセットしました。");
     }
   </script>
 </body>

@@ -240,6 +240,95 @@
       );
     }
 
+
+    /* ===== 価値を見る：コンパクト一覧 ===== */
+    .history-item.compact-history-item {
+      padding: 14px 16px;
+      margin: 10px 0;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .compact-history-item:active {
+      transform: scale(0.99);
+    }
+
+    .history-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .history-card-date {
+      color: #777;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .compact-history-item h4 {
+      margin: 4px 0 8px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .history-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-card-arrow {
+      color: #999;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .memory-detail-dialog {
+      width: min(92vw, 520px);
+      max-height: 82vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+    }
+
+    .memory-detail-dialog h3 {
+      margin: 0 0 14px;
+    }
+
+    .memory-detail-section {
+      padding: 12px 0;
+      border-top: 1px solid #eee;
+    }
+
+    .memory-detail-section:first-of-type {
+      border-top: 0;
+    }
+
+    .memory-detail-score-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px 12px;
+      margin-top: 8px;
+    }
+
+    .memory-detail-close {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px;
+      background: #eeeeee;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     .memory-action-row {
       display: flex;
       flex-wrap: wrap;
@@ -269,6 +358,40 @@
       font-size: 12px;
       color: #666666;
       line-height: 1.5;
+    }
+
+    .reevaluate-button {
+      border-color: #2f80ed;
+      color: #2f80ed;
+      font-weight: bold;
+    }
+
+    .reevaluate-score-grid {
+      display: grid;
+      grid-template-columns: 1fr 90px;
+      gap: 8px 12px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .reevaluate-score-grid label {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .reevaluate-score-grid input {
+      margin: 0;
+      text-align: center;
+    }
+
+    .reevaluate-total {
+      margin: 14px 0 4px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f3f7ff;
+      text-align: center;
+      font-weight: bold;
+      color: #245fa8;
     }
 
     .sand-legend {
@@ -534,33 +657,131 @@
     }
 
     .history-filter {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       margin: 12px 0 16px;
-      justify-content: center;
-    }
-
-    .history-filter button {
-      border: 1px solid #c8c8c8;
-      border-radius: 20px;
-      padding: 8px 14px;
+      padding: 12px;
+      border-radius: 12px;
       background: #ffffff;
-      color: #333;
-      font-size: 13px;
-      cursor: pointer;
-      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+      text-align: left;
     }
 
-    .history-filter button.active {
-      background: #2f80ed;
-      color: #ffffff;
+    .history-filter-title {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .history-filter-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .history-filter-row label {
+      margin: 0;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .history-filter-row select {
+      margin: 0;
+      min-width: 0;
+      padding: 8px 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .category-dialog-box {
+      padding: 18px;
+      text-align: left;
+    }
+
+    .category-dialog-box h3 {
+      margin: 0 0 8px;
+    }
+
+    .category-dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .category-dialog-actions button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 9px;
+      border: 1px solid #c8c8c8;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .category-dialog-actions .category-save-button {
       border-color: #2f80ed;
+      background: #2f80ed;
+      color: #fff;
       font-weight: bold;
     }
 
-    .history-filter button:active {
-      transform: scale(0.97);
+    .category-manage-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .category-manage-name {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      word-break: break-word;
+    }
+
+    .category-default-badge {
+      padding: 3px 7px;
+      border-radius: 12px;
+      background: #f0f2f5;
+      color: #777;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .category-delete-button {
+      border: 1px solid #ef9a9a;
+      border-radius: 16px;
+      padding: 5px 10px;
+      background: #fff;
+      color: #c62828;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .category-add-button,
+    .category-close-button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 9px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .category-add-button {
+      border: 1px solid #2f80ed;
+      background: #2f80ed;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .category-close-button {
+      border: 1px solid #c8c8c8;
+      background: #fff;
+      color: #333;
     }
 
     .history-empty {
@@ -640,6 +861,20 @@
       padding: 8px;
       font-size: 13px;
     }
+
+    /* ホームの使い方：白い角丸の説明枠 */
+    #homeView .home-guide {
+      width: min(100%, 420px); margin: 12px auto 16px;
+      padding: 12px 16px; background: #fff;
+      border: 1px solid #dce2eb; border-radius: 15px;
+      box-shadow: 0 2px 9px rgba(0,0,0,.06); text-align: left;
+    }
+    #homeView .home-guide-row { display:flex; align-items:center; gap:12px; padding:5px 0; font-size:13px; font-weight:600; color:#293544; }
+    #homeView .home-guide-symbol { display:flex; width:28px; flex:0 0 28px; justify-content:center; align-items:center; }
+    #homeView .home-guide-triangle { width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-top:16px solid #e8b647; }
+    #homeView .home-guide-outline { width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:16px solid #e8b647; }
+    #homeView .home-guide-neck { width:19px; height:17px; border:2px solid #e8b647; border-radius:4px; position:relative; }
+    #homeView .home-guide-neck::after { content:''; position:absolute; width:7px; height:7px; border-radius:50%; background:#e8b647; left:4px; top:3px; }
   </style>
 </head>
 
@@ -649,78 +884,12 @@
       <div class="center">時間の価値 可視化</div>
     </ons-toolbar>
 
-    <!-- メイン画面 -->
+    <!-- ホーム画面 -->
     <div class="main" id="appMain">
       <section class="app-view active" id="homeView" data-view="home">
       <h1>記憶を砂に変える</h1>
-      <p>上の砂は残りの人生時間、下の砂はAIが評価した思い出の価値を表します。</p>
 
-      <div class="hourglass" aria-label="5項目の価値を色と粒の大きさで表した砂時計">
-        <div class="top-sand" id="topSand"></div>
-        <div class="neck-sand" id="neckSand"></div>
-        <div class="bottom-sand" id="bottomSand"></div>
-      </div>
-
-      <div class="sand-legend" aria-label="砂の色の凡例">
-        <span class="sand-legend-item">
-          <span class="sand-legend-dot" style="background:#ef5350"></span>感情
-        </span>
-        <span class="sand-legend-item">
-          <span class="sand-legend-dot" style="background:#42a5f5"></span>学び
-        </span>
-        <span class="sand-legend-item">
-          <span class="sand-legend-dot" style="background:#fbc02d"></span>希少性
-        </span>
-        <span class="sand-legend-item">
-          <span class="sand-legend-dot" style="background:#66bb6a"></span>人間関係
-        </span>
-        <span class="sand-legend-item">
-          <span class="sand-legend-dot" style="background:#ab47bc"></span>将来への影響
-        </span>
-      </div>
-
-      <div class="period-filter-box">
-        <p class="period-filter-title">砂時計に表示する期間</p>
-
-        <div class="period-filter-buttons" id="periodFilterButtons">
-          <button type="button" class="active" data-period="life" onclick="setClockDisplayMode('life')">人生</button>
-          <button type="button" data-period="custom" onclick="setClockDisplayMode('custom')">期間指定</button>
-        </div>
-
-        <div class="period-filter-selects" style="display:none">
-          <select id="periodYearSelect" onchange="changePeriodSelection()" disabled></select>
-          <select id="periodMonthSelect" onchange="changePeriodSelection()" disabled>
-            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
-            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
-            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
-            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-          </select>
-        </div>
-
-        <div class="period-filter-summary" id="periodFilterSummary">
-          人生全体の思い出を表示しています。
-        </div>
-      </div>
-
-      <div class="grain-size-guide">
-        粒の大きさ：0点は灰色2px、それ以外は合計点（25点満点）で5段階
-        <br>
-        <span class="grain-size-sample" style="width:6px;height:6px"></span>1〜5点
-        ／
-        <span class="grain-size-sample" style="width:10px;height:10px"></span>6〜10点
-        ／
-        <span class="grain-size-sample" style="width:15px;height:15px"></span>11〜15点
-        ／
-        <span class="grain-size-sample" style="width:21px;height:21px"></span>16〜20点
-        ／
-        <span class="grain-size-sample" style="width:28px;height:28px"></span>21〜25点
-        <br>
-        色：代表となる価値の項目
-        <br>
-        形：● 0〜2回 ／ 石 3〜5回 ／ ★ 6回以上 ／ ♥ お気に入り
-      </div>
-
-      <div class="score-box">
+        <div class="score-box">
         <p>残り時間</p>
         <h2 id="timeText">10:00</h2>
 
@@ -728,8 +897,40 @@
         <h2><span id="totalScore">0</span> 点</h2>
         <p id="message">まだ価値の砂はたまっていません</p>
       </div>
+
+      <div class="hourglass" aria-label="5項目の価値を色と粒の大きさで表した砂時計">
+        <div class="top-sand" id="topSand"></div>
+        <div class="neck-sand" id="neckSand"></div>
+        <div class="bottom-sand" id="bottomSand"></div>
+      </div>
+
+      <!-- 説明欄 -->
+
+      <div class="home-guide" aria-label="砂時計の操作方法">
+        <div class="home-guide-row">
+            <span class="home-guide-symbol">
+                <span class="home-guide-triangle"></span>
+            </span>
+            <span>砂時計を設定する</span>
+        </div>
+        
+        <div class="home-guide-row">
+            <span class="home-guide-symbol">
+                <span class="home-guide-neck"></span>
+            </span>
+            <span>価値を記録する</span>
+        </div>
+        
+        <div class="home-guide-row">
+            <span class="home-guide-symbol">
+                <span class="home-guide-outline"></span>
+            </span>
+            <span>価値を見る</span>
+        </div>
+    </div>
       </section>
 
+    <!-- 価値をためる -->
       <section class="app-view" id="addView" data-view="add">
       <h2 class="view-heading">思い出をためる</h2>
       <p class="view-description">写真やメモから、思い出の価値をAIで評価します。</p>
@@ -741,13 +942,8 @@
         <div class="preview-area" id="previewArea"></div>
 
         <label>カテゴリ</label>
-        <select id="category">
-          <option value="勉強">勉強</option>
-          <option value="遊び">遊び</option>
-          <option value="旅行">旅行</option>
-          <option value="アルバイト">アルバイト</option>
-          <option value="家族">家族</option>
-          <option value="挑戦">挑戦</option>
+        <select id="category" onchange="handleMemoryCategoryChange(this)">
+          <!-- 選択肢はJavaScriptで生成 -->
         </select>
 
         <label>思い出メモ</label>
@@ -833,29 +1029,26 @@
       <h3>記録一覧</h3>
 
       <div class="history-filter" id="historyFilter">
-        <button type="button" class="active" data-filter="all" onclick="setHistoryFilter('all')">
-          すべて
-        </button>
+        <div class="history-filter-title">絞り込む</div>
 
-        <button type="button" data-filter="emotion" onclick="setHistoryFilter('emotion')">
-          感情
-        </button>
+        <div class="history-filter-row">
+          <label for="historyCategoryFilter">カテゴリ</label>
+          <select id="historyCategoryFilter" onchange="handleHistoryCategoryChange(this)">
+            <!-- 選択肢はJavaScriptで生成 -->
+          </select>
+        </div>
 
-        <button type="button" data-filter="learning" onclick="setHistoryFilter('learning')">
-          学び
-        </button>
-
-        <button type="button" data-filter="rarity" onclick="setHistoryFilter('rarity')">
-          希少性
-        </button>
-
-        <button type="button" data-filter="relationship" onclick="setHistoryFilter('relationship')">
-          人間関係
-        </button>
-
-        <button type="button" data-filter="future" onclick="setHistoryFilter('future')">
-          将来への影響
-        </button>
+        <div class="history-filter-row">
+          <label for="historyValueFilter">価値</label>
+          <select id="historyValueFilter" onchange="setHistoryValueFilter(this.value)">
+            <option value="all">すべて</option>
+            <option value="emotion">感情</option>
+            <option value="learning">学び</option>
+            <option value="rarity">希少性</option>
+            <option value="relationship">人間関係</option>
+            <option value="future">将来への影響</option>
+          </select>
+        </div>
       </div>
 
       <div id="history"></div>
@@ -936,8 +1129,53 @@
     </nav>
   </ons-page>
 
+
+  <!-- 思い出詳細ダイアログ -->
+  <ons-dialog id="memoryDetailDialog" cancelable>
+    <div class="memory-detail-dialog">
+      <div id="memoryDetailContent"></div>
+      <button type="button" class="memory-detail-close" onclick="closeMemoryDetail()">
+        閉じる
+      </button>
+    </div>
+  </ons-dialog>
+
   <!-- プロフィール設定ダイアログ -->
-  <ons-dialog id="profileDialog" cancelable>
+  
+  <ons-dialog id="categoryDialog" cancelable>
+    <div class="category-dialog-box">
+      <h3>カテゴリを編集</h3>
+      <p>カテゴリの追加・削除ができます。</p>
+
+      <div id="categoryManageList"></div>
+
+      <label for="newCategoryName">新しいカテゴリ</label>
+      <input
+        type="text"
+        id="newCategoryName"
+        maxlength="20"
+        placeholder="例：ライブ"
+      >
+
+      <button
+        type="button"
+        class="category-add-button"
+        onclick="saveCustomCategory()"
+      >
+        ＋ カテゴリを追加
+      </button>
+
+      <button
+        type="button"
+        class="category-close-button"
+        onclick="closeCategoryDialog()"
+      >
+        閉じる
+      </button>
+    </div>
+  </ons-dialog>
+
+<ons-dialog id="profileDialog" cancelable>
     <div style="padding: 20px; min-width: 280px;">
       <h3 style="margin-top: 0;">プロフィール設定</h3>
       <p class="criteria-note">
@@ -986,6 +1224,50 @@
 
       <ons-button modifier="large quiet" class="main-button" onclick="closeProfileDialog()">
         閉じる
+      </ons-button>
+    </div>
+  </ons-dialog>
+
+  <!-- 価値の再評価ダイアログ -->
+  <ons-dialog id="reevaluateDialog" cancelable>
+    <div style="padding:20px; min-width:280px; max-width:420px;">
+      <h3 style="margin-top:0;">価値を再評価・修正</h3>
+      <p class="criteria-note">
+        AIが付けた5項目の点数を、あなた自身の感じ方に合わせて0〜5点で修正できます。
+      </p>
+
+      <p><b id="reevaluateMemoryTitle">思い出</b></p>
+
+      <div class="reevaluate-score-grid">
+        <label for="reevaluateEmotion">感情</label>
+        <input type="number" id="reevaluateEmotion" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
+
+        <label for="reevaluateLearning">学び</label>
+        <input type="number" id="reevaluateLearning" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
+
+        <label for="reevaluateRarity">希少性</label>
+        <input type="number" id="reevaluateRarity" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
+
+        <label for="reevaluateRelationship">人間関係</label>
+        <input type="number" id="reevaluateRelationship" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
+
+        <label for="reevaluateFuture">将来への影響</label>
+        <input type="number" id="reevaluateFuture" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
+      </div>
+
+      <div class="reevaluate-total">
+        修正後の思い出価値：<span id="reevaluateTotalScore">0</span> / 25
+      </div>
+
+      <label for="reevaluateReason">修正理由（任意）</label>
+      <textarea id="reevaluateReason" placeholder="例：実際には友人との時間が特に大切だったため"></textarea>
+
+      <ons-button modifier="large" class="main-button" onclick="saveReevaluatedValue()">
+        この内容で修正する
+      </ons-button>
+
+      <ons-button modifier="large quiet" class="main-button" onclick="closeReevaluateDialog()">
+        キャンセル
       </ons-button>
     </div>
   </ons-dialog>
@@ -1106,7 +1388,23 @@
     let isCalendarConnected = false;
 
     // 記録一覧の表示フィルター
-    let currentHistoryFilter = "all";
+    let currentHistoryCategoryFilter = "all";
+    let currentHistoryValueFilter = "all";
+
+    // 思い出カテゴリ
+    // 初期状態は3つ。ユーザーが追加したカテゴリはlocalStorageへ保存する。
+    const DEFAULT_MEMORY_CATEGORIES = [
+      "日常",
+      "遊び・趣味",
+      "学び・仕事"
+    ];
+    const CUSTOM_CATEGORY_STORAGE_KEY = "timeValueCustomCategories";
+    const ADD_CATEGORY_VALUE = "__add_category__";
+    let customMemoryCategories = loadCustomCategories();
+    let categoryDialogTarget = "memory";
+
+    // 現在、価値を再評価している思い出の配列番号
+    let reevaluatingMemoryIndex = -1;
 
     // 砂時計の期間フィルター
     let currentPeriodMode = "life";
@@ -1123,6 +1421,7 @@
         "Googleカレンダー：初期化中"
       );
       refreshProfileAge();
+      refreshCategorySelects();
 
       const birthdayInput =
         document.getElementById("userBirthday");
@@ -3712,18 +4011,303 @@ function showAIResult(result) {
       return highestCriteria[0] || "emotion";
     }
 
-    function setHistoryFilter(filterName) {
-      currentHistoryFilter = filterName;
+    function loadCustomCategories() {
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem(CUSTOM_CATEGORY_STORAGE_KEY) || "[]"
+        );
 
-      document
-        .querySelectorAll("#historyFilter button")
-        .forEach(function(button) {
-          button.classList.toggle(
-            "active",
-            button.dataset.filter === filterName
+        if (!Array.isArray(saved)) {
+          return [];
+        }
+
+        return saved
+          .map(function(category) {
+            return String(category || "").trim();
+          })
+          .filter(function(category, index, array) {
+            return (
+              category !== "" &&
+              !DEFAULT_MEMORY_CATEGORIES.includes(category) &&
+              array.indexOf(category) === index
+            );
+          });
+      } catch (error) {
+        console.warn("カテゴリの読み込みに失敗しました。", error);
+        return [];
+      }
+    }
+
+    function getAllMemoryCategories() {
+      return DEFAULT_MEMORY_CATEGORIES.concat(customMemoryCategories);
+    }
+
+    function createCategoryOption(value, label) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      return option;
+    }
+
+    function refreshCategorySelects() {
+      const memorySelect = document.getElementById("category");
+      const historySelect = document.getElementById("historyCategoryFilter");
+      const categories = getAllMemoryCategories();
+
+      if (memorySelect) {
+        const previousValue = memorySelect.value;
+        memorySelect.innerHTML = "";
+
+        categories.forEach(function(category) {
+          memorySelect.appendChild(
+            createCategoryOption(category, category)
           );
         });
 
+        memorySelect.appendChild(
+          createCategoryOption(ADD_CATEGORY_VALUE, "カテゴリを編集")
+        );
+
+        if (categories.includes(previousValue)) {
+          memorySelect.value = previousValue;
+        } else if (categories.length > 0) {
+          memorySelect.value = categories[0];
+        }
+      }
+
+      if (historySelect) {
+        const previousFilter = currentHistoryCategoryFilter;
+        historySelect.innerHTML = "";
+        historySelect.appendChild(
+          createCategoryOption("all", "すべて")
+        );
+
+        categories.forEach(function(category) {
+          historySelect.appendChild(
+            createCategoryOption(category, category)
+          );
+        });
+
+
+
+        if (
+          previousFilter === "all" ||
+          categories.includes(previousFilter)
+        ) {
+          historySelect.value = previousFilter;
+        } else {
+          currentHistoryCategoryFilter = "all";
+          historySelect.value = "all";
+        }
+      }
+    }
+
+    function handleMemoryCategoryChange(selectElement) {
+      if (selectElement.value === ADD_CATEGORY_VALUE) {
+        categoryDialogTarget = "memory";
+        openCategoryDialog();
+      }
+    }
+
+    function handleHistoryCategoryChange(selectElement) {
+      if (selectElement.value === ADD_CATEGORY_VALUE) {
+        categoryDialogTarget = "history";
+        openCategoryDialog();
+        return;
+      }
+
+      setHistoryCategoryFilter(selectElement.value);
+    }
+
+    function openCategoryDialog() {
+      const dialog = document.getElementById("categoryDialog");
+      const input = document.getElementById("newCategoryName");
+
+      if (input) {
+        input.value = "";
+      }
+
+      renderCategoryManageList();
+
+      if (dialog) {
+        dialog.show();
+      }
+    }
+
+    function renderCategoryManageList() {
+      const list = document.getElementById("categoryManageList");
+      if (!list) {
+        return;
+      }
+
+      list.innerHTML = "";
+
+      getAllMemoryCategories().forEach(function(category) {
+        const row = document.createElement("div");
+        row.className = "category-manage-row";
+
+        const name = document.createElement("span");
+        name.className = "category-manage-name";
+        name.textContent = category;
+        row.appendChild(name);
+
+        if (DEFAULT_MEMORY_CATEGORIES.includes(category)) {
+          const badge = document.createElement("span");
+          badge.className = "category-default-badge";
+          badge.textContent = "初期";
+          row.appendChild(badge);
+        } else {
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "category-delete-button";
+          deleteButton.textContent = "削除";
+          deleteButton.onclick = function() {
+            deleteCustomCategory(category);
+          };
+          row.appendChild(deleteButton);
+        }
+
+        list.appendChild(row);
+      });
+    }
+
+    function deleteCustomCategory(categoryName) {
+      if (DEFAULT_MEMORY_CATEGORIES.includes(categoryName)) {
+        return;
+      }
+
+      ons.notification.confirm(
+        "「" + categoryName + "」をカテゴリ一覧から削除しますか？\n" +
+        "すでに保存済みの思い出のカテゴリ情報は消えません。"
+      ).then(function(result) {
+        if (result !== 1) {
+          return;
+        }
+
+        customMemoryCategories = customMemoryCategories.filter(
+          function(category) {
+            return category !== categoryName;
+          }
+        );
+
+        try {
+          localStorage.setItem(
+            CUSTOM_CATEGORY_STORAGE_KEY,
+            JSON.stringify(customMemoryCategories)
+          );
+        } catch (error) {
+          console.warn("カテゴリの削除保存に失敗しました。", error);
+          ons.notification.toast("カテゴリを削除できませんでした。", {
+            timeout: 1800
+          });
+          return;
+        }
+
+        if (currentHistoryCategoryFilter === categoryName) {
+          currentHistoryCategoryFilter = "all";
+        }
+
+        refreshCategorySelects();
+        renderCategoryManageList();
+        renderHistory();
+
+        ons.notification.toast(
+          "「" + categoryName + "」を削除しました。",
+          { timeout: 1800 }
+        );
+      });
+    }
+
+    function closeCategoryDialog() {
+      const dialog = document.getElementById("categoryDialog");
+
+      if (dialog) {
+        dialog.hide();
+      }
+
+      // 「追加する」を選んだままにしない
+      refreshCategorySelects();
+    }
+
+    function saveCustomCategory() {
+      const input = document.getElementById("newCategoryName");
+      const categoryName = String(input ? input.value : "").trim();
+
+      if (!categoryName) {
+        ons.notification.toast("カテゴリ名を入力してください。", {
+          timeout: 1800
+        });
+        return;
+      }
+
+      if (categoryName.length > 20) {
+        ons.notification.toast("カテゴリ名は20文字以内で入力してください。", {
+          timeout: 1800
+        });
+        return;
+      }
+
+      const allCategories = getAllMemoryCategories();
+
+      if (!allCategories.includes(categoryName)) {
+        customMemoryCategories.push(categoryName);
+
+        try {
+          localStorage.setItem(
+            CUSTOM_CATEGORY_STORAGE_KEY,
+            JSON.stringify(customMemoryCategories)
+          );
+        } catch (error) {
+          console.warn("カテゴリの保存に失敗しました。", error);
+          ons.notification.toast("カテゴリを保存できませんでした。", {
+            timeout: 1800
+          });
+          return;
+        }
+      }
+
+      refreshCategorySelects();
+
+      if (categoryDialogTarget === "memory") {
+        const memorySelect = document.getElementById("category");
+        if (memorySelect) {
+          memorySelect.value = categoryName;
+        }
+      } else {
+        const historySelect = document.getElementById("historyCategoryFilter");
+        if (historySelect) {
+          historySelect.value = categoryName;
+        }
+        setHistoryCategoryFilter(categoryName);
+      }
+
+      renderCategoryManageList();
+
+      if (input) {
+        input.value = "";
+      }
+
+      ons.notification.toast(
+        "「" + categoryName + "」をカテゴリに追加しました。",
+        { timeout: 1800 }
+      );
+    }
+
+    function setHistoryCategoryFilter(categoryName) {
+      currentHistoryCategoryFilter = categoryName;
+
+      const historySelect =
+        document.getElementById("historyCategoryFilter");
+
+      if (historySelect && historySelect.value !== categoryName) {
+        historySelect.value = categoryName;
+      }
+
+      renderHistory();
+    }
+
+    function setHistoryValueFilter(valueName) {
+      currentHistoryValueFilter = valueName;
       renderHistory();
     }
 
@@ -3738,9 +4322,9 @@ function showAIResult(result) {
       }
 
       const filteredMemories = memories.filter(function(memory) {
-        if (currentHistoryFilter === "all") {
-          return true;
-        }
+        const categoryMatches =
+          currentHistoryCategoryFilter === "all" ||
+          String(memory.category || "未分類") === currentHistoryCategoryFilter;
 
         const primaryCriterion =
           memory.primaryCriterion ||
@@ -3749,144 +4333,154 @@ function showAIResult(result) {
             memory.userPriority || ""
           );
 
-        return primaryCriterion === currentHistoryFilter;
+        const valueMatches =
+          currentHistoryValueFilter === "all" ||
+          primaryCriterion === currentHistoryValueFilter;
+
+        return categoryMatches && valueMatches;
       });
 
       if (filteredMemories.length === 0) {
         history.innerHTML =
-          "<p class='history-empty'>" +
-          escapeHtml(
-            CRITERIA_LABELS[currentHistoryFilter] || "選択中"
-          ) +
-          "に該当する記録はありません。</p>";
+          "<p class='history-empty'>選択した条件に該当する記録はありません。</p>";
         return;
       }
 
       filteredMemories.forEach(function(memory) {
         const div = document.createElement("div");
-        div.className = "history-item";
+        div.className = "history-item compact-history-item";
 
         const memoryIndex = memories.indexOf(memory);
-        const viewCount = Math.max(0, Number(memory.viewCount || 0));
-        const isFavorite = memory.favorite === true;
-        const currentShape = getMemoryShape(memory);
-
-        const currentShapeLabel =
-          currentShape === "heart"
-            ? "ハート"
-            : currentShape === "star"
-              ? "星"
-              : currentShape === "stone"
-                ? "石"
-                : "砂粒";
-
         const title =
           memory.memoryTitle ||
           memory.summary ||
           "思い出";
 
-        const summary =
-          memory.memorySummary ||
-          memory.summary ||
-          "なし";
-
-        const emotion = Math.max(
-          0,
-          Math.min(
-            5,
-            Math.round(Number(memory.emotion || 0))
-          )
-        );
-
-        const learning = Math.max(
-          0,
-          Math.min(
-            5,
-            Math.round(
-              Number(
-                memory.learning ??
-                memory.meaning ??
-                memory.experience ??
-                0
-              )
-            )
-          )
-        );
-
-        const rarity = Math.max(
-          0,
-          Math.min(
-            5,
-            Math.round(
-              Number(
-                memory.rarity ??
-                memory.special ??
-                0
-              )
-            )
-          )
-        );
-
-        const relationship = Math.max(
-          0,
-          Math.min(
-            5,
-            Math.round(
-              Number(
-                memory.relationship ??
-                memory.people ??
-                0
-              )
-            )
-          )
-        );
-
-        const future = Math.max(
-          0,
-          Math.min(
-            5,
-            Math.round(Number(memory.future || 0))
-          )
-        );
-
-        const score =
-          emotion +
-          learning +
-          rarity +
-          relationship +
-          future;
-
+        const scores = getMemoryCriterionScores(memory);
         const primaryCriterion =
           memory.primaryCriterion ||
-          getPrimaryCriterion(
-            {
-              emotion,
-              learning,
-              rarity,
-              relationship,
-              future
-            },
-            memory.userPriority || ""
-          );
+          getPrimaryCriterion(scores, memory.userPriority || "");
+
+        const memoryDate = getMemoryDate(memory);
+        const displayDate =
+          memoryDate && !Number.isNaN(memoryDate.getTime())
+            ? memoryDate.toLocaleDateString("ja-JP")
+            : String(memory.date || "");
+
+        div.setAttribute("role", "button");
+        div.setAttribute("tabindex", "0");
+        div.onclick = function() {
+          openMemoryDetail(memoryIndex);
+        };
+        div.onkeydown = function(event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openMemoryDetail(memoryIndex);
+          }
+        };
 
         div.innerHTML = `
-          <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+          <div class="history-card-top">
+            <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+            <span class="history-card-date">${escapeHtml(displayDate)}</span>
+          </div>
 
           <h4>${escapeHtml(title)}</h4>
 
-          <span class="primary-criterion">
-            主な評価：${escapeHtml(
-              CRITERIA_LABELS[primaryCriterion] || "未分類"
-            )}
-          </span>
+          <div class="history-card-bottom">
+            <span class="primary-criterion">
+              主な評価：${escapeHtml(
+                CRITERIA_LABELS[primaryCriterion] || "未分類"
+              )}
+            </span>
+            <span class="history-card-arrow" aria-hidden="true">›</span>
+          </div>
+        `;
 
-          <p><b>思い出メモ：</b>${escapeHtml(memory.memo || "なし")}</p>
-          <p><b>思い出の概要：</b>${escapeHtml(summary)}</p>
-          <p><b>文脈的な意味：</b>${escapeHtml(memory.contextMeaning || "なし")}</p>
-          <p><b>時間価値の理由：</b>${escapeHtml(memory.valueReason || "なし")}</p>
-          <p>判断に使用した写真：${Number(memory.photoCount || 0)}枚</p>
+        history.appendChild(div);
+      });
+    }
 
+    function openMemoryDetail(index) {
+      const memory = memories[index];
+      const dialog = document.getElementById("memoryDetailDialog");
+      const content = document.getElementById("memoryDetailContent");
 
+      if (!memory || !dialog || !content) return;
+
+      const scores = getMemoryCriterionScores(memory);
+      const score =
+        scores.emotion +
+        scores.learning +
+        scores.rarity +
+        scores.relationship +
+        scores.future;
+
+      const primaryCriterion =
+        memory.primaryCriterion ||
+        getPrimaryCriterion(scores, memory.userPriority || "");
+
+      const memoryDate = getMemoryDate(memory);
+      const displayDate =
+        memoryDate && !Number.isNaN(memoryDate.getTime())
+          ? memoryDate.toLocaleString("ja-JP")
+          : String(memory.date || "");
+
+      const isFavorite = memory.favorite === true;
+      const viewCount = Math.max(0, Number(memory.viewCount || 0));
+      const currentShape = getMemoryShape(memory);
+      const currentShapeLabel =
+        currentShape === "heart"
+          ? "ハート"
+          : currentShape === "star"
+            ? "星"
+            : currentShape === "stone"
+              ? "石"
+              : "砂粒";
+
+      content.innerHTML = `
+        <h3>${escapeHtml(memory.memoryTitle || memory.summary || "思い出")}</h3>
+
+        <div class="memory-detail-section">
+          <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+          <p><small>${escapeHtml(displayDate)}</small></p>
+          <p><b>主な評価：</b>${escapeHtml(
+            CRITERIA_LABELS[primaryCriterion] || "未分類"
+          )}</p>
+          <p><b>思い出価値：</b>${score} / 25</p>
+        </div>
+
+        <div class="memory-detail-section">
+          <p><b>思い出メモ</b></p>
+          <p>${escapeHtml(memory.memo || "なし")}</p>
+
+          <p><b>思い出の概要</b></p>
+          <p>${escapeHtml(memory.memorySummary || memory.summary || "なし")}</p>
+
+          <p><b>文脈的な意味</b></p>
+          <p>${escapeHtml(memory.contextMeaning || "なし")}</p>
+
+          <p><b>時間価値の理由</b></p>
+          <p>${escapeHtml(memory.valueReason || "なし")}</p>
+
+          <p><b>判断に使用した写真：</b>${Number(memory.photoCount || 0)}枚</p>
+        </div>
+
+        <div class="memory-detail-section">
+          <p><b>5項目の評価</b></p>
+          <div class="memory-detail-score-grid">
+            <span>感情</span><b>${scores.emotion} / 5</b>
+            <span>学び</span><b>${scores.learning} / 5</b>
+            <span>希少性</span><b>${scores.rarity} / 5</b>
+            <span>人間関係</span><b>${scores.relationship} / 5</b>
+            <span>将来への影響</span><b>${scores.future} / 5</b>
+          </div>
+
+          <p><b>点数評価の理由</b></p>
+          <div>${formatScoreReason(memory.reason || "なし")}</div>
+        </div>
+
+        <div class="memory-detail-section">
           <p><b>ユーザーが重視した要素：</b>${escapeHtml(
             memory.userPriorityLabel ||
             CRITERIA_LABELS[memory.userPriority] ||
@@ -3894,31 +4488,23 @@ function showAIResult(result) {
           )}</p>
 
           ${
-            Number(memory.historyCountUsed || 0) > 0
+            memory.userCorrected === true
               ? `
-                <p>
-                  <b>判断に使用した過去の思い出：</b>
-                  ${Number(memory.historyCountUsed)}件
-                </p>
+                <p class="primary-criterion">ユーザーによる再評価済み</p>
+                ${
+                  memory.correctionReason
+                    ? `<p><b>修正理由：</b>${escapeHtml(memory.correctionReason)}</p>`
+                    : ""
+                }
               `
               : ""
           }
-
-          <p><b>思い出価値：${score} / 25</b></p>
-          <p>感情：${emotion} / 5</p>
-          <p>学び：${learning} / 5</p>
-          <p>希少性：${rarity} / 5</p>
-          <p>人間関係：${relationship} / 5</p>
-          <p>将来への影響：${future} / 5</p>
-
-          <p><b>点数評価の理由：</b></p>
-          <div>${formatScoreReason(memory.reason || "なし")}</div>
 
           <div class="memory-action-row">
             <button
               type="button"
               class="memory-action-button ${isFavorite ? "favorite-active" : ""}"
-              onclick="toggleFavorite(${memoryIndex})"
+              onclick="toggleFavorite(${index}); openMemoryDetail(${index});"
             >
               ${isFavorite ? "♥ お気に入り済み" : "♡ お気に入り"}
             </button>
@@ -3926,9 +4512,17 @@ function showAIResult(result) {
             <button
               type="button"
               class="memory-action-button"
-              onclick="viewMemoryAgain(${memoryIndex})"
+              onclick="viewMemoryAgain(${index}); openMemoryDetail(${index});"
             >
               思い出を見返す
+            </button>
+
+            <button
+              type="button"
+              class="memory-action-button reevaluate-button"
+              onclick="closeMemoryDetail(); openReevaluateDialog(${index});"
+            >
+              価値を再評価
             </button>
           </div>
 
@@ -3938,12 +4532,167 @@ function showAIResult(result) {
             0〜2回＝砂粒、3〜5回＝石、6回以上＝星、
             お気に入り＝ハート
           </p>
+        </div>
+      `;
 
-          <small>${escapeHtml(memory.date || "")}</small>
-        `;
+      dialog.show();
+    }
 
-        history.appendChild(div);
-      });
+    function closeMemoryDetail() {
+      const dialog = document.getElementById("memoryDetailDialog");
+      if (dialog) dialog.hide();
+    }
+
+    // ==============================
+    // 価値の再評価・ユーザーによる手動修正
+    // ==============================
+    function openReevaluateDialog(index) {
+      if (index < 0 || index >= memories.length) return;
+
+      reevaluatingMemoryIndex = index;
+      const memory = memories[index];
+      const scores = getMemoryCriterionScores(memory);
+
+      document.getElementById("reevaluateMemoryTitle").textContent =
+        memory.memoryTitle || memory.summary || "思い出";
+
+      document.getElementById("reevaluateEmotion").value = scores.emotion;
+      document.getElementById("reevaluateLearning").value = scores.learning;
+      document.getElementById("reevaluateRarity").value = scores.rarity;
+      document.getElementById("reevaluateRelationship").value = scores.relationship;
+      document.getElementById("reevaluateFuture").value = scores.future;
+      document.getElementById("reevaluateReason").value =
+        memory.correctionReason || "";
+
+      updateReevaluateTotal();
+      document.getElementById("reevaluateDialog").show();
+    }
+
+    function closeReevaluateDialog() {
+      reevaluatingMemoryIndex = -1;
+      document.getElementById("reevaluateDialog").hide();
+    }
+
+    function getReevaluateInputScore(id) {
+      const input = document.getElementById(id);
+      const raw = Number(input?.value);
+
+      if (!Number.isFinite(raw)) return 0;
+
+      const score = Math.max(0, Math.min(5, Math.round(raw)));
+      if (input) input.value = score;
+      return score;
+    }
+
+    function updateReevaluateTotal() {
+      const emotion = getReevaluateInputScore("reevaluateEmotion");
+      const learning = getReevaluateInputScore("reevaluateLearning");
+      const rarity = getReevaluateInputScore("reevaluateRarity");
+      const relationship = getReevaluateInputScore("reevaluateRelationship");
+      const future = getReevaluateInputScore("reevaluateFuture");
+
+      const score = emotion + learning + rarity + relationship + future;
+      document.getElementById("reevaluateTotalScore").textContent = score;
+      return score;
+    }
+
+    function saveReevaluatedValue() {
+      const index = reevaluatingMemoryIndex;
+
+      if (index < 0 || index >= memories.length) {
+        ons.notification.alert("修正する思い出を確認できませんでした。");
+        return;
+      }
+
+      const memory = memories[index];
+
+      const oldScore = Number(
+        memory.totalScore ??
+        memory.score ??
+        0
+      );
+
+      const emotion = getReevaluateInputScore("reevaluateEmotion");
+      const learning = getReevaluateInputScore("reevaluateLearning");
+      const rarity = getReevaluateInputScore("reevaluateRarity");
+      const relationship = getReevaluateInputScore("reevaluateRelationship");
+      const future = getReevaluateInputScore("reevaluateFuture");
+
+      const newScore =
+        emotion +
+        learning +
+        rarity +
+        relationship +
+        future;
+
+      // 初回修正時だけ、AIが最初に付けた評価を保存しておく
+      if (!memory.originalAIEvaluation) {
+        memory.originalAIEvaluation = {
+          emotion: clampCriterionScore(memory.emotion),
+          learning: clampCriterionScore(
+            memory.learning ?? memory.meaning ?? memory.experience
+          ),
+          rarity: clampCriterionScore(
+            memory.rarity ?? memory.special
+          ),
+          relationship: clampCriterionScore(
+            memory.relationship ?? memory.people
+          ),
+          future: clampCriterionScore(memory.future),
+          totalScore: oldScore
+        };
+      }
+
+      memory.emotion = emotion;
+      memory.learning = learning;
+      memory.rarity = rarity;
+      memory.relationship = relationship;
+      memory.future = future;
+      memory.score = newScore;
+      memory.totalScore = newScore;
+
+      memory.primaryCriterion = getPrimaryCriterion(
+        {
+          emotion,
+          learning,
+          rarity,
+          relationship,
+          future
+        },
+        memory.userPriority || ""
+      );
+
+      memory.correctionReason =
+        document.getElementById("reevaluateReason").value.trim();
+
+      memory.userCorrected = true;
+      memory.correctedAt = new Date().toISOString();
+
+      // アプリ全体の合計値も修正後の点数に合わせる
+      totalScore = memories.reduce(function(sum, item) {
+        return sum + Number(item.totalScore ?? item.score ?? 0);
+      }, 0);
+
+      localStorage.setItem(
+        STORAGE_KEYS.totalScore,
+        String(totalScore)
+      );
+
+      localStorage.setItem(
+        STORAGE_KEYS.memories,
+        JSON.stringify(memories)
+      );
+
+      document.getElementById("reevaluateDialog").hide();
+      reevaluatingMemoryIndex = -1;
+
+      initializePeriodFilter();
+      updateDisplay();
+
+      ons.notification.toast(
+        "思い出の価値を " + oldScore + "点 → " + newScore + "点に修正しました。",
+        { timeout: 2200 }
+      );
     }
 
     // ==============================
@@ -4183,6 +4932,11 @@ function showAIResult(result) {
       updateTimeDisplay();
       updateDebug("残り時間を設定した時間にリセットしました。");
     }
+
+    //説明欄
+    
+
+
   </script>
 </body>
 </html>

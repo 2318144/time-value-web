@@ -44,10 +44,11 @@
 
     .main {
       padding: 18px;
-      padding-bottom: 104px;
+      padding-bottom: 24px;
       text-align: center;
     }
 
+    .view-back-button { display: block; margin: 0 0 14px; padding: 9px 14px; border: 1px solid #d9dee7; border-radius: 10px; background: white; color: #334155; font-size: 14px; cursor: pointer; }
     .app-view { display: none; animation: viewFadeIn 0.2s ease; }
     .app-view.active { display: block; }
     @keyframes viewFadeIn {
@@ -177,69 +178,15 @@
       border:1px solid rgba(255,255,255,.6);
     }
 
-    /* =====================================
-       思い出の形
-       ・通常：砂粒
-       ・3〜5回見返し：石
-       ・6回以上見返し：星
-       ・お気に入り：ハート（最優先）
-       ===================================== */
-
-    .value-grain.shape-sand {
-      border-radius: 50%;
+    /* 砂は円形。AI評価はサイズ、人の閲覧は輝きで示す */
+    .value-grain, .value-grain.shape-sand, .value-grain.shape-stone,
+    .value-grain.shape-star, .value-grain.shape-heart {
+      border-radius: 50% !important;
+      clip-path: none !important;
     }
-
-    .value-grain.shape-stone {
-      border-radius: 0;
-      clip-path: polygon(
-        50% 0%,
-        100% 38%,
-        82% 100%,
-        18% 100%,
-        0% 38%
-      );
-    }
-
-    .value-grain.shape-star {
-      border-radius: 0;
-      clip-path: polygon(
-        50% 0%,
-        61% 35%,
-        98% 35%,
-        68% 57%,
-        79% 91%,
-        50% 70%,
-        21% 91%,
-        32% 57%,
-        2% 35%,
-        39% 35%
-      );
-    }
-
-    .value-grain.shape-heart {
-      border-radius: 0;
-      clip-path: polygon(
-        50% 92%,
-        42% 84%,
-        18% 63%,
-        7% 48%,
-        5% 33%,
-        10% 20%,
-        20% 11%,
-        33% 9%,
-        43% 14%,
-        50% 23%,
-        57% 14%,
-        67% 9%,
-        80% 11%,
-        90% 20%,
-        95% 33%,
-        93% 48%,
-        82% 63%,
-        58% 84%
-      );
-    }
-
+    .value-grain.memory-glow-1 { box-shadow: 0 0 5px 2px rgba(255,230,128,.65); filter: brightness(1.12); }
+    .value-grain.memory-glow-2 { box-shadow: 0 0 9px 3px rgba(255,221,94,.85); filter: brightness(1.24); }
+    .value-grain.memory-glow-3 { box-shadow: 0 0 14px 5px rgba(255,215,90,.95),0 0 23px 7px rgba(255,215,90,.4); filter: brightness(1.4); }
 
     /* ===== 価値を見る：コンパクト一覧 ===== */
     .history-item.compact-history-item {
@@ -358,30 +305,6 @@
       font-size: 12px;
       color: #666666;
       line-height: 1.5;
-    }
-
-    .reevaluate-button {
-      border-color: #2f80ed;
-      color: #2f80ed;
-      font-weight: bold;
-    }
-
-    .reevaluate-score-grid {
-      display: grid;
-      grid-template-columns: 1fr 90px;
-      gap: 8px 12px;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .reevaluate-score-grid label {
-      margin: 0;
-      font-size: 14px;
-    }
-
-    .reevaluate-score-grid input {
-      margin: 0;
-      text-align: center;
     }
 
     .reevaluate-total {
@@ -862,6 +785,27 @@
       font-size: 13px;
     }
 
+    /* ヘッダーの右上角に設定ボタンを配置 */
+    ons-toolbar { position: relative !important; }
+    ons-toolbar .right, ons-toolbar .toolbar__right {
+      position: absolute !important;
+      top: 0 !important;
+      right: 0 !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+    }
+    .top-settings-button {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 100%; padding: 0; margin: 0;
+      border: 0; background: transparent; color: #334155;
+      cursor: pointer; font-size: 23px;
+    }
+    .top-settings-button:focus-visible { outline: 2px solid #3878df; outline-offset: -3px; }
+    .bottom-navigation { grid-template-columns:repeat(3,1fr); }
     /* ホームの使い方：白い角丸の説明枠 */
     #homeView .home-guide {
       width: min(100%, 420px); margin: 12px auto 16px;
@@ -875,6 +819,55 @@
     #homeView .home-guide-outline { width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:16px solid #e8b647; }
     #homeView .home-guide-neck { width:19px; height:17px; border:2px solid #e8b647; border-radius:4px; position:relative; }
     #homeView .home-guide-neck::after { content:''; position:absolute; width:7px; height:7px; border-radius:50%; background:#e8b647; left:4px; top:3px; }
+
+    #homeView .top-sand { cursor: pointer; touch-action: manipulation; }
+    #homeView .top-sand:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+    /* ホームの残り時間の枠をコンパクトにする */
+    #homeView .score-box {
+      width: min(88%, 320px);
+      margin: 8px auto 12px;
+      padding: 7px 12px;
+      border-radius: 12px;
+    }
+    #homeView .score-box p { margin: 3px 0; font-size: 11px; line-height: 1.3; }
+    #homeView .score-box h2 { margin: 2px 0 5px; font-size: 17px; line-height: 1.2; }
+    #homeView .score-box #message { font-size: 10px; margin: 3px 0 0; }
+    .timer-settings-heading { display:flex; align-items:center; justify-content:center; width:100%; gap:12px; margin:6px 0 10px; text-align:center; }
+    .timer-settings-heading .view-heading { margin:0; text-align:center; }
+    .timer-back-button { border:1px solid #c7d0d4; background:#fff; color:#303b42; border-radius:10px; padding:9px 12px; font-size:14px; cursor:pointer; }
+    #timerSettingsView .settings-card { margin-top:14px; }
+    .timer-floating-back {
+      position: fixed; z-index: 1002; left: 50%;
+      bottom: calc(94px + env(safe-area-inset-bottom));
+      transform: translateX(-50%); border: 1px solid #c7d0d4;
+      border-radius: 24px; background: #fff; color: #303b42;
+      padding: 10px 25px; font-size: 14px; font-weight: 600;
+      box-shadow: 0 3px 12px rgba(0,0,0,.12); cursor: pointer;
+    }
+    .timer-floating-back[hidden] { display: none !important; }
+    /* 砂時計の上下は独立したタップ領域 */
+    #topSand, #bottomSand { cursor: pointer; }
+    #topSand:focus-visible, #bottomSand:focus-visible { outline: 3px solid #3677d2; outline-offset: -3px; }
+    /* 砂時計のくびれをタップして「価値をためる」を開く */
+    #homeView .hourglass-neck-action {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 10;
+      touch-action: manipulation;
+    }
+    #homeView .hourglass-neck-action:focus-visible {
+      outline: 3px solid #2563eb;
+      outline-offset: -3px;
+      border-radius: 12px;
+    }
   </style>
 </head>
 
@@ -882,6 +875,7 @@
   <ons-page>
     <ons-toolbar>
       <div class="center">時間の価値 可視化</div>
+      <div class="right"><button type="button" class="top-settings-button" aria-label="設定を開く" title="設定" onclick="switchAppView('settings')"><ons-icon icon="md-settings"></ons-icon></button></div>
     </ons-toolbar>
 
     <!-- ホーム画面 -->
@@ -893,45 +887,23 @@
         <p>残り時間</p>
         <h2 id="timeText">10:00</h2>
 
-        <p>思い出価値</p>
-        <h2><span id="totalScore">0</span> 点</h2>
-        <p id="message">まだ価値の砂はたまっていません</p>
+        <!-- AI評価と砂時計の更新処理で参照するため、非表示で保持 -->
+        <span id="totalScore" hidden>0</span>
+        <span id="message" hidden></span>
       </div>
 
       <div class="hourglass" aria-label="5項目の価値を色と粒の大きさで表した砂時計">
-        <div class="top-sand" id="topSand"></div>
+        <div class="top-sand" id="topSand" role="button" tabindex="0" aria-label="砂時計の時間設定を開く" title="タップして砂時計の時間を設定" onclick="openHourglassTimerSettings()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openHourglassTimerSettings();}"></div>
         <div class="neck-sand" id="neckSand"></div>
-        <div class="bottom-sand" id="bottomSand"></div>
+        <button type="button" class="hourglass-neck-action" aria-label="価値をためる画面を開く" title="タップして価値をためる" onclick="switchAppView('add')"></button>
+        <div class="bottom-sand" id="bottomSand" role="button" tabindex="0" aria-label="価値を見る一覧を開く" title="タップして価値を見る一覧へ" onclick="switchAppView('value')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchAppView('value');}"></div>
       </div>
 
-      <!-- 説明欄 -->
-
-      <div class="home-guide" aria-label="砂時計の操作方法">
-        <div class="home-guide-row">
-            <span class="home-guide-symbol">
-                <span class="home-guide-triangle"></span>
-            </span>
-            <span>砂時計を設定する</span>
-        </div>
-        
-        <div class="home-guide-row">
-            <span class="home-guide-symbol">
-                <span class="home-guide-neck"></span>
-            </span>
-            <span>価値を記録する</span>
-        </div>
-        
-        <div class="home-guide-row">
-            <span class="home-guide-symbol">
-                <span class="home-guide-outline"></span>
-            </span>
-            <span>価値を見る</span>
-        </div>
-    </div>
       </section>
 
     <!-- 価値をためる -->
       <section class="app-view" id="addView" data-view="add">
+        <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
       <h2 class="view-heading">思い出をためる</h2>
       <p class="view-description">写真やメモから、思い出の価値をAIで評価します。</p>
       <div class="form-box">
@@ -1024,6 +996,7 @@
       </section>
 
       <section class="app-view" id="valueView" data-view="value">
+        <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
       <h2 class="view-heading">価値を見る</h2>
       <p class="view-description">期間や価値の種類から、これまでの思い出を振り返れます。</p>
       <h3>記録一覧</h3>
@@ -1055,6 +1028,7 @@
       </section>
 
       <section class="app-view" id="settingsView" data-view="settings">
+        <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
         <h2 class="view-heading">設定</h2>
         <p class="view-description">プロフィールや連携、保存データを管理します。</p>
         <div class="settings-card">
@@ -1063,6 +1037,13 @@
           <ons-button modifier="large" onclick="openProfileDialog()">プロフィールを設定</ons-button>
         </div>
         <div class="settings-card" id="calendarSettingsCard"><h3>Googleカレンダー</h3></div>
+        <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
+      </section>
+      <section class="app-view" id="timerSettingsView" data-view="timer-settings">
+        <div class="timer-settings-heading">
+          <h2 class="view-heading">砂時計設定</h2>
+        </div>
+        <p class="view-description">砂時計に表示する時間を設定します。</p>
         <div class="settings-card">
           <h3>砂時計の時間</h3>
           <p>基本は人生の残り時間を表示し、短期表示にも切り替えられます。</p>
@@ -1109,24 +1090,11 @@
             この設定で砂時計を表示する
           </ons-button>
         </div>
-        <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
       </section>
     </div>
 
-    <nav class="bottom-navigation" aria-label="メインメニュー">
-      <button type="button" class="bottom-nav-button active" data-view-target="home" onclick="switchAppView('home')">
-        <ons-icon icon="md-home"></ons-icon><span>ホーム</span>
-      </button>
-      <button type="button" class="bottom-nav-button add-button" data-view-target="add" onclick="switchAppView('add')">
-        <ons-icon icon="md-plus"></ons-icon><span>ためる</span>
-      </button>
-      <button type="button" class="bottom-nav-button" data-view-target="value" onclick="switchAppView('value')">
-        <ons-icon icon="md-hourglass-alt"></ons-icon><span>価値を見る</span>
-      </button>
-      <button type="button" class="bottom-nav-button" data-view-target="settings" onclick="switchAppView('settings')">
-        <ons-icon icon="md-settings"></ons-icon><span>設定</span>
-      </button>
-    </nav>
+    <button type="button" id="timerFloatingBack" class="timer-floating-back" onclick="switchAppView('home')" aria-label="ホームに戻る" hidden>← 戻る</button>
+
   </ons-page>
 
 
@@ -1228,50 +1196,6 @@
     </div>
   </ons-dialog>
 
-  <!-- 価値の再評価ダイアログ -->
-  <ons-dialog id="reevaluateDialog" cancelable>
-    <div style="padding:20px; min-width:280px; max-width:420px;">
-      <h3 style="margin-top:0;">価値を再評価・修正</h3>
-      <p class="criteria-note">
-        AIが付けた5項目の点数を、あなた自身の感じ方に合わせて0〜5点で修正できます。
-      </p>
-
-      <p><b id="reevaluateMemoryTitle">思い出</b></p>
-
-      <div class="reevaluate-score-grid">
-        <label for="reevaluateEmotion">感情</label>
-        <input type="number" id="reevaluateEmotion" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
-
-        <label for="reevaluateLearning">学び</label>
-        <input type="number" id="reevaluateLearning" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
-
-        <label for="reevaluateRarity">希少性</label>
-        <input type="number" id="reevaluateRarity" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
-
-        <label for="reevaluateRelationship">人間関係</label>
-        <input type="number" id="reevaluateRelationship" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
-
-        <label for="reevaluateFuture">将来への影響</label>
-        <input type="number" id="reevaluateFuture" min="0" max="5" step="1" oninput="updateReevaluateTotal()">
-      </div>
-
-      <div class="reevaluate-total">
-        修正後の思い出価値：<span id="reevaluateTotalScore">0</span> / 25
-      </div>
-
-      <label for="reevaluateReason">修正理由（任意）</label>
-      <textarea id="reevaluateReason" placeholder="例：実際には友人との時間が特に大切だったため"></textarea>
-
-      <ons-button modifier="large" class="main-button" onclick="saveReevaluatedValue()">
-        この内容で修正する
-      </ons-button>
-
-      <ons-button modifier="large quiet" class="main-button" onclick="closeReevaluateDialog()">
-        キャンセル
-      </ons-button>
-    </div>
-  </ons-dialog>
-
   <script>
     // ==============================
     // 定数
@@ -1322,7 +1246,7 @@
     // 1つの思い出 = 1粒
     // 色：主な評価
     // 大きさ：合計点（25点満点）
-    // 形：お気に入り・見返し回数
+    // 形：円形固定。輝き：閲覧回数（人間側の関心の指標）
     const MAX_VISIBLE_GRAINS = 420;
 
     // ==============================
@@ -1403,8 +1327,7 @@
     let customMemoryCategories = loadCustomCategories();
     let categoryDialogTarget = "memory";
 
-    // 現在、価値を再評価している思い出の配列番号
-    let reevaluatingMemoryIndex = -1;
+
 
     // 砂時計の期間フィルター
     let currentPeriodMode = "life";
@@ -1473,6 +1396,10 @@
       switchAppView("home", false);
     }
 
+    function openHourglassTimerSettings() {
+      switchAppView("timer-settings");
+    }
+
     function switchAppView(viewName, scrollToTop = true) {
       const targetView = document.querySelector('[data-view="' + viewName + '"]');
       if (!targetView) return;
@@ -1485,6 +1412,8 @@
         if (isActive) button.setAttribute("aria-current", "page");
         else button.removeAttribute("aria-current");
       });
+      const timerBack = document.getElementById("timerFloatingBack");
+      if (timerBack) timerBack.hidden = viewName !== "timer-settings";
       if (viewName === "home") requestAnimationFrame(function() { renderValueSand(); });
       if (viewName === "value") renderHistory();
       if (scrollToTop) window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2675,8 +2604,7 @@
           memo,
           photoCount: files.length,
 
-          // ユーザー行動による形の変化
-          // favorite=true は見返し回数より優先してハート表示
+          // 閲覧回数は人間側の関心を表す。形は円形固定
           favorite: false,
           viewCount: 0,
 
@@ -3603,34 +3531,11 @@ function showAIResult(result) {
       return 6;                   // 0〜5点：最小
     }
 
-    function getMemoryShape(memory) {
-      /*
-        形の優先順位
-        1. お気に入り → ハート
-        2. 見返し6回以上 → 星
-        3. 見返し3〜5回 → 石
-        4. 見返し0〜2回 → 通常の砂粒
+    function getMemoryShape(memory) { return "sand"; }
 
-        既存データに favorite / viewCount が無くても動作する。
-      */
-      if (memory?.favorite === true) {
-        return "heart";
-      }
-
-      const viewCount = Math.max(
-        0,
-        Number(memory?.viewCount || 0)
-      );
-
-      if (viewCount >= 6) {
-        return "star";
-      }
-
-      if (viewCount >= 3) {
-        return "stone";
-      }
-
-      return "sand";
+    function getMemoryGlowLevel(memory) {
+      const count = Math.max(0, Number(memory?.viewCount || 0));
+      return count >= 6 ? 3 : count >= 3 ? 2 : count >= 1 ? 1 : 0;
     }
 
     /*
@@ -3914,8 +3819,7 @@ function showAIResult(result) {
         grain.className =
           "value-grain " +
           criterion +
-          " shape-" +
-          shape;
+          " shape-sand memory-glow-" + getMemoryGlowLevel(memory);
 
         grain.style.width =
           size + "px";
@@ -3933,22 +3837,14 @@ function showAIResult(result) {
         grain.style.bottom =
           position.y + "px";
 
-        const shapeLabel =
-          shape === "heart"
-            ? "お気に入り"
-            : shape === "star"
-              ? "星"
-              : shape === "stone"
-                ? "石"
-                : "砂粒";
+        const shapeLabel = "円形";
 
         grain.title =
           (CRITERIA_LABELS[criterion] || "") +
           " ／ 思い出価値：" +
           totalValueScore +
           " / 25" +
-          " ／ 形：" +
-          shapeLabel +
+          " ／ 形：円形" +
           " ／ 見返し：" +
           Number(memory.viewCount || 0) +
           "回";
@@ -4407,6 +4303,7 @@ function showAIResult(result) {
       const content = document.getElementById("memoryDetailContent");
 
       if (!memory || !dialog || !content) return;
+      recordMemoryView(index);
 
       const scores = getMemoryCriterionScores(memory);
       const score =
@@ -4426,17 +4323,9 @@ function showAIResult(result) {
           ? memoryDate.toLocaleString("ja-JP")
           : String(memory.date || "");
 
-      const isFavorite = memory.favorite === true;
+
       const viewCount = Math.max(0, Number(memory.viewCount || 0));
-      const currentShape = getMemoryShape(memory);
-      const currentShapeLabel =
-        currentShape === "heart"
-          ? "ハート"
-          : currentShape === "star"
-            ? "星"
-            : currentShape === "stone"
-              ? "石"
-              : "砂粒";
+      const glowLevel = getMemoryGlowLevel(memory);
 
       content.innerHTML = `
         <h3>${escapeHtml(memory.memoryTitle || memory.summary || "思い出")}</h3>
@@ -4487,50 +4376,12 @@ function showAIResult(result) {
             "未選択"
           )}</p>
 
-          ${
-            memory.userCorrected === true
-              ? `
-                <p class="primary-criterion">ユーザーによる再評価済み</p>
-                ${
-                  memory.correctionReason
-                    ? `<p><b>修正理由：</b>${escapeHtml(memory.correctionReason)}</p>`
-                    : ""
-                }
-              `
-              : ""
-          }
 
-          <div class="memory-action-row">
-            <button
-              type="button"
-              class="memory-action-button ${isFavorite ? "favorite-active" : ""}"
-              onclick="toggleFavorite(${index}); openMemoryDetail(${index});"
-            >
-              ${isFavorite ? "♥ お気に入り済み" : "♡ お気に入り"}
-            </button>
-
-            <button
-              type="button"
-              class="memory-action-button"
-              onclick="viewMemoryAgain(${index}); openMemoryDetail(${index});"
-            >
-              思い出を見返す
-            </button>
-
-            <button
-              type="button"
-              class="memory-action-button reevaluate-button"
-              onclick="closeMemoryDetail(); openReevaluateDialog(${index});"
-            >
-              価値を再評価
-            </button>
-          </div>
 
           <p class="memory-behavior-note">
-            見返し回数：${viewCount}回 ／ 現在の形：${currentShapeLabel}
-            <br>
-            0〜2回＝砂粒、3〜5回＝石、6回以上＝星、
-            お気に入り＝ハート
+            閲覧回数：${viewCount}回 ／ 輝きレベル：${glowLevel} / 3<br>
+            砂の大きさはAI評価（変更不可）、輝きは閲覧回数で決まります。<br>
+            この思い出を開くと閲覧回数が1回増えます。
           </p>
         </div>
       `;
@@ -4541,158 +4392,6 @@ function showAIResult(result) {
     function closeMemoryDetail() {
       const dialog = document.getElementById("memoryDetailDialog");
       if (dialog) dialog.hide();
-    }
-
-    // ==============================
-    // 価値の再評価・ユーザーによる手動修正
-    // ==============================
-    function openReevaluateDialog(index) {
-      if (index < 0 || index >= memories.length) return;
-
-      reevaluatingMemoryIndex = index;
-      const memory = memories[index];
-      const scores = getMemoryCriterionScores(memory);
-
-      document.getElementById("reevaluateMemoryTitle").textContent =
-        memory.memoryTitle || memory.summary || "思い出";
-
-      document.getElementById("reevaluateEmotion").value = scores.emotion;
-      document.getElementById("reevaluateLearning").value = scores.learning;
-      document.getElementById("reevaluateRarity").value = scores.rarity;
-      document.getElementById("reevaluateRelationship").value = scores.relationship;
-      document.getElementById("reevaluateFuture").value = scores.future;
-      document.getElementById("reevaluateReason").value =
-        memory.correctionReason || "";
-
-      updateReevaluateTotal();
-      document.getElementById("reevaluateDialog").show();
-    }
-
-    function closeReevaluateDialog() {
-      reevaluatingMemoryIndex = -1;
-      document.getElementById("reevaluateDialog").hide();
-    }
-
-    function getReevaluateInputScore(id) {
-      const input = document.getElementById(id);
-      const raw = Number(input?.value);
-
-      if (!Number.isFinite(raw)) return 0;
-
-      const score = Math.max(0, Math.min(5, Math.round(raw)));
-      if (input) input.value = score;
-      return score;
-    }
-
-    function updateReevaluateTotal() {
-      const emotion = getReevaluateInputScore("reevaluateEmotion");
-      const learning = getReevaluateInputScore("reevaluateLearning");
-      const rarity = getReevaluateInputScore("reevaluateRarity");
-      const relationship = getReevaluateInputScore("reevaluateRelationship");
-      const future = getReevaluateInputScore("reevaluateFuture");
-
-      const score = emotion + learning + rarity + relationship + future;
-      document.getElementById("reevaluateTotalScore").textContent = score;
-      return score;
-    }
-
-    function saveReevaluatedValue() {
-      const index = reevaluatingMemoryIndex;
-
-      if (index < 0 || index >= memories.length) {
-        ons.notification.alert("修正する思い出を確認できませんでした。");
-        return;
-      }
-
-      const memory = memories[index];
-
-      const oldScore = Number(
-        memory.totalScore ??
-        memory.score ??
-        0
-      );
-
-      const emotion = getReevaluateInputScore("reevaluateEmotion");
-      const learning = getReevaluateInputScore("reevaluateLearning");
-      const rarity = getReevaluateInputScore("reevaluateRarity");
-      const relationship = getReevaluateInputScore("reevaluateRelationship");
-      const future = getReevaluateInputScore("reevaluateFuture");
-
-      const newScore =
-        emotion +
-        learning +
-        rarity +
-        relationship +
-        future;
-
-      // 初回修正時だけ、AIが最初に付けた評価を保存しておく
-      if (!memory.originalAIEvaluation) {
-        memory.originalAIEvaluation = {
-          emotion: clampCriterionScore(memory.emotion),
-          learning: clampCriterionScore(
-            memory.learning ?? memory.meaning ?? memory.experience
-          ),
-          rarity: clampCriterionScore(
-            memory.rarity ?? memory.special
-          ),
-          relationship: clampCriterionScore(
-            memory.relationship ?? memory.people
-          ),
-          future: clampCriterionScore(memory.future),
-          totalScore: oldScore
-        };
-      }
-
-      memory.emotion = emotion;
-      memory.learning = learning;
-      memory.rarity = rarity;
-      memory.relationship = relationship;
-      memory.future = future;
-      memory.score = newScore;
-      memory.totalScore = newScore;
-
-      memory.primaryCriterion = getPrimaryCriterion(
-        {
-          emotion,
-          learning,
-          rarity,
-          relationship,
-          future
-        },
-        memory.userPriority || ""
-      );
-
-      memory.correctionReason =
-        document.getElementById("reevaluateReason").value.trim();
-
-      memory.userCorrected = true;
-      memory.correctedAt = new Date().toISOString();
-
-      // アプリ全体の合計値も修正後の点数に合わせる
-      totalScore = memories.reduce(function(sum, item) {
-        return sum + Number(item.totalScore ?? item.score ?? 0);
-      }, 0);
-
-      localStorage.setItem(
-        STORAGE_KEYS.totalScore,
-        String(totalScore)
-      );
-
-      localStorage.setItem(
-        STORAGE_KEYS.memories,
-        JSON.stringify(memories)
-      );
-
-      document.getElementById("reevaluateDialog").hide();
-      reevaluatingMemoryIndex = -1;
-
-      initializePeriodFilter();
-      updateDisplay();
-
-      ons.notification.toast(
-        "思い出の価値を " + oldScore + "点 → " + newScore + "点に修正しました。",
-        { timeout: 2200 }
-      );
     }
 
     // ==============================
@@ -4709,64 +4408,11 @@ function showAIResult(result) {
       updateValueDisplay();
     }
 
-    function toggleFavorite(index) {
-      if (
-        index < 0 ||
-        index >= memories.length
-      ) {
-        return;
-      }
-
-      memories[index].favorite =
-        memories[index].favorite !== true;
-
+    // 思い出の詳細を開いた時に自動で閲覧を記録する。
+    function recordMemoryView(index) {
+      if (index < 0 || index >= memories.length) return;
+      memories[index].viewCount = Math.max(0, Number(memories[index].viewCount || 0)) + 1;
       saveMemoriesAndRefresh();
-
-      ons.notification.toast(
-        memories[index].favorite
-          ? "お気に入りに登録しました。砂の形をハートに変更しました。"
-          : "お気に入りを解除しました。見返し回数に応じた形へ戻しました。",
-        { timeout: 1800 }
-      );
-    }
-
-    function viewMemoryAgain(index) {
-      if (
-        index < 0 ||
-        index >= memories.length
-      ) {
-        return;
-      }
-
-      const currentCount =
-        Math.max(
-          0,
-          Number(memories[index].viewCount || 0)
-        );
-
-      memories[index].viewCount =
-        currentCount + 1;
-
-      const shape = getMemoryShape(memories[index]);
-
-      const shapeLabel =
-        shape === "heart"
-          ? "ハート"
-          : shape === "star"
-            ? "星"
-            : shape === "stone"
-              ? "石"
-              : "砂粒";
-
-      saveMemoriesAndRefresh();
-
-      ons.notification.toast(
-        "見返し回数：" +
-        memories[index].viewCount +
-        "回 ／ 現在の形：" +
-        shapeLabel,
-        { timeout: 1800 }
-      );
     }
 
     // ==============================

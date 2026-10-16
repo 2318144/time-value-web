@@ -51,7 +51,6 @@ function startHourglassTutorial(){
 function finishHourglassTutorial(){
   document.getElementById('tutorialOverlay').classList.remove('is-open');
   document.body.style.overflow='';
-  try{localStorage.setItem(HOURGLASS_TUTORIAL_KEY,'1')}catch(e){}
 }
 function changeHourglassTutorial(direction){
   const next=hourglassTutorialIndex+direction;
@@ -79,7 +78,6 @@ window.addEventListener('resize',()=>{if(document.getElementById('tutorialOverla
 window.addEventListener('load',()=>{
   syncHourglassTutorialAutoToggle();
   if(!isHourglassTutorialAutoEnabled())return;
-  try{if(localStorage.getItem(HOURGLASS_TUTORIAL_KEY)==='1')return}catch(e){}
   setTimeout(()=>{if(!document.getElementById('tutorialOverlay').classList.contains('is-open'))startHourglassTutorial()},550);
 });
 
@@ -1131,7 +1129,7 @@ window.addEventListener('load',()=>{
           <h3>チュートリアル</h3>
           <p>砂時計の操作方法を確認できます。</p>
           <label for="tutorialAutoToggle" class="tutorial-auto-setting">
-            <span><strong>初回起動時に自動表示</strong><small>オフにすると自動表示しません。手動ではいつでも見られます。</small></span>
+            <span><strong>起動時に毎回自動表示</strong><small>オフにすると自動表示しません。手動ではいつでも見られます。</small></span>
             <input type="checkbox" id="tutorialAutoToggle" checked onchange="setHourglassTutorialAutoEnabled(this.checked)" aria-label="チュートリアルの自動表示を切り替える">
           </label>
           <ons-button modifier="large" onclick="startHourglassTutorial()">使い方を見る</ons-button>

@@ -17,6 +17,73 @@
   <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
 
   <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script>
+// チュートリアル：ホームの操作箇所を順番に案内
+const HOURGLASS_TUTORIAL_KEY='hourglass_tutorial_completed_v1';
+const HOURGLASS_TUTORIAL_AUTO_KEY='hourglass_tutorial_auto_enabled_v1';
+function isHourglassTutorialAutoEnabled(){
+  try{return localStorage.getItem(HOURGLASS_TUTORIAL_AUTO_KEY)!=='0'}catch(e){return true}
+}
+function setHourglassTutorialAutoEnabled(enabled){
+  try{localStorage.setItem(HOURGLASS_TUTORIAL_AUTO_KEY,enabled?'1':'0')}catch(e){}
+  const checkbox=document.getElementById('tutorialAutoToggle');
+  if(checkbox)checkbox.checked=enabled;
+}
+function syncHourglassTutorialAutoToggle(){
+  const checkbox=document.getElementById('tutorialAutoToggle');
+  if(checkbox)checkbox.checked=isHourglassTutorialAutoEnabled();
+}
+const hourglassTutorialSteps=[
+ {title:'時間の価値を、砂時計で見てみよう',description:'上の砂は残り時間、下の色付きの砂粒は記録した思い出を表します。操作する場所を順番に紹介します。',selector:null},
+ {title:'上の砂をタップ',description:'砂時計に表示する期間を設定できます。「人生」または「期間指定」から選べます。',selector:'#topSand'},
+ {title:'中央のくびれをタップ',description:'写真やメモから思い出を記録できます。AIが思い出を評価し、砂粒として蓄積します。',selector:'.hourglass-neck-action'},
+ {title:'下の砂をタップ',description:'記録した思い出の一覧を表示します。カテゴリや価値で絞り込み、詳細を振り返れます。',selector:'#bottomSand'},
+ {title:'右上の歯車をタップ',description:'プロフィールやGoogleカレンダー連携を設定できます。このチュートリアルも設定画面から再表示できます。',selector:'.top-settings-button'}
+];
+let hourglassTutorialIndex=0;
+function startHourglassTutorial(){
+  if(typeof switchAppView==='function')switchAppView('home');
+  hourglassTutorialIndex=0;
+  document.getElementById('tutorialOverlay').classList.add('is-open');
+  document.body.style.overflow='hidden';
+  requestAnimationFrame(renderHourglassTutorial);
+}
+function finishHourglassTutorial(){
+  document.getElementById('tutorialOverlay').classList.remove('is-open');
+  document.body.style.overflow='';
+  try{localStorage.setItem(HOURGLASS_TUTORIAL_KEY,'1')}catch(e){}
+}
+function changeHourglassTutorial(direction){
+  const next=hourglassTutorialIndex+direction;
+  if(next>=hourglassTutorialSteps.length){finishHourglassTutorial();return}
+  hourglassTutorialIndex=Math.max(0,next);renderHourglassTutorial();
+}
+function renderHourglassTutorial(){
+  const step=hourglassTutorialSteps[hourglassTutorialIndex];
+  document.getElementById('tutorialCount').textContent='STEP '+hourglassTutorialIndex+' / 4';
+  document.getElementById('tutorialTitle').textContent=step.title;
+  document.getElementById('tutorialDescription').textContent=step.description;
+  document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
+  document.getElementById('tutorialNext').textContent=hourglassTutorialIndex===hourglassTutorialSteps.length-1?'完了':'次へ';
+  document.getElementById('tutorialProgress').innerHTML=hourglassTutorialSteps.map((_,i)=>'<span class="'+(i===hourglassTutorialIndex?'current':'')+'"></span>').join('');
+  document.getElementById('tutorialDim').style.display=step.selector?'none':'block';
+  const spot=document.getElementById('tutorialSpot');
+  const el=step.selector?document.querySelector(step.selector):null;
+  if(!el){spot.style.display='none';return}
+  const r=el.getBoundingClientRect();const pad=10;
+  spot.style.display='block';
+  spot.style.left=Math.max(4,r.left-pad)+'px';spot.style.top=Math.max(4,r.top-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px';spot.style.height=(r.height+pad*2)+'px';
+}
+window.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
+window.addEventListener('load',()=>{
+  syncHourglassTutorialAutoToggle();
+  if(!isHourglassTutorialAutoEnabled())return;
+  try{if(localStorage.getItem(HOURGLASS_TUTORIAL_KEY)==='1')return}catch(e){}
+  setTimeout(()=>{if(!document.getElementById('tutorialOverlay').classList.contains('is-open'))startHourglassTutorial()},550);
+});
+
+  </script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
@@ -822,7 +889,7 @@
 
     #homeView .top-sand { cursor: pointer; touch-action: manipulation; }
     #homeView .top-sand:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
-    /* ホームの残り時間の枠をコンパクトにする */
+    /* ホームの残り時間・思い出価値の枠をコンパクトにする */
     #homeView .score-box {
       width: min(88%, 320px);
       margin: 8px auto 12px;
@@ -868,7 +935,32 @@
       outline-offset: -3px;
       border-radius: 12px;
     }
+  /* 初回ガイド：対象を明るく残すスポットライト */
+#tutorialOverlay{position:fixed;inset:0;z-index:99999;display:none;pointer-events:none;font-family:inherit}
+#tutorialOverlay.is-open{display:block}
+#tutorialDim{position:absolute;inset:0;background:rgba(12,22,40,.68);pointer-events:auto}
+#tutorialSpot{position:fixed;border:3px solid #ffad32;border-radius:16px;box-shadow:0 0 0 9999px rgba(12,22,40,.68),0 0 22px rgba(255,173,50,.75);z-index:2;pointer-events:none;display:none;transition:top .2s,left .2s,width .2s,height .2s}
+#tutorialPanel{position:fixed;z-index:3;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));max-width:410px;margin:auto;background:#fff;color:#1e293b;border-radius:20px;padding:20px;box-shadow:0 14px 50px rgba(0,0,0,.24);pointer-events:auto;box-sizing:border-box}
+#tutorialPanel .tutorial-count{font-size:12px;color:#54728c;font-weight:700;letter-spacing:.08em}
+#tutorialPanel h3{font-size:20px;margin:8px 0 8px;line-height:1.4}
+#tutorialPanel p{font-size:14px;line-height:1.65;margin:0 0 18px;color:#475569}
+.tutorial-controls{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.tutorial-controls button{border:0;border-radius:10px;padding:10px 15px;background:#e9eef5;color:#334155;font-size:14px;cursor:pointer}
+.tutorial-controls .tutorial-primary{background:#3182ed;color:#fff;font-weight:700}
+.tutorial-controls .tutorial-skip{margin-right:auto;background:transparent;color:#64748b;padding-left:0}
+#tutorialOverlay .tutorial-progress{display:flex;gap:5px;margin-bottom:13px}
+#tutorialOverlay .tutorial-progress span{width:24px;height:4px;border-radius:4px;background:#e2e8f0}
+#tutorialOverlay .tutorial-progress span.current{background:#3182ed}
+@media(max-height:570px){#tutorialPanel{bottom:8px;padding:12px 16px}#tutorialPanel p{margin-bottom:9px}#tutorialPanel h3{font-size:17px;margin:4px 0}}
+
   </style>
+<style>
+.tutorial-auto-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;background:#f8fafc}
+.tutorial-auto-setting span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tutorial-auto-setting strong{font-size:14px;color:#1e293b}
+.tutorial-auto-setting small{font-size:12px;line-height:1.5;color:#64748b}
+.tutorial-auto-setting input{width:22px;height:22px;flex-shrink:0;accent-color:#2563eb;cursor:pointer}
+</style>
 </head>
 
 <body>
@@ -886,8 +978,7 @@
         <div class="score-box">
         <p>残り時間</p>
         <h2 id="timeText">10:00</h2>
-
-        <!-- AI評価と砂時計の更新処理で参照するため、非表示で保持 -->
+        <!-- 評価処理用の要素は非表示で保持 -->
         <span id="totalScore" hidden>0</span>
         <span id="message" hidden></span>
       </div>
@@ -1035,6 +1126,15 @@
           <h3>プロフィール</h3>
           <p>誕生日・年齢・性別・職業を、AI評価の参考情報として設定します。</p>
           <ons-button modifier="large" onclick="openProfileDialog()">プロフィールを設定</ons-button>
+        </div>
+        <div class="settings-card">
+          <h3>チュートリアル</h3>
+          <p>砂時計の操作方法を確認できます。</p>
+          <label for="tutorialAutoToggle" class="tutorial-auto-setting">
+            <span><strong>初回起動時に自動表示</strong><small>オフにすると自動表示しません。手動ではいつでも見られます。</small></span>
+            <input type="checkbox" id="tutorialAutoToggle" checked onchange="setHourglassTutorialAutoEnabled(this.checked)" aria-label="チュートリアルの自動表示を切り替える">
+          </label>
+          <ons-button modifier="large" onclick="startHourglassTutorial()">使い方を見る</ons-button>
         </div>
         <div class="settings-card" id="calendarSettingsCard"><h3>Googleカレンダー</h3></div>
         <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
@@ -4584,5 +4684,19 @@ function showAIResult(result) {
 
 
   </script>
+<div id="tutorialOverlay" role="dialog" aria-modal="true" aria-label="使い方チュートリアル">
+  <div id="tutorialDim"></div><div id="tutorialSpot"></div>
+  <div id="tutorialPanel">
+    <div class="tutorial-progress" id="tutorialProgress"></div>
+    <div class="tutorial-count" id="tutorialCount"></div>
+    <h3 id="tutorialTitle"></h3><p id="tutorialDescription"></p>
+    <div class="tutorial-controls">
+      <button type="button" class="tutorial-skip" onclick="finishHourglassTutorial()">スキップ</button>
+      <button type="button" id="tutorialPrev" onclick="changeHourglassTutorial(-1)">戻る</button>
+      <button type="button" class="tutorial-primary" id="tutorialNext" onclick="changeHourglassTutorial(1)">次へ</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

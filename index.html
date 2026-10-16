@@ -901,15 +901,6 @@ window.addEventListener('load',()=>{
     .timer-settings-heading .view-heading { margin:0; text-align:center; }
     .timer-back-button { border:1px solid #c7d0d4; background:#fff; color:#303b42; border-radius:10px; padding:9px 12px; font-size:14px; cursor:pointer; }
     #timerSettingsView .settings-card { margin-top:14px; }
-    .timer-floating-back {
-      position: fixed; z-index: 1002; left: 50%;
-      bottom: calc(94px + env(safe-area-inset-bottom));
-      transform: translateX(-50%); border: 1px solid #c7d0d4;
-      border-radius: 24px; background: #fff; color: #303b42;
-      padding: 10px 25px; font-size: 14px; font-weight: 600;
-      box-shadow: 0 3px 12px rgba(0,0,0,.12); cursor: pointer;
-    }
-    .timer-floating-back[hidden] { display: none !important; }
     /* 砂時計の上下は独立したタップ領域 */
     #topSand, #bottomSand { cursor: pointer; }
     #topSand:focus-visible, #bottomSand:focus-visible { outline: 3px solid #3677d2; outline-offset: -3px; }
@@ -1138,6 +1129,7 @@ window.addEventListener('load',()=>{
         <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
       </section>
       <section class="app-view" id="timerSettingsView" data-view="timer-settings">
+        <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
         <div class="timer-settings-heading">
           <h2 class="view-heading">砂時計設定</h2>
         </div>
@@ -1191,7 +1183,7 @@ window.addEventListener('load',()=>{
       </section>
     </div>
 
-    <button type="button" id="timerFloatingBack" class="timer-floating-back" onclick="switchAppView('home')" aria-label="ホームに戻る" hidden>← 戻る</button>
+
 
   </ons-page>
 
@@ -1510,8 +1502,6 @@ window.addEventListener('load',()=>{
         if (isActive) button.setAttribute("aria-current", "page");
         else button.removeAttribute("aria-current");
       });
-      const timerBack = document.getElementById("timerFloatingBack");
-      if (timerBack) timerBack.hidden = viewName !== "timer-settings";
       if (viewName === "home") requestAnimationFrame(function() { renderValueSand(); });
       if (viewName === "value") renderHistory();
       if (scrollToTop) window.scrollTo({ top: 0, behavior: "smooth" });

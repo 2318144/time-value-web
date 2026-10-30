@@ -1384,6 +1384,11 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
         <h2 class="view-heading">設定</h2>
         <p class="view-description">プロフィールや連携、保存データを管理します。</p>
         <div class="settings-card">
+          <h3>砂時計設定</h3>
+          <p>人生の目標年齢や、砂時計に表示する期間を変更できます。</p>
+          <ons-button modifier="large" onclick="switchAppView('timer-settings')">砂時計設定を開く</ons-button>
+        </div>
+        <div class="settings-card">
           <h3>プロフィール</h3>
           <p>誕生日・年齢・性別・職業を、AI評価の参考情報として設定します。</p>
           <ons-button modifier="large" onclick="openProfileDialog()">プロフィールを設定</ons-button>
@@ -1401,7 +1406,7 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
         <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
       </section>
       <section class="app-view" id="timerSettingsView" data-view="timer-settings">
-        <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
+        <button type="button" class="view-back-button" onclick="switchAppView('settings')">← 設定に戻る</button>
         <div class="timer-settings-heading">
           <h2 class="view-heading">砂時計設定</h2>
         </div>

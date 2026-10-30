@@ -1133,6 +1133,15 @@ body,ons-page,.page__background{background:#f8f5f0!important}
 #homeView .sand-bottom-clip { overflow:hidden!important; }
 #homeView .bottom-sand { background:linear-gradient(to top,rgba(222,183,112,.07),transparent 70%)!important; }
 </style>
+<style>
+/* 固定ナビを維持し、プロフィール画面だけ操作しやすくする */
+.bottom-navigation{position:fixed!important;bottom:0!important;z-index:1000!important}
+#profileDialog .dialog{max-width:min(92vw,420px)!important;max-height:calc(100dvh - 115px)!important;overflow-y:auto!important}
+#profileDialog .dialog > div{min-width:0!important;padding:20px!important}
+.birthday-select-row{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;width:100%}
+.birthday-select-row select{width:100%;min-width:0;padding:11px 5px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;text-align:center}
+.birthday-select-row select:focus{outline:2px solid #82b5f7;outline-offset:1px}
+</style>
 </head>
 
 <body>
@@ -1460,10 +1469,12 @@ body,ons-page,.page__background{background:#f8f5f0!important}
       </p>
 
       <label for="userBirthday">誕生日</label>
-      <input
-        type="date"
-        id="userBirthday"
-      >
+      <div class="birthday-select-row" aria-label="生年月日を選択">
+        <select id="birthYear" aria-label="生まれた年" onchange="syncBirthdaySelects()"></select>
+        <select id="birthMonth" aria-label="生まれた月" onchange="syncBirthdaySelects()"></select>
+        <select id="birthDay" aria-label="生まれた日" onchange="syncBirthdaySelects()"></select>
+      </div>
+      <input type="date" id="userBirthday" hidden aria-hidden="true">
 
       <label for="userAge">現在の年齢</label>
       <input
@@ -1946,11 +1957,40 @@ body,ons-page,.page__background{background:#f8f5f0!important}
         calculateAgeFromBirthday(birthdayValue);
     }
 
+
+/* 生年月日を年・月・日で選択。既存の保存処理はuserBirthdayをそのまま利用 */
+function initializeBirthdaySelects(value) {
+  const y=document.getElementById('birthYear'),m=document.getElementById('birthMonth'),d=document.getElementById('birthDay');
+  if(!y||!m||!d)return;
+  const now=new Date().getFullYear();
+  y.innerHTML='<option value="">年</option>'+Array.from({length:121},(_,i)=>{const n=now-i;return `<option value="${n}">${n}年</option>`}).join('');
+  m.innerHTML='<option value="">月</option>'+Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}月</option>`).join('');
+  const parts=value?value.split('-'):[];
+  y.value=parts[0]||'';m.value=parts[1]?String(Number(parts[1])):'';
+  populateBirthdayDays(parts[2]?Number(parts[2]):null);
+}
+function populateBirthdayDays(selected){
+  const y=Number(document.getElementById('birthYear').value),m=Number(document.getElementById('birthMonth').value);
+  const d=document.getElementById('birthDay');
+  const days=y&&m?new Date(y,m,0).getDate():31;
+  d.innerHTML='<option value="">日</option>'+Array.from({length:days},(_,i)=>`<option value="${i+1}">${i+1}日</option>`).join('');
+  if(selected&&selected<=days)d.value=String(selected);
+}
+function syncBirthdaySelects(){
+  const y=document.getElementById('birthYear').value,m=document.getElementById('birthMonth').value;
+  const day=document.getElementById('birthDay');const prev=Number(day.value);
+  populateBirthdayDays(prev);
+  const d=day.value;
+  document.getElementById('userBirthday').value=y&&m&&d?`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`:'';
+  updateAgePreview();
+}
+
     function openProfileDialog() {
       refreshProfileAge();
 
       document.getElementById("userBirthday").value =
         userProfile.birthday || "";
+      initializeBirthdaySelects(userProfile.birthday || "");
 
       document.getElementById("userAge").value =
         userProfile.age || "";

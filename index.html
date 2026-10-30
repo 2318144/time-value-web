@@ -34,11 +34,13 @@ function syncHourglassTutorialAutoToggle(){
   if(checkbox)checkbox.checked=isHourglassTutorialAutoEnabled();
 }
 const hourglassTutorialSteps=[
- {title:'時間の価値を、砂時計で見てみよう',description:'上の砂は残り時間、下の色付きの砂粒は記録した思い出を表します。操作する場所を順番に紹介します。',selector:null},
- {title:'上の砂をタップ',description:'砂時計に表示する期間を設定できます。「人生」または「期間指定」から選べます。',selector:'#topSand'},
- {title:'中央のくびれをタップ',description:'写真やメモから思い出を記録できます。AIが思い出を評価し、砂粒として蓄積します。',selector:'.hourglass-neck-action'},
- {title:'下の砂をタップ',description:'記録した思い出の一覧を表示します。カテゴリや価値で絞り込み、詳細を振り返れます。',selector:'#bottomSand'},
- {title:'右上の歯車をタップ',description:'プロフィールやGoogleカレンダー連携を設定できます。このチュートリアルも設定画面から再表示できます。',selector:'.top-settings-button'}
+ {title:'時間の価値を砂時計で見てみよう',description:'上の金色の砂は残り時間、下の色付きの粒は記録した思い出です。今の画面に合わせて操作を紹介します。',selector:null},
+ {title:'残り時間を確認',description:'この枠に、設定した期間の残り時間が表示されます。砂時計の上の砂と連動します。',selector:'#homeView .score-box'},
+ {title:'思い出の表示期間を選ぶ',description:'「月・年・人生」で下の思い出の表示範囲を切り替えられます。年月の文字を押すと、見たい年月を選べます。',selector:'#homeView .hourglass-period-box'},
+ {title:'砂時計設定は2か所から開けます',description:'① 砂時計の上側（金色の砂）をタップ ② 画面下の「設定」→「砂時計設定を開く」。どちらからでも、人生の目標年齢や期間指定を変更できます。',selector:'#homeView .sand-top-clip',secondSelector:'.bottom-nav-button[data-view-target="settings"]'},
+ {title:'中央：思い出を入力',description:'砂時計の中央のくびれをタップすると、写真やメモから思い出を登録できます。下の「入力」からも開けます。',selector:'#homeView .hourglass-neck-action',secondSelector:'.bottom-nav-button[data-view-target="add"]'},
+ {title:'下の砂：思い出を振り返る',description:'色付きの砂粒は思い出の価値を表します。下側をタップするか「価値を見る」を選ぶと、思い出を一覧で振り返れます。',selector:'#homeView .sand-bottom-clip',secondSelector:'.bottom-nav-button[data-view-target="value"]'},
+ {title:'下の「設定」からも砂時計設定へ',description:'右下の「設定」を押し、「砂時計設定を開く」を選びます。砂時計の上側をタップしても同じ設定画面を開けます。プロフィールやチュートリアルの設定もここから行えます。',selector:'.bottom-nav-button[data-view-target="settings"]'}
 ];
 let hourglassTutorialIndex=0;
 function startHourglassTutorial(){
@@ -51,6 +53,7 @@ function startHourglassTutorial(){
 function finishHourglassTutorial(){
   document.getElementById('tutorialOverlay').classList.remove('is-open');
   document.body.style.overflow='';
+  document.getElementById('tutorialPanel').classList.remove('tutorial-panel-top');
 }
 function changeHourglassTutorial(direction){
   const next=hourglassTutorialIndex+direction;
@@ -59,7 +62,12 @@ function changeHourglassTutorial(direction){
 }
 function renderHourglassTutorial(){
   const step=hourglassTutorialSteps[hourglassTutorialIndex];
-  document.getElementById('tutorialCount').textContent='STEP '+hourglassTutorialIndex+' / 4';
+  const panel=document.getElementById('tutorialPanel');
+  const isTopStep=hourglassTutorialIndex>=3 && hourglassTutorialIndex<=5;
+  document.getElementById('tutorialOverlay').classList.toggle('tutorial-step-upper',isTopStep);
+  panel.classList.toggle('tutorial-panel-top',isTopStep);
+  panel.style.removeProperty('top'); panel.style.removeProperty('bottom'); panel.style.removeProperty('max-height');
+  document.getElementById('tutorialCount').textContent='STEP '+(hourglassTutorialIndex+1)+' / '+hourglassTutorialSteps.length;
   document.getElementById('tutorialTitle').textContent=step.title;
   document.getElementById('tutorialDescription').textContent=step.description;
   document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
@@ -67,12 +75,84 @@ function renderHourglassTutorial(){
   document.getElementById('tutorialProgress').innerHTML=hourglassTutorialSteps.map((_,i)=>'<span class="'+(i===hourglassTutorialIndex?'current':'')+'"></span>').join('');
   document.getElementById('tutorialDim').style.display=step.selector?'none':'block';
   const spot=document.getElementById('tutorialSpot');
+  const spot2=document.getElementById('tutorialSpotSecond');
+  const shade=document.getElementById('tutorialDualShade');
   const el=step.selector?document.querySelector(step.selector):null;
-  if(!el){spot.style.display='none';return}
-  const r=el.getBoundingClientRect();const pad=10;
-  spot.style.display='block';
-  spot.style.left=Math.max(4,r.left-pad)+'px';spot.style.top=Math.max(4,r.top-pad)+'px';
-  spot.style.width=(r.width+pad*2)+'px';spot.style.height=(r.height+pad*2)+'px';
+  const el2=step.secondSelector?document.querySelector(step.secondSelector):null;
+  const dual=Boolean(el&&el2);
+  spot2.style.display='none';shade.style.display='none';
+  spot.classList.toggle('tutorial-dual-spot',dual);
+  if(!el){spot.style.display='none';positionTutorialPanel([]);return}
+  function place(target,element){
+    const bounds=element.getBoundingClientRect();
+    // 砂時計設定の案内は、砂時計全体ではなく上半分だけを囲む。
+    const isUpperGlass=element.classList.contains('sand-top-clip');
+    const r=isUpperGlass ? {left:bounds.left+bounds.width*0.10,top:bounds.top+bounds.height*0.025,width:bounds.width*0.80,height:bounds.height*0.47} : bounds;
+    const pad=isUpperGlass?3:8;
+    const left=Math.max(4,r.left-pad),top=Math.max(4,r.top-pad);
+    const width=Math.min(innerWidth-left-4,r.width+pad*2);
+    const height=Math.min(innerHeight-top-4,r.height+pad*2);
+    target.style.display='block';target.style.left=left+'px';target.style.top=top+'px';
+    target.style.width=width+'px';target.style.height=height+'px';
+    return {left,top,width,height};
+  }
+  const first=place(spot,el);
+  if(dual){
+    const second=place(spot2,el2);
+    shade.style.display='block';
+    shade.setAttribute('viewBox','0 0 '+innerWidth+' '+innerHeight);
+    shade.querySelector('#tutorialDualBackdrop').setAttribute('width',innerWidth);
+    shade.querySelector('#tutorialDualBackdrop').setAttribute('height',innerHeight);
+    [first,second].forEach((r,i)=>{
+      const hole=shade.querySelector(i===0?'#tutorialHoleOne':'#tutorialHoleTwo');
+      ['x','y','width','height'].forEach((attr,j)=>hole.setAttribute(attr,[r.left,r.top,r.width,r.height][j]));
+    });
+  }
+  positionTutorialPanel(dual?[first,second]:[first]);
+}
+// 説明パネルを強調枠の上下の空きスペースへ自動配置する。
+function positionTutorialPanel(rects){
+  const panel=document.getElementById('tutorialPanel');
+  const viewport=window.visualViewport?.height||window.innerHeight;
+  const margin=12, gap=14;
+  panel.style.removeProperty('top');panel.style.removeProperty('bottom');panel.style.removeProperty('max-height');
+  panel.style.overflowY='auto';
+  const desired=panel.getBoundingClientRect().height;
+  // STEP 4〜6: 白い説明パネルそのものを画面の最上部へ固定する。
+  // オレンジのスポットライトは移動しない。
+  if(hourglassTutorialIndex>=3 && hourglassTutorialIndex<=5){
+    // 上側の説明パネルはCSSで固定し、オレンジ枠とは独立させる。
+    panel.classList.add('tutorial-panel-top');
+    return;
+  }
+  panel.classList.remove('tutorial-panel-top');
+  // STEP 2とSTEP 3は同じ位置（画面下部）に説明枠を表示する。
+  if(hourglassTutorialIndex===1 || hourglassTutorialIndex===2){
+    panel.style.top='auto';
+    panel.style.bottom='calc(20px + env(safe-area-inset-bottom, 0px))';
+    panel.style.maxHeight='min(42dvh, 300px)';
+    return;
+  }
+  if(!rects.length){panel.style.bottom=margin+'px';return;}
+  const topEdge=Math.min(...rects.map(r=>r.top));
+  const bottomEdge=Math.max(...rects.map(r=>r.top+r.height));
+  const above=Math.max(0,topEdge-gap-margin);
+  const below=Math.max(0,viewport-bottomEdge-gap-margin);
+  // オレンジ枠の間に空間がある場合も候補に含める。
+  const sorted=[...rects].sort((a,b)=>a.top-b.top);
+  const spaces=[{start:margin,end:topEdge-gap},{start:bottomEdge+gap,end:viewport-margin}];
+  for(let i=0;i<sorted.length-1;i++){
+    const start=sorted[i].top+sorted[i].height+gap;
+    const end=sorted[i+1].top-gap;
+    if(end>start)spaces.push({start,end});
+  }
+  spaces.sort((a,b)=>(b.end-b.start)-(a.end-a.start));
+  const fitting=spaces.filter(x=>x.end-x.start>=desired);
+  const chosen=fitting[0]||spaces[0];
+  const available=Math.max(50,chosen.end-chosen.start);
+  panel.style.maxHeight=available+'px';
+  panel.style.top=Math.max(margin,chosen.start+(available-Math.min(desired,available))/2)+'px';
+  panel.style.bottom='auto';
 }
 window.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
 window.addEventListener('load',()=>{
@@ -960,7 +1040,7 @@ window.addEventListener('load',()=>{
       cursor: pointer; font-size: 23px;
     }
     .top-settings-button:focus-visible { outline: 2px solid #3878df; outline-offset: -3px; }
-    .bottom-navigation { grid-template-columns:repeat(3,1fr); }
+    .bottom-navigation { grid-template-columns:repeat(4,1fr); }
     /* ホームの使い方：白い角丸の説明枠 */
     #homeView .home-guide {
       width: min(100%, 420px); margin: 12px auto 16px;
@@ -1019,6 +1099,9 @@ window.addEventListener('load',()=>{
 #tutorialOverlay.is-open{display:block}
 #tutorialDim{position:absolute;inset:0;background:rgba(12,22,40,.68);pointer-events:auto}
 #tutorialSpot{position:fixed;border:3px solid #ffad32;border-radius:16px;box-shadow:0 0 0 9999px rgba(12,22,40,.68),0 0 22px rgba(255,173,50,.75);z-index:2;pointer-events:none;display:none;transition:top .2s,left .2s,width .2s,height .2s}
+#tutorialSpot.tutorial-dual-spot{box-shadow:0 0 22px rgba(255,173,50,.75)}
+#tutorialSpotSecond{position:fixed;border:3px solid #ffad32;border-radius:16px;box-shadow:0 0 22px rgba(255,173,50,.75);z-index:2;pointer-events:none;display:none;transition:top .2s,left .2s,width .2s,height .2s}
+#tutorialDualShade{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:none}
 #tutorialPanel{position:fixed;z-index:3;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));max-width:410px;margin:auto;background:#fff;color:#1e293b;border-radius:20px;padding:20px;box-shadow:0 14px 50px rgba(0,0,0,.24);pointer-events:auto;box-sizing:border-box}
 #tutorialPanel .tutorial-count{font-size:12px;color:#54728c;font-weight:700;letter-spacing:.08em}
 #tutorialPanel h3{font-size:20px;margin:8px 0 8px;line-height:1.4}
@@ -1033,7 +1116,7 @@ window.addEventListener('load',()=>{
 @media(max-height:570px){#tutorialPanel{bottom:8px;padding:12px 16px}#tutorialPanel p{margin-bottom:9px}#tutorialPanel h3{font-size:17px;margin:4px 0}}
 
     /* メニューバーを4項目で表示 */
-  .bottom-navigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bottom-navigation { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .bottom-nav-button { min-width: 0; }
   
     /* 残り時間と統一した白い表示切り替え枠 */
@@ -1044,7 +1127,7 @@ window.addEventListener('load',()=>{
       text-align:center;
     }
     .hourglass-period-title {font-size:11px;color:#687584;margin:0 0 7px;font-weight:600;}
-    .hourglass-period-tabs {display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+    .hourglass-period-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
     .hourglass-period-tabs button {background:#f4f6f8;border:1px solid #e1e6ec;border-radius:8px;padding:7px 3px;font-size:13px;font-weight:600;color:#576473;cursor:pointer;}
     .hourglass-period-tabs button.active {background:#eaf3ff;border-color:#76a9e9;color:#1763bb;}
     .hourglass-month-nav {display:flex;align-items:center;justify-content:center;gap:14px;margin:6px auto 0;font-size:13px;font-weight:700;color:#455567;min-height:30px;}
@@ -1058,7 +1141,7 @@ window.addEventListener('load',()=>{
     .hourglass-date-picker {position:absolute;z-index:60;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:min(275px,calc(100vw - 45px));box-sizing:border-box;padding:12px;border:1px solid #dfe6ee;border-radius:13px;background:#fff;box-shadow:0 8px 25px rgba(27,45,67,.18);}
     .hourglass-picker-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#34495e;}
     .hourglass-picker-header button {border:0;background:#f3f6fa;border-radius:8px;width:34px;height:32px;font-size:22px;color:#34495e;cursor:pointer;}
-    .hourglass-picker-months {display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+    .hourglass-picker-months {display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
     .hourglass-picker-months button {border:1px solid #e3e8ee;border-radius:8px;background:#f8fafc;color:#44566a;min-height:37px;font-size:13px;cursor:pointer;}
     .hourglass-picker-months button.selected {background:#eaf3ff;border-color:#76a9e9;color:#1763bb;font-weight:700;}
     .hourglass-picker-today {display:block;width:100%;margin-top:11px;border:0;border-radius:8px;padding:9px;background:#edf4fb;color:#2466a8;font-weight:600;cursor:pointer;}
@@ -1069,6 +1152,8 @@ window.addEventListener('load',()=>{
       scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
     }
     ons-page .page__content { scroll-padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px)); }
+#tutorialPanel{overscroll-behavior:contain;scrollbar-width:thin}
+@media(max-height:570px){#tutorialPanel.tutorial-panel-top{top:6px;bottom:auto}}
 </style>
 <style>
 .tutorial-auto-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;background:#f8fafc}
@@ -1155,6 +1240,11 @@ body.home-fit-mode #homeView .hourglass-month-nav{margin-top:3px;min-height:26px
 body.home-fit-mode #homeView .hourglass-period-title{margin-bottom:5px;}
 body.home-fit-mode #homeView .score-box h2{margin:2px 0!important;}
 body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!important;}
+/* 思い出の表示期間：タイトル・選択ボタン・年月ナビを中央揃え */
+#homeView .hourglass-period-box { text-align:center!important; }
+#homeView .hourglass-period-title { display:block; width:100%; text-align:center!important; }
+#homeView .hourglass-period-tabs { width:100%; margin-left:auto; margin-right:auto; grid-template-columns:repeat(3,minmax(0,1fr))!important; }
+#homeView .hourglass-month-nav { width:100%; justify-content:center!important; margin-left:auto; margin-right:auto; }
 </style>
 <script>
 (function(){
@@ -1193,13 +1283,46 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
   });
 })();
 </script>
+<style id="tutorial-panel-upper-fix">
+/* STEP 4〜6 の白い説明枠を上端に表示 */
+#tutorialPanel.tutorial-panel-top{
+ position:fixed!important;
+ top:calc(8px + env(safe-area-inset-top, 0px))!important;
+ bottom:auto!important;
+ max-height:min(38dvh,260px)!important;
+ overflow-y:auto!important;
+ z-index:100002!important;
+}
+</style>
+<style id="tutorial-step-upper-reliable">
+/* STEP4～6：白い説明カードを画面の上部に固定。下側のスポットライトと重ねない。 */
+#tutorialOverlay.is-open.tutorial-step-upper #tutorialPanel {
+  position: fixed !important;
+  top: calc(10px + env(safe-area-inset-top, 0px)) !important;
+  bottom: auto !important;
+  left: 16px !important;
+  right: 16px !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  max-height: min(32dvh, 245px) !important;
+  overflow-y: auto !important;
+  z-index: 100002 !important;
+}
+@media (max-height: 650px) {
+  #tutorialOverlay.is-open.tutorial-step-upper #tutorialPanel {
+    top: 6px !important;
+    max-height: 38dvh !important;
+    padding: 12px 16px !important;
+  }
+}
+</style>
 </head>
 
 <body>
   <ons-page>
     <ons-toolbar>
       <div class="center">時間の価値 可視化</div>
-      <div class="right"><button type="button" class="top-settings-button" aria-label="設定を開く" title="設定" onclick="switchAppView('settings')"><ons-icon icon="md-settings"></ons-icon></button></div>
+      
     </ons-toolbar>
 
     <!-- ホーム画面 -->
@@ -1468,6 +1591,7 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
       <button type="button" class="bottom-nav-button active" data-view-target="home" onclick="switchAppView('home')" aria-current="page"><ons-icon icon="md-home"></ons-icon><span>ホーム</span></button>
       <button type="button" class="bottom-nav-button" data-view-target="value" onclick="switchAppView('value')"><ons-icon icon="md-collection-image"></ons-icon><span>価値を見る</span></button>
       <button type="button" class="bottom-nav-button" data-view-target="add" onclick="switchAppView('add')"><ons-icon icon="md-plus-circle"></ons-icon><span>入力</span></button>
+      <button type="button" class="bottom-nav-button" data-view-target="settings" onclick="switchAppView('settings')"><ons-icon icon="md-settings"></ons-icon><span>設定</span></button>
     </nav>
   </ons-page>
 
@@ -5132,7 +5256,11 @@ function showAIResult(result) {
 
   </script>
 <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-label="使い方チュートリアル">
-  <div id="tutorialDim"></div><div id="tutorialSpot"></div>
+  <div id="tutorialDim"></div><div id="tutorialSpot"></div><div id="tutorialSpotSecond"></div>
+  <svg id="tutorialDualShade" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+    <defs><mask id="tutorialDualMask" maskUnits="userSpaceOnUse"><rect id="tutorialDualBackdrop" x="0" y="0" width="100%" height="100%" fill="white"/><rect id="tutorialHoleOne" fill="black" rx="12"/><rect id="tutorialHoleTwo" fill="black" rx="12"/></mask></defs>
+    <rect width="100%" height="100%" fill="rgba(12,22,40,.68)" mask="url(#tutorialDualMask)"/>
+  </svg>
   <div id="tutorialPanel">
     <div class="tutorial-progress" id="tutorialProgress"></div>
     <div class="tutorial-count" id="tutorialCount"></div>

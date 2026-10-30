@@ -5273,5 +5273,47 @@ function showAIResult(result) {
   </div>
 </div>
 
+
+<style id="tutorial-interaction-lock">
+/* 画面全体を透明な操作遮断レイヤーにし、白い説明枠のボタンだけ操作可能にする。 */
+#tutorialOverlay.is-open { pointer-events: auto !important; }
+#tutorialOverlay.is-open #tutorialDim { pointer-events: auto !important; }
+#tutorialOverlay.is-open #tutorialDualShade,
+#tutorialOverlay.is-open #tutorialSpot,
+#tutorialOverlay.is-open #tutorialSpotSecond { pointer-events: none !important; }
+#tutorialOverlay.is-open #tutorialPanel,
+#tutorialOverlay.is-open #tutorialPanel button { pointer-events: auto !important; }
+</style>
+
+<style id="tutorial-touch-guard-style">
+/* ガイドの穴も含めて画面全域をタッチ遮断。説明パネルだけ前面で操作可能。 */
+#tutorialOverlay.is-open { pointer-events:auto!important; touch-action:none; }
+#tutorialOverlay.is-open::before { content:""; position:fixed; inset:0; z-index:2; background:transparent; pointer-events:auto; touch-action:none; }
+#tutorialOverlay.is-open #tutorialPanel { z-index:4!important; pointer-events:auto!important; touch-action:pan-y; }
+#tutorialOverlay.is-open #tutorialPanel button { pointer-events:auto!important; touch-action:manipulation; }
+</style>
+<script id="tutorial-touch-guard-script">
+(function(){
+  const guarded=['pointerdown','pointerup','click','touchstart','touchmove','touchend','mousedown','mouseup','wheel'];
+  function guard(event){
+    const overlay=document.getElementById('tutorialOverlay');
+    if(!overlay || !overlay.classList.contains('is-open')) return;
+    const panel=document.getElementById('tutorialPanel');
+    // 説明枠内の操作は許可（戻る・次へ・スキップ・完了）。
+    if(panel && panel.contains(event.target)) return;
+    if(event.cancelable) event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+  guarded.forEach(type=>document.addEventListener(type,guard,{capture:true,passive:false}));
+  document.addEventListener('keydown',function(event){
+    const overlay=document.getElementById('tutorialOverlay');
+    if(!overlay?.classList.contains('is-open'))return;
+    const panel=document.getElementById('tutorialPanel');
+    if(panel?.contains(document.activeElement) && (event.key==='Enter'||event.key===' '||event.key==='Tab'||event.key==='Shift'))return;
+    if(event.cancelable)event.preventDefault();
+    event.stopImmediatePropagation();
+  },true);
+})();
+</script>
 </body>
 </html>

@@ -1035,7 +1035,35 @@ window.addEventListener('load',()=>{
     /* メニューバーを4項目で表示 */
   .bottom-navigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .bottom-nav-button { min-width: 0; }
-  </style>
+  
+    /* 残り時間と統一した白い表示切り替え枠 */
+    #homeView .hourglass-period-box {
+      box-sizing:border-box; width:min(88%,320px); margin:8px auto 10px;
+      padding:9px 12px 8px; border:1px solid #dce3e9; border-radius:12px;
+      background:#fff; box-shadow:0 2px 9px rgba(35,50,70,.07);
+      text-align:center;
+    }
+    .hourglass-period-title {font-size:11px;color:#687584;margin:0 0 7px;font-weight:600;}
+    .hourglass-period-tabs {display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+    .hourglass-period-tabs button {background:#f4f6f8;border:1px solid #e1e6ec;border-radius:8px;padding:7px 3px;font-size:13px;font-weight:600;color:#576473;cursor:pointer;}
+    .hourglass-period-tabs button.active {background:#eaf3ff;border-color:#76a9e9;color:#1763bb;}
+    .hourglass-month-nav {display:flex;align-items:center;justify-content:center;gap:14px;margin:6px auto 0;font-size:13px;font-weight:700;color:#455567;min-height:30px;}
+    .hourglass-month-nav button {border:0;background:transparent;color:inherit;font-size:23px;line-height:1;min-width:32px;min-height:30px;cursor:pointer;}
+    .hourglass-month-nav button:disabled {opacity:0;pointer-events:none;}
+    .hourglass-month-nav .hourglass-date-trigger {font-size:13px;min-width:115px;padding:5px 10px;border:1px solid #dbe4ee;border-radius:9px;background:#f7faff;color:#34495e;}
+    .hourglass-date-trigger::after {content:" ▾";font-size:11px;color:#7890a9;}
+    .hourglass-date-trigger:disabled::after {content:"";}
+    #homeView .hourglass-period-box {position:relative;overflow:visible;}
+    .hourglass-date-picker[hidden] {display:none!important;}
+    .hourglass-date-picker {position:absolute;z-index:60;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:min(275px,calc(100vw - 45px));box-sizing:border-box;padding:12px;border:1px solid #dfe6ee;border-radius:13px;background:#fff;box-shadow:0 8px 25px rgba(27,45,67,.18);}
+    .hourglass-picker-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#34495e;}
+    .hourglass-picker-header button {border:0;background:#f3f6fa;border-radius:8px;width:34px;height:32px;font-size:22px;color:#34495e;cursor:pointer;}
+    .hourglass-picker-months {display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+    .hourglass-picker-months button {border:1px solid #e3e8ee;border-radius:8px;background:#f8fafc;color:#44566a;min-height:37px;font-size:13px;cursor:pointer;}
+    .hourglass-picker-months button.selected {background:#eaf3ff;border-color:#76a9e9;color:#1763bb;font-weight:700;}
+    .hourglass-picker-today {display:block;width:100%;margin-top:11px;border:0;border-radius:8px;padding:9px;background:#edf4fb;color:#2466a8;font-weight:600;cursor:pointer;}
+    .hourglass {touch-action:pan-y;}
+</style>
 <style>
 .tutorial-auto-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;background:#f8fafc}
 .tutorial-auto-setting span{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -1064,6 +1092,28 @@ window.addEventListener('load',()=>{
         <span id="message" hidden></span>
       </div>
 
+      <div class="hourglass-period-box" aria-label="砂時計の表示期間">
+        <p class="hourglass-period-title">思い出の表示期間</p>
+        <div class="hourglass-period-tabs" role="group" aria-label="表示期間を選択">
+          <button type="button" class="active" data-hourglass-period="month" onclick="setHourglassPeriod('month')" aria-pressed="true">月</button>
+          <button type="button" data-hourglass-period="year" onclick="setHourglassPeriod('year')" aria-pressed="false">年</button>
+          <button type="button" data-hourglass-period="life" onclick="setHourglassPeriod('life')" aria-pressed="false">人生</button>
+        </div>
+        <div class="hourglass-month-nav" aria-label="表示期間の移動">
+          <button id="hourglassPeriodPrev" type="button" onclick="shiftHourglassMonth(-1)" aria-label="前の期間">‹</button>
+          <button id="hourglassMonthLabel" type="button" class="hourglass-date-trigger" aria-live="polite" aria-haspopup="dialog" aria-expanded="false" onclick="toggleHourglassDatePicker()" title="年月を選択"></button>
+          <button id="hourglassPeriodNext" type="button" onclick="shiftHourglassMonth(1)" aria-label="次の期間">›</button>
+        </div>
+        <div id="hourglassDatePicker" class="hourglass-date-picker" role="dialog" aria-label="表示する年月を選択" hidden>
+          <div class="hourglass-picker-header">
+            <button type="button" onclick="changeHourglassPickerYear(-1)" aria-label="前年">‹</button>
+            <strong id="hourglassPickerYear"></strong>
+            <button type="button" onclick="changeHourglassPickerYear(1)" aria-label="翌年">›</button>
+          </div>
+          <div id="hourglassPickerMonths" class="hourglass-picker-months"></div>
+          <button type="button" class="hourglass-picker-today" onclick="selectHourglassCurrentPeriod()">今月・今年に戻る</button>
+        </div>
+      </div>
       <div class="hourglass" aria-label="5項目の価値を色と粒の大きさで表した砂時計">
         <div class="top-sand" id="topSand" role="button" tabindex="0" aria-label="砂時計の時間設定を開く" title="タップして砂時計の時間を設定" onclick="openHourglassTimerSettings()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openHourglassTimerSettings();}"></div>
         <div class="neck-sand" id="neckSand"></div>
@@ -3610,7 +3660,7 @@ function showAIResult(result) {
 
       document.getElementById("totalScore").textContent = periodTotalScore;
 
-      renderValueSand(periodMemories);
+      refreshHourglassMonth();
       updatePeriodFilterSummary(periodMemories);
 
       const message = document.getElementById("message");
@@ -3932,7 +3982,140 @@ function showAIResult(result) {
       return best;
     }
 
-    function renderValueSand(targetMemories = getMemoriesForCurrentPeriod()) {
+
+    // ホームの砂時計は「月・年・人生」を独立して切り替える
+    let hourglassPeriodMode = 'month';
+    let hourglassDisplayMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    function getHourglassPeriodMemories() {
+      if (hourglassPeriodMode === 'life') return memories;
+      const year = hourglassDisplayMonth.getFullYear();
+      const month = hourglassDisplayMonth.getMonth();
+      return memories.filter(function(memory) {
+        const d = getMemoryDate(memory);
+        return d && d.getFullYear() === year &&
+          (hourglassPeriodMode === 'year' || d.getMonth() === month);
+      });
+    }
+    function refreshHourglassMonth() {
+      const label = document.getElementById('hourglassMonthLabel');
+      if (label) label.textContent = hourglassPeriodMode === 'life' ? '人生全体' :
+        hourglassDisplayMonth.getFullYear() + '年' +
+        (hourglassPeriodMode === 'month' ? (hourglassDisplayMonth.getMonth() + 1) + '月' : '');
+      if (label) { label.disabled = hourglassPeriodMode === 'life'; label.setAttribute('aria-expanded', String(!document.getElementById('hourglassDatePicker').hidden)); }
+      if (hourglassPeriodMode === 'life') closeHourglassDatePicker();
+      ['hourglassPeriodPrev','hourglassPeriodNext'].forEach(function(id) {
+        const btn = document.getElementById(id);
+        if (btn) btn.disabled = hourglassPeriodMode === 'life';
+      });
+      document.querySelectorAll('[data-hourglass-period]').forEach(function(btn) {
+        const active = btn.dataset.hourglassPeriod === hourglassPeriodMode;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+      renderValueSand(getHourglassPeriodMemories());
+    }
+    function setHourglassPeriod(mode) {
+      if (!['month','year','life'].includes(mode)) return;
+      hourglassPeriodMode = mode;
+      closeHourglassDatePicker();
+      refreshHourglassMonth();
+    }
+    let hourglassPickerYear = new Date().getFullYear();
+    function closeHourglassDatePicker() {
+      const picker = document.getElementById('hourglassDatePicker');
+      const label = document.getElementById('hourglassMonthLabel');
+      if (picker) picker.hidden = true;
+      if (label) label.setAttribute('aria-expanded', 'false');
+    }
+    function toggleHourglassDatePicker() {
+      if (hourglassPeriodMode === 'life') return;
+      const picker = document.getElementById('hourglassDatePicker');
+      if (!picker) return;
+      if (!picker.hidden) { closeHourglassDatePicker(); return; }
+      hourglassPickerYear = hourglassDisplayMonth.getFullYear();
+      renderHourglassDatePicker();
+      picker.hidden = false;
+      document.getElementById('hourglassMonthLabel').setAttribute('aria-expanded', 'true');
+    }
+    function changeHourglassPickerYear(offset) {
+      hourglassPickerYear += offset;
+      renderHourglassDatePicker();
+    }
+    function renderHourglassDatePicker() {
+      const year = document.getElementById('hourglassPickerYear');
+      const grid = document.getElementById('hourglassPickerMonths');
+      if (!year || !grid) return;
+      year.textContent = hourglassPickerYear + '年';
+      grid.replaceChildren();
+      if (hourglassPeriodMode === 'year') {
+        const btn = document.createElement('button');
+        btn.textContent = hourglassPickerYear + '年を表示';
+        btn.style.gridColumn = '1 / -1';
+        btn.classList.toggle('selected', hourglassPickerYear === hourglassDisplayMonth.getFullYear());
+        btn.addEventListener('click', function() { selectHourglassPickerMonth(0); });
+        grid.appendChild(btn);
+        return;
+      }
+      for (let m = 0; m < 12; m++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = (m + 1) + '月';
+        btn.classList.toggle('selected', hourglassPickerYear === hourglassDisplayMonth.getFullYear() && m === hourglassDisplayMonth.getMonth());
+        btn.addEventListener('click', function() { selectHourglassPickerMonth(m); });
+        grid.appendChild(btn);
+      }
+    }
+    function selectHourglassPickerMonth(month) {
+      hourglassDisplayMonth = new Date(hourglassPickerYear, month, 1);
+      closeHourglassDatePicker();
+      refreshHourglassMonth();
+    }
+    function selectHourglassCurrentPeriod() {
+      const now = new Date();
+      hourglassDisplayMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      closeHourglassDatePicker();
+      refreshHourglassMonth();
+    }
+    document.addEventListener('click', function(e) {
+      const box = document.querySelector('#homeView .hourglass-period-box');
+      if (box && !box.contains(e.target)) closeHourglassDatePicker();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeHourglassDatePicker();
+    });
+    function shiftHourglassMonth(offset) {
+      if (hourglassPeriodMode === 'life') return;
+      hourglassDisplayMonth = new Date(hourglassDisplayMonth.getFullYear(),
+        hourglassDisplayMonth.getMonth() + (hourglassPeriodMode === 'year' ? offset * 12 : offset), 1);
+      refreshHourglassMonth();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const glass = document.querySelector('#homeView .hourglass');
+      if (!glass) return;
+      let startX = 0, startY = 0;
+      glass.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+      }, {passive:true});
+      glass.addEventListener('touchend', function(e) {
+        if (!e.changedTouches.length) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          shiftHourglassMonth(dx < 0 ? -1 : 1);
+          // スワイプ直後に砂時計のタップ操作が誤発火しないようにする
+          glass.dataset.swipedAt = String(Date.now());
+        }
+      }, {passive:true});
+      glass.addEventListener('click', function(e) {
+        if (Date.now() - Number(glass.dataset.swipedAt || 0) < 500) {
+          e.preventDefault(); e.stopPropagation();
+        }
+      }, true);
+      refreshHourglassMonth();
+    });
+
+    function renderValueSand(targetMemories = getHourglassPeriodMemories()) {
       const bottomSand = document.getElementById("bottomSand");
       if (!bottomSand) return;
 

@@ -1142,6 +1142,57 @@ body,ons-page,.page__background{background:#f8f5f0!important}
 .birthday-select-row select{width:100%;min-width:0;padding:11px 5px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;text-align:center}
 .birthday-select-row select:focus{outline:2px solid #82b5f7;outline-offset:1px}
 </style>
+
+<style id="home-responsive-fit">
+/* ホームのみ画面内に収める。他の画面は通常スクロール。 */
+body.home-fit-mode #appMain{padding:0 12px!important;overflow:hidden!important;}
+body.home-fit-mode #homeView.active{display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;height:100%;overflow:hidden;min-height:0;}
+body.home-fit-mode #homeView .score-box{flex:0 0 auto;width:min(94%,420px);margin:var(--home-top-gap,8px) auto var(--home-gap,8px)!important;padding:clamp(6px,1.2vh,12px) 12px!important;}
+body.home-fit-mode #homeView .hourglass-period-box{flex:0 0 auto;width:min(94%,420px);margin:0 auto var(--home-gap,8px)!important;padding:clamp(6px,1.1vh,12px) 10px!important;}
+body.home-fit-mode #homeView .hourglass{flex:0 0 auto;width:var(--fitted-glass-width,190px)!important;height:var(--fitted-glass-height,320px)!important;max-height:none!important;margin:0 auto!important;aspect-ratio:190/320;}
+body.home-fit-mode #homeView .hourglass-period-tabs button{padding:clamp(4px,.8vh,7px) 3px;}
+body.home-fit-mode #homeView .hourglass-month-nav{margin-top:3px;min-height:26px;}
+body.home-fit-mode #homeView .hourglass-period-title{margin-bottom:5px;}
+body.home-fit-mode #homeView .score-box h2{margin:2px 0!important;}
+body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!important;}
+</style>
+<script>
+(function(){
+  function fitHome(){
+    const home=document.getElementById('homeView');
+    const main=document.getElementById('appMain');
+    const glass=home?.querySelector('.hourglass');
+    const card=home?.querySelector('.score-box');
+    const period=home?.querySelector('.hourglass-period-box');
+    if(!home||!main||!glass||!card||!period)return;
+    const active=home.classList.contains('active');
+    document.body.classList.toggle('home-fit-mode',active);
+    if(!active){main.style.removeProperty('height');return;}
+    const viewport=window.visualViewport?.height||window.innerHeight;
+    const toolbar=document.querySelector('ons-toolbar');
+    const nav=document.querySelector('.bottom-navigation');
+    const toolbarBottom=toolbar?.getBoundingClientRect().bottom||44;
+    const navHeight=nav?.getBoundingClientRect().height||78;
+    const contentHeight=Math.max(150,viewport-toolbarBottom-navHeight-6);
+    main.style.height=contentHeight+'px';
+    main.style.setProperty('--home-top-gap',contentHeight<540?'3px':'9px');
+    main.style.setProperty('--home-gap',contentHeight<540?'4px':'9px');
+    const gap=contentHeight<540?4:9;
+    const available=contentHeight-card.getBoundingClientRect().height-period.getBoundingClientRect().height-gap*3-6;
+    const glassHeight=Math.max(70,Math.min(440,available));
+    const glassWidth=Math.min(265,glassHeight*190/320,window.innerWidth*.75);
+    main.style.setProperty('--fitted-glass-width',glassWidth+'px');
+    main.style.setProperty('--fitted-glass-height',(glassWidth*320/190)+'px');
+  }
+  window.addEventListener('resize',fitHome);
+  window.visualViewport?.addEventListener('resize',fitHome);
+  document.addEventListener('DOMContentLoaded',()=>{
+    fitHome();
+    new MutationObserver(fitHome).observe(document.getElementById('homeView'),{attributes:true,attributeFilter:['class']});
+    setTimeout(fitHome,300);
+  });
+})();
+</script>
 </head>
 
 <body>

@@ -249,9 +249,99 @@ window.addEventListener('load',()=>{
       border-radius: 50% !important;
       clip-path: none !important;
     }
-    .value-grain.memory-glow-1 { box-shadow: 0 0 5px 2px rgba(255,230,128,.65); filter: brightness(1.12); }
-    .value-grain.memory-glow-2 { box-shadow: 0 0 9px 3px rgba(255,221,94,.85); filter: brightness(1.24); }
-    .value-grain.memory-glow-3 { box-shadow: 0 0 14px 5px rgba(255,215,90,.95),0 0 23px 7px rgba(255,215,90,.4); filter: brightness(1.4); }
+    /* 光り方だけ変更：直近30日間の閲覧回数 */
+    /* 閲覧0回は評価項目の色を残しつつ、彩度を落としてくすませる */
+    .value-grain.memory-view-zero {
+      box-shadow: none !important;
+      filter: saturate(.4) brightness(.8) !important;
+      opacity: .8 !important;
+      animation: none !important;
+    }
+    .value-grain.memory-glow-0 { filter: none; opacity: 1; }
+    .value-grain.memory-glow-1 { filter: none; }
+    /* 粒の塗りは光らせず、輪郭のリングだけを常時発光させる */
+    .value-grain.memory-glow-2, .value-grain.memory-glow-3 {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22), inset 0 0 2px rgba(255, 255, 255, 0.55);
+      animation: none !important;
+    }
+    /* 金色のリングだけがキラキラと常時発光。粒の色・明るさは変更しない */
+    .value-grain.memory-glow-2::after, .value-grain.memory-glow-3::after {
+      content: "";
+      position: absolute;
+      inset: -1.5px;
+      border-radius: 50%;
+      border: 0.5px solid #ffd34d;
+      background: transparent;
+      box-shadow:
+        0 0 2px .5px rgba(255, 246, 180, 1),
+        0 0 4px 1px rgba(255, 206, 44, .95),
+        0 0 7px 2px rgba(255, 174, 0, .55),
+        inset 0 0 2px rgba(255, 245, 170, .8);
+      pointer-events: none;
+      animation: none !important;
+    }
+    /* 小さな金色の光点をリングの外側に固定表示 */
+    .value-grain.memory-glow-2::before, .value-grain.memory-glow-3::before {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      top: -3px;
+      right: -3px;
+      border-radius: 50%;
+      background: #fff6b0;
+      box-shadow:
+        0 0 3px 1px #ffdf60,
+        -6px 7px 0 -1px #fff0a0,
+        -6px 7px 4px 1px rgba(255, 202, 30, .85);
+      pointer-events: none;
+      animation: none !important;
+    }
+
+    /* ===== リアルな砂の質感・落下・堆積（表示のみ） ===== */
+    .top-sand {
+      background:
+        radial-gradient(ellipse at 28% 18%, rgba(255,255,255,.36), transparent 55%),
+        repeating-linear-gradient(112deg, transparent 0px, rgba(120,81,22,.065) 1px, transparent 3px, transparent 6px),
+        linear-gradient(165deg, #f7df94 0%, #e7c777 44%, #c79b4b 100%);
+    }
+    .bottom-sand {
+      background:
+        radial-gradient(ellipse at 50% 92%, rgba(177,132,67,.18), transparent 68%),
+        linear-gradient(to top, rgba(237,224,190,.35), rgba(255,255,255,0));
+    }
+    /* 元の色は維持。表面のハイライトと下側の影だけで立体感を追加 */
+    .value-grain {
+      border-color: rgba(255,255,255,.36);
+      background-image:
+        radial-gradient(circle at 30% 24%, rgba(255,255,255,.46) 0%, rgba(255,255,255,.13) 25%, transparent 54%),
+        radial-gradient(circle at 72% 82%, rgba(0,0,0,.22), transparent 57%);
+      box-shadow:
+        0 1px 2px rgba(60,42,26,.3),
+        inset 0 1px 1px rgba(255,255,255,.24),
+        inset 0 -1px 2px rgba(0,0,0,.14);
+    }
+    /* 背景色指定を残し、透明な光沢レイヤーだけを重ねる */
+    .value-grain.emotion, .value-grain.learning, .value-grain.rarity,
+    .value-grain.relationship, .value-grain.future, .value-grain.zero {
+      background-blend-mode: normal;
+    }
+    /* 新しく表示された粒が中央から落ち、少し跳ねて収まる */
+    @keyframes realistic-grain-settle {
+      0% { transform: translate(-50%, -115px) scale(.86); opacity: .35; }
+      67% { transform: translate(-50%, 53%) scale(1.04); opacity: 1; }
+      83% { transform: translate(-50%, 44%) scale(.98); }
+      100% { transform: translate(-50%, 50%) scale(1); opacity: 1; }
+    }
+    .value-grain.sand-settling {
+      animation: realistic-grain-settle .55s cubic-bezier(.24,.68,.3,1) both;
+      animation-delay: var(--settle-delay, 0ms);
+    }
+    .value-grain.memory-glow-2.sand-settling,
+    .value-grain.memory-glow-3.sand-settling { animation: realistic-grain-settle .55s cubic-bezier(.24,.68,.3,1) both !important; animation-delay: var(--settle-delay, 0ms) !important; }
+    @media (prefers-reduced-motion: reduce) {
+      .value-grain.sand-settling { animation: none !important; }
+    }
 
     /* ===== 価値を見る：コンパクト一覧 ===== */
     .history-item.compact-history-item {
@@ -942,6 +1032,9 @@ window.addEventListener('load',()=>{
 #tutorialOverlay .tutorial-progress span.current{background:#3182ed}
 @media(max-height:570px){#tutorialPanel{bottom:8px;padding:12px 16px}#tutorialPanel p{margin-bottom:9px}#tutorialPanel h3{font-size:17px;margin:4px 0}}
 
+    /* メニューバーを4項目で表示 */
+  .bottom-navigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bottom-nav-button { min-width: 0; }
   </style>
 <style>
 .tutorial-auto-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;background:#f8fafc}
@@ -962,7 +1055,6 @@ window.addEventListener('load',()=>{
     <!-- ホーム画面 -->
     <div class="main" id="appMain">
       <section class="app-view active" id="homeView" data-view="home">
-      <h1>記憶を砂に変える</h1>
 
         <div class="score-box">
         <p>残り時間</p>
@@ -1185,6 +1277,13 @@ window.addEventListener('load',()=>{
 
 
 
+
+    <!-- 画面下部の固定メニューバー -->
+    <nav class="bottom-navigation" aria-label="メインメニュー">
+      <button type="button" class="bottom-nav-button active" data-view-target="home" onclick="switchAppView('home')" aria-current="page"><ons-icon icon="md-home"></ons-icon><span>ホーム</span></button>
+      <button type="button" class="bottom-nav-button" data-view-target="value" onclick="switchAppView('value')"><ons-icon icon="md-collection-image"></ons-icon><span>価値を見る</span></button>
+      <button type="button" class="bottom-nav-button" data-view-target="add" onclick="switchAppView('add')"><ons-icon icon="md-plus-circle"></ons-icon><span>入力</span></button>
+    </nav>
   </ons-page>
 
 
@@ -3622,8 +3721,10 @@ function showAIResult(result) {
     function getMemoryShape(memory) { return "sand"; }
 
     function getMemoryGlowLevel(memory) {
-      const count = Math.max(0, Number(memory?.viewCount || 0));
-      return count >= 6 ? 3 : count >= 3 ? 2 : count >= 1 ? 1 : 0;
+      const now = Date.now();
+      const recent = (Array.isArray(memory?.viewHistory) ? memory.viewHistory : [])
+        .filter(t => Number.isFinite(Number(t)) && Number(t) <= now && Number(t) >= now - 30 * 86400000).length;
+      return recent >= 5 ? 3 : recent >= 1 ? 1 : 0;
     }
 
     /*
@@ -3795,7 +3896,7 @@ function showAIResult(result) {
         const score =
           y +
           distanceFromDrop * 5 +
-          centerDistance * 1.5 +
+          centerDistance * 3 +
           candidateIndex * 0.0001;
 
         if (!best || score < best.score) {
@@ -3907,7 +4008,8 @@ function showAIResult(result) {
         grain.className =
           "value-grain " +
           criterion +
-          " shape-sand memory-glow-" + getMemoryGlowLevel(memory);
+          " shape-sand memory-glow-" + getMemoryGlowLevel(memory) +
+          (getMemoryGlowLevel(memory) === 0 ? " memory-view-zero" : "");
 
         grain.style.width =
           size + "px";
@@ -3937,6 +4039,14 @@ function showAIResult(result) {
           Number(memory.viewCount || 0) +
           "回";
 
+        // 積もった位置は既存の衝突判定で決定。初回のみ落下を演出する。
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && index >= memoriesOldestFirst.length - 18) {
+          grain.classList.add('sand-settling');
+          grain.style.setProperty('--settle-delay', Math.min(420, (index - Math.max(0, memoriesOldestFirst.length - 18)) * 24) + 'ms');
+          grain.addEventListener('animationend', function() {
+            grain.classList.remove('sand-settling');
+          }, { once: true });
+        }
         bottomSand.appendChild(grain);
       });
     }
@@ -4467,7 +4577,7 @@ function showAIResult(result) {
 
 
           <p class="memory-behavior-note">
-            閲覧回数：${viewCount}回 ／ 輝きレベル：${glowLevel} / 3<br>
+            閲覧回数：${viewCount}回 ／ 直近30日の光り方：${glowLevel >= 3 ? "リング" : "通常"}<br>
             砂の大きさはAI評価（変更不可）、輝きは閲覧回数で決まります。<br>
             この思い出を開くと閲覧回数が1回増えます。
           </p>
@@ -4500,6 +4610,10 @@ function showAIResult(result) {
     function recordMemoryView(index) {
       if (index < 0 || index >= memories.length) return;
       memories[index].viewCount = Math.max(0, Number(memories[index].viewCount || 0)) + 1;
+      const now = Date.now();
+      const history = Array.isArray(memories[index].viewHistory) ? memories[index].viewHistory : [];
+      memories[index].viewHistory = history.filter(t => Number(t) >= now - 30 * 86400000 && Number(t) <= now);
+      memories[index].viewHistory.push(now);
       saveMemoriesAndRefresh();
     }
 

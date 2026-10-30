@@ -1063,6 +1063,12 @@ window.addEventListener('load',()=>{
     .hourglass-picker-months button.selected {background:#eaf3ff;border-color:#76a9e9;color:#1763bb;font-weight:700;}
     .hourglass-picker-today {display:block;width:100%;margin-top:11px;border:0;border-radius:8px;padding:9px;background:#edf4fb;color:#2466a8;font-weight:600;cursor:pointer;}
     .hourglass {touch-action:pan-y;}
+    /* 固定メニューバーの高さ＋セーフエリア分をスクロール末尾に確保 */
+    #appMain {
+      padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+      scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    }
+    ons-page .page__content { scroll-padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px)); }
 </style>
 <style>
 .tutorial-auto-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;background:#f8fafc}

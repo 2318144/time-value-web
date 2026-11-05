@@ -1268,17 +1268,15 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
     }
 
     const viewport = window.visualViewport?.height || window.innerHeight;
-    const toolbar = document.querySelector('ons-toolbar');
-    const toolbarHeight = toolbar && getComputedStyle(toolbar).display !== 'none'
-      ? Math.max(0, toolbar.getBoundingClientRect().bottom) : 0;
     const nav = document.querySelector('.bottom-navigation');
     const navTop = nav?.getBoundingClientRect().top ?? viewport;
-    const usableBottom = Math.min(viewport, navTop);
-    const availableHeight = Math.max(0, usableBottom - toolbarHeight - 6);
+    const mainTop = main.getBoundingClientRect().top;
+    // Safari の下部メニューとの間に余白を確保
+    const availableHeight = Math.max(0, Math.min(viewport, navTop) - mainTop - 14);
     main.style.height = availableHeight + 'px';
 
     const compact = availableHeight < 550;
-    const gap = compact ? 4 : 10;
+    const gap = compact ? 5 : 10;
     main.style.setProperty('--home-top-gap', (compact ? 3 : 9) + 'px');
     main.style.setProperty('--home-gap', gap + 'px');
 
@@ -1290,10 +1288,11 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
     const outerHeight = (el, style) => el.getBoundingClientRect().height
       + parseFloat(style.marginTop || 0) + parseFloat(style.marginBottom || 0);
     const occupied = outerHeight(card, styleCard) + outerHeight(period, stylePeriod);
-    const freeHeight = Math.max(0, availableHeight - occupied - gap - 6);
+    // 上下余白を含めた安全領域。小さい画面で期間切替が隠れないようにする。
+    const freeHeight = Math.max(0, availableHeight - occupied - gap - 30);
 
     const availableWidth = Math.max(1, main.clientWidth - 24);
-    const glassWidth = Math.max(1, Math.min(265, availableWidth * .82, freeHeight * 190 / 320));
+    const glassWidth = Math.max(1, Math.min(245, availableWidth * .80, freeHeight * 190 / 320));
     main.style.setProperty('--fitted-glass-width', glassWidth + 'px');
     main.style.setProperty('--fitted-glass-height', (glassWidth * 320 / 190) + 'px');
   }
@@ -1519,6 +1518,50 @@ body.home-fit-mode #homeView .hourglass-period-box {
     padding:5px 7px!important;
     font-size:12px!important;
   }
+}
+</style>
+<style id="mobile-viewport-calendar-fix">
+/* スマホのSafari等で下部メニューに期間ボタンが隠れないよう余白を確保 */
+body.home-fit-mode #homeView.active {
+  overflow:visible!important;
+}
+body.home-fit-mode #appMain {
+  overflow:visible!important;
+}
+body.home-fit-mode #homeView .hourglass-period-box {
+  position:relative!important;
+  z-index:1010!important;
+  margin-top:7px!important;
+  margin-bottom:12px!important;
+}
+body.home-fit-mode #homeView .score-box {
+  padding-top:3px!important;
+  padding-bottom:3px!important;
+}
+/* 日付ピッカーは砂時計の下ではなく、期間ボタンの上に展開。
+   下部ナビ・画面外へのはみ出しを避ける */
+#homeView #hourglassDatePicker {
+  position:absolute!important;
+  top:auto!important;
+  bottom:calc(100% + 10px)!important;
+  right:0!important;
+  left:auto!important;
+  transform:none!important;
+  z-index:1100!important;
+  max-height:min(340px, 55dvh)!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  pointer-events:auto!important;
+}
+#homeView #hourglassDatePicker button {
+  pointer-events:auto!important;
+  touch-action:manipulation;
+}
+@media(max-height:620px){
+  body.home-fit-mode #homeView .score-box {margin-top:2px!important;margin-bottom:3px!important;}
+  body.home-fit-mode #homeView .hourglass-period-box {margin-top:3px!important;margin-bottom:6px!important;}
+  #homeView #hourglassDatePicker {max-height:48dvh!important;}
 }
 </style>
 </head>

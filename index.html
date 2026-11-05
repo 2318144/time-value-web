@@ -114,66 +114,39 @@ function renderHourglassTutorial(){
 // 説明パネルを強調枠の上下の空きスペースへ自動配置する。
 function positionTutorialPanel(rects){
   const panel=document.getElementById('tutorialPanel');
-  // 全STEPでオレンジ枠と説明パネルの実際の位置を比較して配置する。
-  panel.classList.remove('tutorial-panel-top');
   const overlay=document.getElementById('tutorialOverlay');
-  overlay.classList.remove('tutorial-step-upper');
   const view=window.visualViewport;
-  const viewportTop=view ? view.offsetTop : 0;
-  const viewportHeight=view ? view.height : window.innerHeight;
-  const viewportBottom=viewportTop+viewportHeight;
-  const margin=12, gap=16;
+  const topLimit=(view ? view.offsetTop : 0)+12;
+  const bottomLimit=(view ? view.offsetTop+view.height : window.innerHeight)-12;
+  const available=Math.max(100,bottomLimit-topLimit);
+  const gap=20;
+  // 上部表示は使わず、「下部」か「中央」の2か所だけで切り替える。
+  panel.classList.remove('tutorial-panel-top');
+  overlay.classList.remove('tutorial-step-upper');
   panel.style.setProperty('top','auto','important');
   panel.style.setProperty('bottom','auto','important');
   panel.style.setProperty('max-height','none','important');
   panel.style.overflowY='auto';
   const desired=panel.getBoundingClientRect().height;
-  const top=viewportTop+margin;
-  const bottom=viewportBottom-margin;
-  if(!rects.length){
-    panel.style.setProperty('max-height',Math.max(80,bottom-top)+'px','important');
-    panel.style.setProperty('top',top+'px','important');
-    return;
+  const height=Math.min(desired,available*0.46);
+  const bottomY=bottomLimit-height;
+  const middleY=topLimit+(available-height)/2;
+  const positions=[{name:'bottom',y:bottomY},{name:'middle',y:middleY}];
+  function overlap(y){
+    return rects.reduce((sum,r)=>{
+      const start=r.top-gap,end=r.top+r.height+gap;
+      return sum+Math.max(0,Math.min(y+height,end)-Math.max(y,start));
+    },0);
   }
-  // すべての枠の上端・下端から空き区間を構成する。
-  const blocked=rects.map(r=>({start:r.top-gap,end:r.top+r.height+gap}))
-    .sort((a,b)=>a.start-b.start);
-  const merged=[];
-  for(const r of blocked){
-    if(merged.length && r.start<=merged[merged.length-1].end){
-      merged[merged.length-1].end=Math.max(merged[merged.length-1].end,r.end);
-    }else merged.push({...r});
-  }
-  const spaces=[];
-  let cursor=top;
-  for(const r of merged){
-    if(r.start>cursor) spaces.push({start:cursor,end:Math.min(bottom,r.start)});
-    cursor=Math.max(cursor,r.end);
-  }
-  if(cursor<bottom)spaces.push({start:cursor,end:bottom});
-  const valid=spaces.filter(r=>r.end-r.start>=65);
-  // 収まるなら十分な広さを優先。収まらない場合は最も広い空き領域で内部スクロール。
-  valid.sort((x,y)=>{
-    const xFit=(x.end-x.start)>=desired, yFit=(y.end-y.start)>=desired;
-    if(xFit!==yFit)return xFit?-1:1;
-    return (y.end-y.start)-(x.end-x.start);
-  });
-  const selected=valid[0];
-  if(selected){
-    const h=Math.min(desired,selected.end-selected.start);
-    const y=selected.start+Math.max(0,(selected.end-selected.start-h)/2);
-    panel.style.setProperty('max-height',h+'px','important');
-    panel.style.setProperty('top',y+'px','important');
-  }else{
-    // 極端に小さい画面では、重なりを最小にする位置を選ぶ。
-    const height=Math.min(desired,Math.max(95,(bottom-top)*0.36));
-    const positions=[top,bottom-height];
-    const overlap=y=>rects.reduce((sum,r)=>sum+Math.max(0,Math.min(y+height,r.top+r.height)-Math.max(y,r.top)),0);
-    const y=positions.sort((x,y)=>overlap(x)-overlap(y))[0];
-    panel.style.setProperty('max-height',height+'px','important');
-    panel.style.setProperty('top',y+'px','important');
-  }
+  // 下部を優先し、強調枠と重なる場合だけ中央へ切り替える。
+  // 中央でも重なる場合は、より重なりが少ない方を採用。
+  positions.sort((a,b)=>overlap(a.y)-overlap(b.y));
+  const selected=positions[0];
+  panel.style.setProperty('max-height',height+'px','important');
+  panel.style.setProperty('top',selected.y+'px','important');
+  panel.dataset.placement=selected.name;
 }
+
 window.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
 window.visualViewport?.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
 window.addEventListener('load',()=>{
@@ -1605,6 +1578,18 @@ body.home-fit-mode #homeView .score-box {
   pointer-events:auto!important;
 }
 #homeView #hourglassDatePicker[hidden] {display:none!important;}
+</style>
+<style id="tutorial-two-positions-only">
+/* 説明欄の位置は下部か中央のみ。古い上部固定指定を無効化 */
+#tutorialOverlay.is-open #tutorialPanel {
+  bottom:auto!important;
+  transform:none!important;
+  max-height:46dvh;
+}
+#tutorialOverlay.is-open #tutorialPanel[data-placement="middle"] {
+  /* 実際の中央座標はJSで画面高に合わせて指定 */
+  bottom:auto!important;
+}
 </style>
 </head>
 

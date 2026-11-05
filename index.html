@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>時間の価値 可視化アプリ</title>
   <meta name="description" content="写真と文脈から思い出の価値を可視化する研究用アプリ">
 
@@ -1594,6 +1594,74 @@ body.home-fit-mode #homeView .score-box {
 <style id="disable-browser-zoom">
 html, body { touch-action: manipulation; }
 </style>
+<style id="zoom-resilience-20261105">
+/* 画面拡大や極小ウィンドウでも横方向にはみ出さない */
+html { width:100%; max-width:100%; overflow-x:hidden; }
+body { width:100%; max-width:100%; overflow-x:hidden; }
+#appMain, #homeView { box-sizing:border-box; max-width:100%; }
+.bottom-navigation { box-sizing:border-box; width:100%; max-width:100%; }
+#homeView .hourglass-period-box { box-sizing:border-box; }
+#homeView #hourglassDatePicker {
+  box-sizing:border-box;
+  max-width:calc(100vw - 24px)!important;
+  max-height:min(70dvh, 410px)!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+#tutorialOverlay.is-open #tutorialPanel {
+  box-sizing:border-box;
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100dvh - 30px)!important;
+  overflow-y:auto;
+}
+/* iOSで入力欄フォーカス時の自動ズームを起こしにくくする */
+@media (pointer:coarse) {
+  input, select, textarea { font-size:max(16px, 1em); }
+}
+@media (max-width:340px) {
+  #homeView .hourglass-period-box { gap:4px!important; }
+  #homeView .hourglass-period-tabs button { padding-inline:5px!important; min-width:27px!important; }
+  #homeView .hourglass-month-nav .hourglass-date-trigger { max-width:116px!important; padding-inline:6px!important; }
+}
+</style>
+<script id="zoom-interaction-guard-20261105">
+/* ブラウザが許可する範囲での拡大操作制限。OS/ブラウザメニューは制御できない。 */
+(function(){
+  const cancel = e => { if(e.cancelable) e.preventDefault(); };
+  // iOS Safariのジェスチャー拡大
+  document.addEventListener('gesturestart', cancel, {passive:false});
+  document.addEventListener('gesturechange', cancel, {passive:false});
+  document.addEventListener('gestureend', cancel, {passive:false});
+
+  // PCのCtrl/Cmd + ホイールによる拡大
+  document.addEventListener('wheel', function(e){
+    if(e.ctrlKey || e.metaKey) cancel(e);
+  }, {passive:false});
+
+  // Ctrl/Cmd +/-/0 などのページ拡大ショートカット
+  document.addEventListener('keydown', function(e){
+    if(!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    const key = e.key;
+    if(['+','-','=','0','Add','Subtract'].includes(key)) cancel(e);
+  }, {capture:true});
+
+  // 2本指タッチを制限（1本指のカレンダー操作やスクロールは維持）
+  document.addEventListener('touchmove', function(e){
+    if(e.touches.length > 1) cancel(e);
+  }, {passive:false});
+
+  // ダブルタップによる拡大を抑制。フォーム操作やカレンダーの単押しは維持
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e){
+    if(e.changedTouches.length !== 1 || e.touches.length) return;
+    const el=e.target;
+    if(el && el.closest && el.closest('input, textarea, select, [contenteditable="true"]')) return;
+    const now=Date.now();
+    if(now-lastTap < 300) cancel(e);
+    lastTap=now;
+  }, {passive:false});
+})();
+</script>
 </head>
 
 <body>

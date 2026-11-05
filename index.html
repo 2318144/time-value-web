@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>時間の価値 可視化アプリ</title>
   <meta name="description" content="写真と文脈から思い出の価値を可視化する研究用アプリ">
 
@@ -1590,6 +1590,9 @@ body.home-fit-mode #homeView .score-box {
   /* 実際の中央座標はJSで画面高に合わせて指定 */
   bottom:auto!important;
 }
+</style>
+<style id="disable-browser-zoom">
+html, body { touch-action: manipulation; }
 </style>
 </head>
 

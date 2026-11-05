@@ -34,13 +34,15 @@ function syncHourglassTutorialAutoToggle(){
   if(checkbox)checkbox.checked=isHourglassTutorialAutoEnabled();
 }
 const hourglassTutorialSteps=[
- {title:'時間の価値を砂時計で見てみよう',description:'上の金色の砂は残り時間、下の色付きの粒は記録した思い出です。今の画面に合わせて操作を紹介します。',selector:null},
- {title:'残り時間を確認',description:'この枠に、設定した期間の残り時間が表示されます。砂時計の上の砂と連動します。',selector:'#homeView .score-box'},
- {title:'思い出の表示期間を選ぶ',description:'「月・年・人生」で下の思い出の表示範囲を切り替えられます。年月の文字を押すと、見たい年月を選べます。',selector:'#homeView .hourglass-period-box'},
- {title:'砂時計設定は2か所から開けます',description:'① 砂時計の上側（金色の砂）をタップ ② 画面下の「設定」→「砂時計設定を開く」。どちらからでも、人生の目標年齢や期間指定を変更できます。',selector:'#homeView .sand-top-clip',secondSelector:'.bottom-nav-button[data-view-target="settings"]'},
- {title:'中央：思い出を入力',description:'砂時計の中央のくびれをタップすると、写真やメモから思い出を登録できます。下の「入力」からも開けます。',selector:'#homeView .hourglass-neck-action',secondSelector:'.bottom-nav-button[data-view-target="add"]'},
- {title:'下の砂：思い出を振り返る',description:'色付きの砂粒は思い出の価値を表します。下側をタップするか「価値を見る」を選ぶと、思い出を一覧で振り返れます。',selector:'#homeView .sand-bottom-clip',secondSelector:'.bottom-nav-button[data-view-target="value"]'},
- {title:'下の「設定」からも砂時計設定へ',description:'右下の「設定」を押し、「砂時計設定を開く」を選びます。砂時計の上側をタップしても同じ設定画面を開けます。プロフィールやチュートリアルの設定もここから行えます。',selector:'.bottom-nav-button[data-view-target="settings"]'}
+ {label:'1',title:'時間の価値を砂時計で見てみよう',description:'上の金色の砂は残り時間、下の色付きの粒は記録した思い出です。今の画面に合わせて操作を紹介します。',selector:null},
+ {label:'2',title:'残り時間を確認',description:'この枠に、設定した期間の残り時間が表示されます。砂時計の上の砂と連動します。',selector:'#homeView .score-box'},
+ {label:'3',title:'思い出の表示期間を選ぶ',description:'「月・年・人生」で下の思い出の表示範囲を切り替えられます。年月の文字を押すと、見たい年月を選べます。',selector:'#homeView .hourglass-period-box'},
+ {label:'4-1',title:'砂時計の設定方法①',description:'砂時計の上側（金色の砂）をタップすると、砂時計の設定画面を開けます。人生の目標年齢や表示期間を変更できます。',selector:'#homeView .sand-top-clip'},
+ {label:'4-2',title:'砂時計の設定方法②',description:'画面下の「設定」をタップし、「砂時計設定を開く」を選びます。①と同じ設定画面を開けます。',selector:'.bottom-nav-button[data-view-target="settings"]'},
+ {label:'5-1',title:'思い出の入力方法①',description:'砂時計の中央にあるくびれをタップすると、写真やメモから思い出を登録できます。',selector:'#homeView .hourglass-neck-action'},
+ {label:'5-2',title:'思い出の入力方法②',description:'画面下の「入力」をタップしても、①と同じ思い出の入力画面を開けます。',selector:'.bottom-nav-button[data-view-target="add"]'},
+ {label:'6-1',title:'思い出を振り返る方法①',description:'砂時計の下側にある色付きの砂粒は、記録した思い出の価値を表しています。下側をタップすると、思い出を振り返れます。',selector:'#homeView .sand-bottom-clip'},
+ {label:'6-2',title:'思い出を振り返る方法②',description:'画面下の「価値を見る」をタップしても、①と同じ思い出の一覧を開けます。',selector:'.bottom-nav-button[data-view-target="value"]'}
 ];
 let hourglassTutorialIndex=0;
 function startHourglassTutorial(){
@@ -63,11 +65,10 @@ function changeHourglassTutorial(direction){
 function renderHourglassTutorial(){
   const step=hourglassTutorialSteps[hourglassTutorialIndex];
   const panel=document.getElementById('tutorialPanel');
-  const isTopStep=hourglassTutorialIndex>=3 && hourglassTutorialIndex<=5;
-  document.getElementById('tutorialOverlay').classList.toggle('tutorial-step-upper',isTopStep);
-  panel.classList.toggle('tutorial-panel-top',isTopStep);
+  document.getElementById('tutorialOverlay').classList.remove('tutorial-step-upper');
+  panel.classList.remove('tutorial-panel-top');
   panel.style.removeProperty('top'); panel.style.removeProperty('bottom'); panel.style.removeProperty('max-height');
-  document.getElementById('tutorialCount').textContent='STEP '+(hourglassTutorialIndex+1)+' / '+hourglassTutorialSteps.length;
+  document.getElementById('tutorialCount').textContent='STEP '+step.label+' / 6';
   document.getElementById('tutorialTitle').textContent=step.title;
   document.getElementById('tutorialDescription').textContent=step.description;
   document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
@@ -113,48 +114,68 @@ function renderHourglassTutorial(){
 // 説明パネルを強調枠の上下の空きスペースへ自動配置する。
 function positionTutorialPanel(rects){
   const panel=document.getElementById('tutorialPanel');
-  const viewport=window.visualViewport?.height||window.innerHeight;
-  const margin=12, gap=14;
-  panel.style.removeProperty('top');panel.style.removeProperty('bottom');panel.style.removeProperty('max-height');
+  // 全STEPでオレンジ枠と説明パネルの実際の位置を比較して配置する。
+  panel.classList.remove('tutorial-panel-top');
+  const overlay=document.getElementById('tutorialOverlay');
+  overlay.classList.remove('tutorial-step-upper');
+  const view=window.visualViewport;
+  const viewportTop=view ? view.offsetTop : 0;
+  const viewportHeight=view ? view.height : window.innerHeight;
+  const viewportBottom=viewportTop+viewportHeight;
+  const margin=12, gap=16;
+  panel.style.setProperty('top','auto','important');
+  panel.style.setProperty('bottom','auto','important');
+  panel.style.setProperty('max-height','none','important');
   panel.style.overflowY='auto';
   const desired=panel.getBoundingClientRect().height;
-  // STEP 4〜6: 白い説明パネルそのものを画面の最上部へ固定する。
-  // オレンジのスポットライトは移動しない。
-  if(hourglassTutorialIndex>=3 && hourglassTutorialIndex<=5){
-    // 上側の説明パネルはCSSで固定し、オレンジ枠とは独立させる。
-    panel.classList.add('tutorial-panel-top');
+  const top=viewportTop+margin;
+  const bottom=viewportBottom-margin;
+  if(!rects.length){
+    panel.style.setProperty('max-height',Math.max(80,bottom-top)+'px','important');
+    panel.style.setProperty('top',top+'px','important');
     return;
   }
-  panel.classList.remove('tutorial-panel-top');
-  // STEP 2とSTEP 3は同じ位置（画面下部）に説明枠を表示する。
-  if(hourglassTutorialIndex===1 || hourglassTutorialIndex===2){
-    panel.style.top='auto';
-    panel.style.bottom='calc(20px + env(safe-area-inset-bottom, 0px))';
-    panel.style.maxHeight='min(42dvh, 300px)';
-    return;
+  // すべての枠の上端・下端から空き区間を構成する。
+  const blocked=rects.map(r=>({start:r.top-gap,end:r.top+r.height+gap}))
+    .sort((a,b)=>a.start-b.start);
+  const merged=[];
+  for(const r of blocked){
+    if(merged.length && r.start<=merged[merged.length-1].end){
+      merged[merged.length-1].end=Math.max(merged[merged.length-1].end,r.end);
+    }else merged.push({...r});
   }
-  if(!rects.length){panel.style.bottom=margin+'px';return;}
-  const topEdge=Math.min(...rects.map(r=>r.top));
-  const bottomEdge=Math.max(...rects.map(r=>r.top+r.height));
-  const above=Math.max(0,topEdge-gap-margin);
-  const below=Math.max(0,viewport-bottomEdge-gap-margin);
-  // オレンジ枠の間に空間がある場合も候補に含める。
-  const sorted=[...rects].sort((a,b)=>a.top-b.top);
-  const spaces=[{start:margin,end:topEdge-gap},{start:bottomEdge+gap,end:viewport-margin}];
-  for(let i=0;i<sorted.length-1;i++){
-    const start=sorted[i].top+sorted[i].height+gap;
-    const end=sorted[i+1].top-gap;
-    if(end>start)spaces.push({start,end});
+  const spaces=[];
+  let cursor=top;
+  for(const r of merged){
+    if(r.start>cursor) spaces.push({start:cursor,end:Math.min(bottom,r.start)});
+    cursor=Math.max(cursor,r.end);
   }
-  spaces.sort((a,b)=>(b.end-b.start)-(a.end-a.start));
-  const fitting=spaces.filter(x=>x.end-x.start>=desired);
-  const chosen=fitting[0]||spaces[0];
-  const available=Math.max(50,chosen.end-chosen.start);
-  panel.style.maxHeight=available+'px';
-  panel.style.top=Math.max(margin,chosen.start+(available-Math.min(desired,available))/2)+'px';
-  panel.style.bottom='auto';
+  if(cursor<bottom)spaces.push({start:cursor,end:bottom});
+  const valid=spaces.filter(r=>r.end-r.start>=65);
+  // 収まるなら十分な広さを優先。収まらない場合は最も広い空き領域で内部スクロール。
+  valid.sort((x,y)=>{
+    const xFit=(x.end-x.start)>=desired, yFit=(y.end-y.start)>=desired;
+    if(xFit!==yFit)return xFit?-1:1;
+    return (y.end-y.start)-(x.end-x.start);
+  });
+  const selected=valid[0];
+  if(selected){
+    const h=Math.min(desired,selected.end-selected.start);
+    const y=selected.start+Math.max(0,(selected.end-selected.start-h)/2);
+    panel.style.setProperty('max-height',h+'px','important');
+    panel.style.setProperty('top',y+'px','important');
+  }else{
+    // 極端に小さい画面では、重なりを最小にする位置を選ぶ。
+    const height=Math.min(desired,Math.max(95,(bottom-top)*0.36));
+    const positions=[top,bottom-height];
+    const overlap=y=>rects.reduce((sum,r)=>sum+Math.max(0,Math.min(y+height,r.top+r.height)-Math.max(y,r.top)),0);
+    const y=positions.sort((x,y)=>overlap(x)-overlap(y))[0];
+    panel.style.setProperty('max-height',height+'px','important');
+    panel.style.setProperty('top',y+'px','important');
+  }
 }
 window.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
+window.visualViewport?.addEventListener('resize',()=>{if(document.getElementById('tutorialOverlay').classList.contains('is-open'))renderHourglassTutorial()});
 window.addEventListener('load',()=>{
   syncHourglassTutorialAutoToggle();
   if(!isHourglassTutorialAutoEnabled())return;

@@ -1585,6 +1585,27 @@ body.home-fit-mode #homeView .score-box {
   #homeView #hourglassDatePicker {max-height:48dvh!important;}
 }
 </style>
+
+<style id="hourglass-calendar-screen-center">
+/* 思い出の表示期間カレンダーを画面中央に固定する */
+#homeView #hourglassDatePicker:not([hidden]) {
+  position:fixed!important;
+  top:50%!important;
+  top:50dvh!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(310px,calc(100vw - 32px))!important;
+  max-width:calc(100vw - 32px)!important;
+  max-height:min(400px,calc(100dvh - 48px))!important;
+  z-index:99999!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  pointer-events:auto!important;
+}
+#homeView #hourglassDatePicker[hidden] {display:none!important;}
+</style>
 </head>
 
 <body>

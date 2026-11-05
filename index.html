@@ -1247,39 +1247,75 @@ body.home-fit-mode .bottom-navigation{position:fixed!important;bottom:0!importan
 #homeView .hourglass-month-nav { width:100%; justify-content:center!important; margin-left:auto; margin-right:auto; }
 </style>
 <script>
+/* ホーム画面だけを画面サイズに合わせて自動調整する */
 (function(){
+  let queued = false;
   function fitHome(){
-    const home=document.getElementById('homeView');
-    const main=document.getElementById('appMain');
-    const glass=home?.querySelector('.hourglass');
-    const card=home?.querySelector('.score-box');
-    const period=home?.querySelector('.hourglass-period-box');
-    if(!home||!main||!glass||!card||!period)return;
-    const active=home.classList.contains('active');
-    document.body.classList.toggle('home-fit-mode',active);
-    if(!active){main.style.removeProperty('height');return;}
-    const viewport=window.visualViewport?.height||window.innerHeight;
-    const toolbar=document.querySelector('ons-toolbar');
-    const nav=document.querySelector('.bottom-navigation');
-    const toolbarBottom=(toolbar && getComputedStyle(toolbar).display==='none') ? 0 : (toolbar?.getBoundingClientRect().bottom||44);
-    const navHeight=nav?.getBoundingClientRect().height||78;
-    const contentHeight=Math.max(150,viewport-toolbarBottom-navHeight-6);
-    main.style.height=contentHeight+'px';
-    main.style.setProperty('--home-top-gap',contentHeight<540?'3px':'9px');
-    main.style.setProperty('--home-gap',contentHeight<540?'4px':'9px');
-    const gap=contentHeight<540?4:9;
-    const available=contentHeight-card.getBoundingClientRect().height-period.getBoundingClientRect().height-gap*3-6;
-    const glassHeight=Math.max(70,Math.min(440,available));
-    const glassWidth=Math.min(265,glassHeight*190/320,window.innerWidth*.75);
-    main.style.setProperty('--fitted-glass-width',glassWidth+'px');
-    main.style.setProperty('--fitted-glass-height',(glassWidth*320/190)+'px');
+    const home = document.getElementById('homeView');
+    const main = document.getElementById('appMain');
+    const glass = home?.querySelector('.hourglass');
+    const card = home?.querySelector('.score-box');
+    const period = home?.querySelector('.hourglass-period-box');
+    if (!home || !main || !glass || !card || !period) return;
+
+    const active = home.classList.contains('active');
+    document.body.classList.toggle('home-fit-mode', active);
+    if (!active) {
+      main.style.removeProperty('height');
+      main.style.removeProperty('--fitted-glass-width');
+      main.style.removeProperty('--fitted-glass-height');
+      return;
+    }
+
+    const viewport = window.visualViewport?.height || window.innerHeight;
+    const toolbar = document.querySelector('ons-toolbar');
+    const toolbarHeight = toolbar && getComputedStyle(toolbar).display !== 'none'
+      ? Math.max(0, toolbar.getBoundingClientRect().bottom) : 0;
+    const nav = document.querySelector('.bottom-navigation');
+    const navTop = nav?.getBoundingClientRect().top ?? viewport;
+    const usableBottom = Math.min(viewport, navTop);
+    const availableHeight = Math.max(0, usableBottom - toolbarHeight - 6);
+    main.style.height = availableHeight + 'px';
+
+    const compact = availableHeight < 550;
+    const gap = compact ? 4 : 10;
+    main.style.setProperty('--home-top-gap', (compact ? 3 : 9) + 'px');
+    main.style.setProperty('--home-gap', gap + 'px');
+
+    // 砂時計をいったん最小にして、上下の要素の実際の高さを測定する
+    main.style.setProperty('--fitted-glass-width', '1px');
+    main.style.setProperty('--fitted-glass-height', '2px');
+    const styleCard = getComputedStyle(card);
+    const stylePeriod = getComputedStyle(period);
+    const outerHeight = (el, style) => el.getBoundingClientRect().height
+      + parseFloat(style.marginTop || 0) + parseFloat(style.marginBottom || 0);
+    const occupied = outerHeight(card, styleCard) + outerHeight(period, stylePeriod);
+    const freeHeight = Math.max(0, availableHeight - occupied - gap - 6);
+
+    const availableWidth = Math.max(1, main.clientWidth - 24);
+    const glassWidth = Math.max(1, Math.min(265, availableWidth * .82, freeHeight * 190 / 320));
+    main.style.setProperty('--fitted-glass-width', glassWidth + 'px');
+    main.style.setProperty('--fitted-glass-height', (glassWidth * 320 / 190) + 'px');
   }
-  window.addEventListener('resize',fitHome);
-  window.visualViewport?.addEventListener('resize',fitHome);
-  document.addEventListener('DOMContentLoaded',()=>{
-    fitHome();
-    new MutationObserver(fitHome).observe(document.getElementById('homeView'),{attributes:true,attributeFilter:['class']});
-    setTimeout(fitHome,300);
+  function scheduleFit(){
+    if(queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; fitHome(); });
+  }
+  window.addEventListener('resize', scheduleFit);
+  window.addEventListener('orientationchange', scheduleFit);
+  window.visualViewport?.addEventListener('resize', scheduleFit);
+  document.addEventListener('DOMContentLoaded', () => {
+    scheduleFit();
+    const home = document.getElementById('homeView');
+    if(home) new MutationObserver(scheduleFit).observe(home, {
+      attributes:true, attributeFilter:['class']
+    });
+    if(window.ResizeObserver){
+      const nav = document.querySelector('.bottom-navigation');
+      if(nav) new ResizeObserver(scheduleFit).observe(nav);
+    }
+    setTimeout(scheduleFit, 350);
   });
 })();
 </script>
@@ -1440,6 +1476,49 @@ body.home-fit-mode #homeView .hourglass {
 #homeView .hourglass-period-box,
 body.home-fit-mode #homeView .hourglass-period-box {
   align-self:center!important;
+}
+</style>
+<style id="home-fit-improvements-20261105">
+/* 画面幅が変わってもホームの配置を維持。砂時計の色・形は変更しない */
+body.home-fit-mode #appMain {
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+body.home-fit-mode #homeView.active {
+  width:100%;
+  min-height:0!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+body.home-fit-mode #homeView .hourglass {
+  flex-shrink:0!important;
+  width:var(--fitted-glass-width,190px)!important;
+  height:var(--fitted-glass-height,320px)!important;
+  min-height:0!important;
+  max-height:none!important;
+}
+body.home-fit-mode #homeView .score-box {
+  flex-shrink:0!important;
+  max-width:100%!important;
+}
+body.home-fit-mode #homeView .hourglass-period-box {
+  flex-shrink:0!important;
+  max-width:100%!important;
+}
+@media(max-width:370px) {
+  #homeView .hourglass-period-box {gap:5px!important;}
+  #homeView .hourglass-period-tabs button {
+    min-width:29px!important;
+    padding:5px 6px!important;
+    font-size:12px!important;
+  }
+  #homeView .hourglass-month-nav .hourglass-date-trigger {
+    max-width:132px!important;
+    padding:5px 7px!important;
+    font-size:12px!important;
+  }
 }
 </style>
 </head>

@@ -34,6 +34,7 @@ function syncHourglassTutorialAutoToggle(){
   if(checkbox)checkbox.checked=isHourglassTutorialAutoEnabled();
 }
 const hourglassTutorialSteps=[
+ {label:'コンセプト',title:'思い出を砂に変え、過去を振り返り、未来を大切にする。',description:'写真やコメントからAIが思い出を評価し、その結果を「思い出の砂」として砂時計に蓄積します。積み重ねた思い出を振り返りながら、人生の残り時間も見つめることで、これまでに過ごした時間と、これから過ごす時間の両方の大切さに気づくきっかけを届けます。',selector:null},
  {label:'1',title:'時間の価値を砂時計で見てみよう',description:'上の金色の砂は残り時間、下の色付きの粒は記録した思い出です。今の画面に合わせて操作を紹介します。',selector:null},
  {label:'2',title:'残り時間を確認',description:'この枠に、設定した期間の残り時間が表示されます。砂時計の上の砂と連動します。',selector:'#homeView .score-box'},
  {label:'3',title:'思い出の表示期間を選ぶ',description:'「月・年・人生」で下の思い出の表示範囲を切り替えられます。年月の文字を押すと、見たい年月を選べます。',selector:'#homeView .hourglass-period-box'},
@@ -68,7 +69,7 @@ function renderHourglassTutorial(){
   document.getElementById('tutorialOverlay').classList.remove('tutorial-step-upper');
   panel.classList.remove('tutorial-panel-top');
   panel.style.removeProperty('top'); panel.style.removeProperty('bottom'); panel.style.removeProperty('max-height');
-  document.getElementById('tutorialCount').textContent='STEP '+step.label+' / 6';
+  document.getElementById('tutorialCount').textContent=hourglassTutorialIndex===0?'このアプリについて':'STEP '+step.label+' / 6';
   document.getElementById('tutorialTitle').textContent=step.title;
   document.getElementById('tutorialDescription').textContent=step.description;
   document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
@@ -1693,6 +1694,38 @@ body.home-fit-mode #homeView .hourglass-period-tabs button {
     font-size:14px!important;
   }
 }
+</style>
+<style id="memory-ai-loading-style">
+#memoryAiLoadingOverlay{position:fixed;inset:0;z-index:120000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(28,25,20,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#memoryAiLoadingOverlay.is-visible{display:flex}
+.memory-ai-loading-card{width:min(100%,310px);padding:29px 22px 25px;border-radius:22px;background:#fffdf9;box-shadow:0 14px 42px rgba(42,31,18,.2);display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center}
+.memory-ai-spinner{width:48px;height:48px;border:5px solid #f1e5d1;border-top-color:#b58a40;border-radius:50%;animation:memory-ai-spin .8s linear infinite}
+@keyframes memory-ai-spin{to{transform:rotate(360deg)}}
+.memory-ai-loading-title{font-size:17px;font-weight:700;color:#493820}
+.memory-ai-loading-detail{font-size:13px;line-height:1.6;color:#756957}
+@media(prefers-reduced-motion:reduce){.memory-ai-spinner{animation-duration:2s}}
+</style>
+<style id="memory-detail-photo-gallery-style">
+  .memory-detail-photo-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:10px 0 6px; }
+  .memory-detail-photo-grid img { width:100%; height:145px; object-fit:cover; border-radius:11px; background:#f3ede3; display:block; }
+  .memory-detail-photo-note { grid-column:1/-1; font-size:12px; line-height:1.6; color:#82796c; }
+  @media (max-width:350px) { .memory-detail-photo-grid img { height:115px; } }
+</style>
+
+<style id="memory-list-thumbnail-style">
+/* 記録一覧：本文の右側に小さな写真を表示 */
+.compact-history-item .history-card-layout { display:flex; align-items:center; gap:12px; min-width:0; }
+.compact-history-item .history-card-text { flex:1; min-width:0; }
+.compact-history-item .history-card-thumbnail { width:76px; height:68px; flex:0 0 76px; border-radius:10px; overflow:hidden; background:#f2ece2; border:1px solid #e8e0d4; display:flex; align-items:center; justify-content:center; }
+.compact-history-item .history-card-thumbnail img { width:100%; height:100%; object-fit:cover; display:block; }
+.compact-history-item .history-card-thumbnail-placeholder { color:#b8a992; font-size:25px; line-height:1; }
+@media(max-width:360px) { .compact-history-item .history-card-thumbnail {width:62px;height:62px;flex-basis:62px;} .compact-history-item .history-card-layout {gap:8px;} }
+</style>
+<style>
+/* チュートリアル導入：コンセプトを読みやすく表示 */
+#tutorialOverlay #tutorialPanel:has(.tutorial-count) { overflow-wrap: anywhere; }
+#tutorialOverlay #tutorialPanel h3 { line-height: 1.45; }
+#tutorialOverlay #tutorialPanel p { line-height: 1.7; }
 </style>
 </head>
 
@@ -3449,10 +3482,46 @@ function syncBirthdaySelects(){
       }
     }
 
+    // 写真を端末内の思い出履歴に保存できるサイズに縮小する。
+    // APIへ送信する元の写真には影響しない。
+    async function makeMemoryPhotoData(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onerror = () => resolve(null);
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => resolve(null);
+          img.onload = () => {
+            try {
+              const maxEdge = 800;
+              const ratio = Math.min(1, maxEdge / Math.max(img.naturalWidth, img.naturalHeight));
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
+              canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
+              canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.65));
+            } catch (_) { resolve(null); }
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function prepareMemoryPhotos(files) {
+      const photos = [];
+      for (const file of Array.from(files).slice(0, 8)) {
+        const data = await makeMemoryPhotoData(file);
+        if (data) photos.push(data);
+      }
+      return photos;
+    }
+
     // ==============================
     // AIによる思い出評価
     // ==============================
     async function addMemoryByAI() {
+      if (memoryAiBusy) return; // 二重送信を防止
       const files = document.getElementById("photoInput").files;
       const memo = document.getElementById("memo").value;
       const category = document.getElementById("category").value;
@@ -3504,10 +3573,12 @@ function syncBirthdaySelects(){
           escapeHtml(CRITERIA_LABELS[userPriority])
         );
 
+        const memoryPhotos = await prepareMemoryPhotos(files);
         const memory = {
           category,
           memo,
           photoCount: files.length,
+          photos: memoryPhotos,
 
           // 閲覧回数は人間側の関心を表す。形は円形固定
           favorite: false,
@@ -3586,10 +3657,20 @@ function syncBirthdaySelects(){
         memories.unshift(memory);
         totalScore += aiResult.totalScore;
 
-        localStorage.setItem(
-          STORAGE_KEYS.memories,
-          JSON.stringify(memories)
-        );
+        try {
+          localStorage.setItem(STORAGE_KEYS.memories, JSON.stringify(memories));
+        } catch (storageError) {
+          // 端末の保存容量が足りない場合も、思い出の文章・評価は優先して残す。
+          memory.photos = [];
+          try {
+            localStorage.setItem(STORAGE_KEYS.memories, JSON.stringify(memories));
+            ons.notification.alert('端末の保存容量が不足したため、写真を除いて思い出を保存しました。');
+          } catch (_) {
+            memories.shift();
+            totalScore -= aiResult.totalScore;
+            throw new Error('端末の保存容量が不足し、思い出を保存できませんでした。');
+          }
+        }
         localStorage.setItem(
           STORAGE_KEYS.totalScore,
           String(totalScore)
@@ -5320,21 +5401,31 @@ function showAIResult(result) {
           }
         };
 
+        // 写真が保存されている記録だけ、最初の1枚をサムネイルに使用
+        const firstPhoto = Array.isArray(memory.photos)
+          ? memory.photos.find(photo => typeof photo === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(photo))
+          : null;
+
         div.innerHTML = `
-          <div class="history-card-top">
-            <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
-            <span class="history-card-date">${escapeHtml(displayDate)}</span>
-          </div>
-
-          <h4>${escapeHtml(title)}</h4>
-
-          <div class="history-card-bottom">
-            <span class="primary-criterion">
-              主な評価：${escapeHtml(
-                CRITERIA_LABELS[primaryCriterion] || "未分類"
-              )}
-            </span>
-            <span class="history-card-arrow" aria-hidden="true">›</span>
+          <div class="history-card-layout">
+            <div class="history-card-text">
+              <div class="history-card-top">
+                <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+                <span class="history-card-date">${escapeHtml(displayDate)}</span>
+              </div>
+              <h4>${escapeHtml(title)}</h4>
+              <div class="history-card-bottom">
+                <span class="primary-criterion">
+                  主な評価：${escapeHtml(CRITERIA_LABELS[primaryCriterion] || "未分類")}
+                </span>
+                <span class="history-card-arrow" aria-hidden="true">›</span>
+              </div>
+            </div>
+            <div class="history-card-thumbnail" aria-label="思い出の写真">
+              ${firstPhoto
+                ? `<img src="${firstPhoto}" alt="${escapeHtml(title)}の写真" loading="lazy">`
+                : `<span class="history-card-thumbnail-placeholder" aria-label="写真なし">▧</span>`}
+            </div>
           </div>
         `;
 
@@ -5398,6 +5489,13 @@ function showAIResult(result) {
           <p>${escapeHtml(memory.valueReason || "なし")}</p>
 
           <p><b>判断に使用した写真：</b>${Number(memory.photoCount || 0)}枚</p>
+          <div class="memory-detail-photo-grid">
+            ${Array.isArray(memory.photos) && memory.photos.length
+              ? memory.photos.map((photo, photoIndex) =>
+                  `<img src="${photo}" alt="思い出の写真 ${photoIndex + 1}" loading="lazy">`
+                ).join('')
+              : '<p class="memory-detail-photo-note">この思い出には表示できる写真が保存されていません。以前の記録は写真データが保存されていないため、再表示できません。</p>'}
+          </div>
         </div>
 
         <div class="memory-detail-section">
@@ -5545,19 +5643,15 @@ function showAIResult(result) {
       }
     }
 
+    let memoryAiBusy = false;
     function setLoading(isLoading) {
       const main = document.getElementById("appMain");
-
-      if (isLoading) {
-        main.classList.add("loading");
-
-        ons.notification.toast(
-          "AIが写真から1つの思い出を評価中です",
-          { timeout: 1200 }
-        );
-
-      } else {
-        main.classList.remove("loading");
+      const overlay = document.getElementById("memoryAiLoadingOverlay");
+      memoryAiBusy = Boolean(isLoading);
+      if (main) main.classList.toggle("loading", memoryAiBusy);
+      if (overlay) {
+        overlay.classList.toggle("is-visible", memoryAiBusy);
+        overlay.setAttribute("aria-hidden", String(!memoryAiBusy));
       }
     }
 
@@ -5693,5 +5787,12 @@ function showAIResult(result) {
   },true);
 })();
 </script>
+<div id="memoryAiLoadingOverlay" role="status" aria-live="polite" aria-label="思い出を記録しています" aria-hidden="true">
+  <div class="memory-ai-loading-card">
+    <div class="memory-ai-spinner" aria-hidden="true"></div>
+    <div class="memory-ai-loading-title">思い出を記録中…</div>
+    <div class="memory-ai-loading-detail">AIが写真やメモを分析しています。<br>完了までしばらくお待ちください。</div>
+  </div>
+</div>
 </body>
 </html>

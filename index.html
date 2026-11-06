@@ -1594,6 +1594,106 @@ body.home-fit-mode #homeView .score-box {
 <style id="disable-browser-zoom">
 html, body { touch-action: manipulation; }
 </style>
+
+<style id="period-controls-always-two-rows-20261106">
+/* 表示期間は常に2段。上：月・年・人生、下：年月選択。砂時計と下部メニューは変更しない。 */
+#homeView .hourglass-period-box,
+body.home-fit-mode #homeView .hourglass-period-box {
+  display:flex!important; flex-direction:column!important; flex-wrap:nowrap!important;
+  align-items:center!important; justify-content:center!important;
+  gap:8px!important; width:max-content!important; max-width:calc(100% - 24px)!important;
+  margin:8px auto 12px!important; padding:0!important;
+  background:transparent!important; border:0!important; box-shadow:none!important;
+  overflow:visible!important; position:relative!important;
+}
+#homeView .hourglass-period-tabs {
+  display:flex!important; justify-content:center!important; width:max-content!important;
+  max-width:100%!important; flex:0 0 auto!important;
+}
+#homeView .hourglass-month-nav,
+body.home-fit-mode #homeView .hourglass-month-nav {
+  display:flex!important; justify-content:center!important; width:max-content!important;
+  max-width:100%!important; flex:0 0 auto!important; margin:0!important;
+}
+#homeView .hourglass-month-nav .hourglass-date-trigger {
+  min-width:130px!important; max-width:calc(100vw - 40px)!important;
+}
+@media (max-height:650px) {
+  #homeView .hourglass-period-box, body.home-fit-mode #homeView .hourglass-period-box {
+    gap:5px!important; margin-top:4px!important; margin-bottom:7px!important;
+  }
+}
+</style>
+<style id="period-active-emphasis-20261106">
+/* 選択中の「月・年・人生」を砂時計の金色に合わせて強調 */
+#homeView .hourglass-period-tabs button,
+body.home-fit-mode #homeView .hourglass-period-tabs button {
+  position:relative;
+  color:#68635d!important;
+  transition:background-color .18s ease,color .18s ease,box-shadow .18s ease;
+}
+#homeView .hourglass-period-tabs button.active,
+body.home-fit-mode #homeView .hourglass-period-tabs button.active {
+  background:#f4e3bd!important;
+  color:#80551c!important;
+  font-weight:800!important;
+  box-shadow:inset 0 0 0 1px #d9b779!important;
+}
+#homeView .hourglass-period-tabs button.active::after {
+  content:"";
+  position:absolute;
+  left:25%;right:25%;bottom:3px;
+  height:2px;border-radius:2px;
+  background:#b78535;
+}
+#homeView .hourglass-period-tabs button:focus-visible {
+  outline:2px solid #b78535!important;
+  outline-offset:2px;
+}
+</style>
+<style id="life-period-label-20261106">
+/* 人生モードでは選択可能な年月がないため、ラベル表示のみとする */
+#homeView .hourglass-month-nav .hourglass-date-trigger:disabled,
+body.home-fit-mode #homeView .hourglass-month-nav .hourglass-date-trigger:disabled {
+  opacity:1!important;
+  color:#4c4439!important;
+  cursor:default!important;
+  pointer-events:none!important;
+  min-width:160px!important;
+}
+#homeView .hourglass-month-nav .hourglass-date-trigger:disabled::after {
+  content:none!important;
+  display:none!important;
+}
+</style>
+<style id="period-touch-target-larger-20261106">
+/* 月・年・人生：見た目を少し拡大し、タップ領域を40pxに */
+#homeView .hourglass-period-tabs,
+body.home-fit-mode #homeView .hourglass-period-tabs {
+  padding:3px!important;
+}
+#homeView .hourglass-period-tabs button,
+body.home-fit-mode #homeView .hourglass-period-tabs button {
+  box-sizing:border-box!important;
+  min-width:56px!important;
+  min-height:40px!important;
+  height:40px!important;
+  padding:7px 12px!important;
+  font-size:15px!important;
+  line-height:1.3!important;
+  touch-action:manipulation;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+@media(max-width:350px){
+  #homeView .hourglass-period-tabs button,
+  body.home-fit-mode #homeView .hourglass-period-tabs button {
+    min-width:49px!important;
+    padding:7px 9px!important;
+    font-size:14px!important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -4562,7 +4662,7 @@ function showAIResult(result) {
     }
     function refreshHourglassMonth() {
       const label = document.getElementById('hourglassMonthLabel');
-      if (label) label.textContent = hourglassPeriodMode === 'life' ? '人生全体' :
+      if (label) label.textContent = hourglassPeriodMode === 'life' ? 'すべての思い出' :
         hourglassDisplayMonth.getFullYear() + '年' +
         (hourglassPeriodMode === 'month' ? (hourglassDisplayMonth.getMonth() + 1) + '月' : '');
       if (label) { label.disabled = hourglassPeriodMode === 'life'; label.setAttribute('aria-expanded', String(!document.getElementById('hourglassDatePicker').hidden)); }

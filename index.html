@@ -1841,6 +1841,74 @@ body.home-fit-mode #homeView .hourglass-period-tabs button {
 #tutorialOverlay #tutorialPanel h3 { line-height: 1.45; }
 #tutorialOverlay #tutorialPanel p { line-height: 1.7; }
 </style>
+<style id="timer-unit-display-wrap-20261113">
+/* 年・週・日・時間・秒の表示がスマホ幅を超えないようにする */
+#homeView .score-box,
+body.home-fit-mode #homeView .score-box { white-space:normal!important; flex-wrap:wrap!important; }
+#homeView .score-box #timeText,
+body.home-fit-mode #homeView .score-box #timeText {
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  font-size:clamp(12px,3.3vw,18px)!important;
+  line-height:1.35!important;
+  text-align:center!important;
+}
+</style>
+<style id="remaining-time-two-line-20261113">
+/* 残り時間：大きな単位を上段、時・分・秒を下段に表示。 */
+#homeView .score-box,
+body.home-fit-mode #homeView .score-box {
+  display:flex!important;
+  flex-direction:column!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  white-space:normal!important;
+  min-height:0!important;
+  max-width:calc(100% - 16px)!important;
+  padding:5px 10px!important;
+}
+#homeView .score-box .remaining-time-label {font-size:11px!important;line-height:1.25!important;}
+#homeView .score-box #timeText,
+body.home-fit-mode #homeView .score-box #timeText {
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:2px!important;
+  width:100%!important;
+  margin:0!important;
+  font-size:inherit!important;
+  line-height:1.3!important;
+  white-space:normal!important;
+}
+#homeView #timeMajor {
+  display:block;
+  font-size:clamp(15px,4.6vw,23px)!important;
+  font-weight:750;
+  color:#302c28;
+  white-space:nowrap;
+  letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+#homeView #timeMinor {
+  display:block;
+  font-size:clamp(12px,3.7vw,17px)!important;
+  font-weight:600;
+  color:#746a5c;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+#homeView #timeMinor[hidden] {display:none!important;}
+@media(max-width:360px){#homeView #timeMajor{font-size:clamp(13px,4.2vw,18px)!important;}#homeView #timeMinor{font-size:clamp(11px,3.3vw,14px)!important;}}
+</style>
+<style id="remaining-time-tap-switch-20261113">
+/* 残り時間をタップし、年/週/日などの表記だけ切り替える */
+#homeView #remainingTimeTap {cursor:pointer!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
+#homeView #remainingTimeTap:focus-visible {outline:2px solid #b58a40!important;outline-offset:3px!important;border-radius:12px!important;}
+#homeView #remainingTimeModeLabel {font-size:11px;color:#a07946;font-weight:600;letter-spacing:0;white-space:nowrap;}
+#homeView #remainingTimeTap:active {opacity:.72;}
+</style>
 </head>
 
 <body>
@@ -1854,8 +1922,8 @@ body.home-fit-mode #homeView .hourglass-period-tabs button {
     <div class="main" id="appMain">
       <section class="app-view active" id="homeView" data-view="home">
 
-        <div class="score-box">
-        <span class="remaining-time-label">◷ 残り</span>
+        <div class="score-box" id="remainingTimeTap" role="button" tabindex="0" aria-label="残り時間をタップして表示単位を切り替える" title="タップして表示単位を切り替え" onclick="cycleRemainingTimeDisplay()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleRemainingTimeDisplay();}">
+        <span class="remaining-time-label">◷ 残り時間 <span id="remainingTimeModeLabel"></span></span>
         <h2 id="timeText">10:00</h2>
         <!-- 評価処理用の要素は非表示で保持 -->
         <span id="totalScore" hidden>0</span>
@@ -5691,28 +5759,123 @@ function showAIResult(result) {
       }, 1000);
     }
 
-    function updateTimeDisplay() {
-      if (remainingTime < 0) {
-        remainingTime = 0;
+    // 残り時間の表示モードをタップで切り替える（タイマーの残り秒数は変えない）。
+    let remainingDisplayMode = null;
+    let remainingDisplaySettingsKey = '';
+    function availableRemainingDisplayModes() {
+      const setting = currentTimerMode === 'life' ? 'life' : shortTimerMode;
+      if (setting === 'life') return ['life', 'week', 'day'];
+      if (setting === 'year') return ['year', 'week', 'day'];
+      if (setting === 'month') return ['month', 'week', 'day'];
+      if (setting === 'week') return ['week', 'day'];
+      return ['day', 'week'];
+    }
+    function ensureRemainingDisplayMode() {
+      const setting = currentTimerMode === 'life' ? 'life' : shortTimerMode;
+      const modes = availableRemainingDisplayModes();
+      if (remainingDisplaySettingsKey !== setting || !modes.includes(remainingDisplayMode)) {
+        remainingDisplaySettingsKey = setting;
+        remainingDisplayMode = modes[0];
+      }
+      return remainingDisplayMode;
+    }
+    function cycleRemainingTimeDisplay() {
+      const modes = availableRemainingDisplayModes();
+      const current = ensureRemainingDisplayMode();
+      remainingDisplayMode = modes[(modes.indexOf(current) + 1) % modes.length];
+      updateTimeDisplay();
+    }
+
+    // 砂時計設定の単位で、主要な残り期間と時・分・秒を分けて表示する。
+    // 年・月の長さは暦に合わせて計算し、1秒ごとに更新する。
+    function calendarPeriodBreakdown(seconds, unit) {
+      const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+      const DAY = 86400, WEEK = 7 * DAY;
+      const endMillis = timerEndAt > 0 ? timerEndAt : Date.now() + safeSeconds * 1000;
+      // カウントダウン値と実時間のずれ（秒未満）を避ける
+      const startMillis = endMillis - safeSeconds * 1000;
+      const start = new Date(startMillis);
+      const end = new Date(endMillis);
+      let cursor = start;
+      const pad = n => String(n).padStart(2, '0');
+
+      // 基準日からNか月後。月末は対象月の最終日に丸める。
+      function addMonths(base, count) {
+        const result = new Date(base.getTime());
+        const originalDay = result.getDate();
+        result.setDate(1);
+        result.setMonth(result.getMonth() + count);
+        const finalDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+        result.setDate(Math.min(originalDay, finalDay));
+        return result;
+      }
+      function fullMonths(from, to) {
+        let count = (to.getFullYear() - from.getFullYear()) * 12 + to.getMonth() - from.getMonth();
+        count = Math.max(0, count);
+        while (count > 0 && addMonths(from, count) > to) count--;
+        while (addMonths(from, count + 1) <= to) count++;
+        return count;
       }
 
-      const timeText = document.getElementById("timeText");
-
-      if (currentTimerMode === "life") {
-        const totalDays = Math.floor(remainingTime / 86400);
-        const years = Math.floor(totalDays / 365.2425);
-        const days = Math.floor(totalDays - years * 365.2425);
-        timeText.textContent = "残り約" + years + "年" + days + "日";
+      let primary = '';
+      if (unit === 'life' || unit === 'year') {
+        const years = Math.floor(fullMonths(start, end) / 12);
+        cursor = addMonths(start, years * 12);
+        if (unit === 'life') {
+          const months = fullMonths(cursor, end);
+          cursor = addMonths(cursor, months);
+          const days = Math.floor((end - cursor) / (DAY * 1000));
+          primary = years + '年 ' + months + 'か月 ' + days + '日';
+        } else {
+          let left = Math.max(0, Math.floor((end - cursor) / 1000));
+          const weeks = Math.floor(left / WEEK); left %= WEEK;
+          const days = Math.floor(left / DAY);
+          primary = years + '年 ' + weeks + '週 ' + days + '日';
+        }
+      } else if (unit === 'month') {
+        const months = fullMonths(start, end);
+        cursor = addMonths(start, months);
+        const days = Math.floor((end - cursor) / (DAY * 1000));
+        primary = months + 'か月 ' + days + '日';
+      } else if (unit === 'week') {
+        const weeks = Math.floor(safeSeconds / WEEK);
+        const days = Math.floor((safeSeconds % WEEK) / DAY);
+        primary = weeks + '週 ' + days + '日';
       } else {
-        const days = Math.floor(remainingTime / 86400);
-        const hours = Math.floor((remainingTime % 86400) / 3600);
-        const minutes = Math.floor((remainingTime % 3600) / 60);
-        const seconds = remainingTime % 60;
-        timeText.textContent =
-          (days > 0 ? days + "日 " : "") +
-          String(hours).padStart(2, "0") + ":" +
-          String(minutes).padStart(2, "0") + ":" +
-          String(seconds).padStart(2, "0");
+        primary = Math.floor(safeSeconds / DAY) + '日';
+      }
+
+      // 下段は全モードで HH時間 MM分 SS秒（人生だけ非表示）。
+      // 「日未満」の余りを表示し、00:00:00で終了する。
+      const subDay = safeSeconds % DAY;
+      const hours = Math.floor(subDay / 3600);
+      const minutes = Math.floor((subDay % 3600) / 60);
+      const sec = subDay % 60;
+      return { primary, secondary: pad(hours) + '時間 ' + pad(minutes) + '分 ' + pad(sec) + '秒' };
+    }
+
+    function updateTimeDisplay() {
+      if (remainingTime < 0) remainingTime = 0;
+      const timeText = document.getElementById('timeText');
+      if (timeText) {
+        const unit = ensureRemainingDisplayMode();
+        const parts = calendarPeriodBreakdown(remainingTime, unit);
+        const modeLabel = document.getElementById('remainingTimeModeLabel');
+        if (modeLabel) {
+          const names = {life:'人生',year:'年',month:'月',week:'週',day:'日'};
+          modeLabel.textContent = '｜'+names[unit]+'表示 ↻';
+        }
+        // 静的な要素を再利用し、毎秒書き換える文字列だけ更新。
+        let major = document.getElementById('timeMajor');
+        let minor = document.getElementById('timeMinor');
+        if (!major || !minor) {
+          timeText.innerHTML = '<span id="timeMajor" class="time-major"></span><span id="timeMinor" class="time-minor"></span>';
+          major = document.getElementById('timeMajor');
+          minor = document.getElementById('timeMinor');
+        }
+        major.textContent = parts.primary;
+        minor.textContent = parts.secondary;
+        minor.hidden = unit === 'life';
       }
 
       const lostPercent = Math.max(0, Math.min(100,

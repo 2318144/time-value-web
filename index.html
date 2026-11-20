@@ -43,7 +43,7 @@ const KYOTO_TUTORIAL_MEMORIES = [
     valueReason:'日常とは異なる場所で、大切な人と感動を共有できた時間だから。',
     primaryCriterion:'relationship', userPriority:'relationship',
     emotion:5,learning:2,rarity:4,relationship:5,future:2,
-    totalScore:18,score:18,viewCount:4,viewHistory:[Date.now()-86400000,Date.now()-7200000,Date.now()-3600000],favorite:true,
+    totalScore:18,score:18,viewCount:5,viewHistory:[Date.now()-86400000,Date.now()-7200000,Date.now()-3600000,Date.now()-1800000,Date.now()-600000],favorite:true,
     memoryDate:'2026-11-05T14:00:00+09:00',date:'2026/11/05',demoScene:'temple'
   },
   {
@@ -70,15 +70,15 @@ const KYOTO_TUTORIAL_MEMORIES = [
   }
 ];
 const hourglassTutorialSteps=[
- {label:'コンセプト',title:'過去の思い出と、未来の時間を大切に',description:'写真やコメントからAIが思い出の意味を判定し、価値を「砂」として可視化します。過去に積み重ねた思い出と未来に残された時間を同時に見つめるアプリです。',selector:null},
- {label:'1',title:'京都旅行で使い方を体験',description:'ここからは架空の「京都旅行」を例に、思い出が砂になり、振り返れるまでをスライドショーで案内します。デモは実際の記録に保存されません。',selector:null,demo:'intro'},
- {label:'2',title:'残された時間を見る',description:'砂時計の上の金色の砂は、これから過ごす時間を表します。上側をタップすると時間を設定できます。',selector:'#homeView .sand-top-clip'},
- {label:'3',title:'思い出を記録する',description:'写真・日時・場所・コメントをもとに、ひとつの出来事を思い出として登録します。京都旅行では清水寺、嵐山、伏見稲荷を例にします。',selector:'#homeView .hourglass-neck-action',demo:'input'},
- {label:'4',title:'AIが価値を分析する',description:'AIは感情・学び・希少性・人間関係・将来への影響の5項目から思い出を読み取ります。以下は説明用の判定例です。',selector:null,demo:'analysis'},
- {label:'5',title:'京都旅行の砂がたまった！',description:'砂時計の下を見てください。京都旅行の3つの思い出が、3粒の色付きの砂として表示されています。色は代表的な価値、大きさはAI評価の違いです。',selector:'#homeView .sand-bottom-clip',demo:'sand'},
- {label:'6',title:'「価値を見る」で振り返る',description:'通常は下側の砂またはメニューの「価値を見る」から一覧を開きます。ここでは京都旅行のデモ一覧をタップして詳細を確認しましょう。',selector:null,demo:'list'},
- {label:'7',title:'思い出の詳細を見る',description:'思い出を選ぶと、メモ・AIが読み取った意味・価値の理由を確認できます。下のサンプルは切り替えて試せます。',selector:null,demo:'detail'},
- {label:'8',title:'砂の輝きと表示期間',description:'見返した思い出は砂の輝きで関心を表し、月・年・人生を切り替えると表示期間を選べます。デモ終了後は元の砂時計に戻ります。',selector:'#homeView .hourglass-period-box',demo:'end'}
+ {label:'コンセプト',title:'過去の思い出と、未来の時間を大切に',description:'写真とコメントなどの情報からAIが思い出の意味や価値を判定し、砂時計に可視化します。下の砂は過去の思い出、上の金色の砂は未来に残された時間です。',selector:null},
+ {label:'デモ選択',title:'京都旅行のデモを選ぼう',description:'架空の京都旅行から、気になる思い出を1つ選んでください。選んだ思い出を使って記録とAI判定を体験します。デモデータは実際の記録には保存されません。',selector:null,demo:'intro'},
+ {label:'砂時計・上',title:'上の砂は、未来の残り時間',description:'金色の砂は、これから過ごせる時間を表します。残り時間は実際の時間経過に合わせて減少します。上部をタップすると、人生の目標年齢や期間を設定できます。',selector:'#homeView .sand-top-clip'},
+ {label:'砂時計・中央',title:'中央から思い出を記録',description:'砂時計のくびれをタップすると入力画面が開きます。写真・コメント・撮影日時や場所などを使って、ひとつの出来事をひとつの思い出として記録します。',selector:'#homeView .hourglass-neck-action',demo:'input'},
+ {label:'AI判定',title:'AIが思い出の価値を判定',description:'AIは感情・学び・希少性・人間関係・将来への影響の5項目から思い出を分析します。下は選んだ思い出の説明用サンプルです。実際のAI通信は行いません。',selector:null,demo:'analysis'},
+ {label:'砂時計・下',title:'砂の色と大きさを知る',description:'思い出1件が1粒の丸い砂になります。色は5項目のうち最も強い価値を示し、大きさはAIによる5項目の合計（25点満点）に対応します。下の見本で確認しましょう。',selector:'#homeView .sand-bottom-clip',demo:'sand'},
+ {label:'価値を見る',title:'一覧から思い出を振り返る',description:'「価値を見る」では、記録した思い出を一覧で確認できます。カテゴリや代表的な価値で絞り込みもできます。下の京都旅行の思い出をタップしてみましょう。',selector:null,demo:'list'},
+ {label:'思い出詳細・輝き',title:'思い出の詳細と砂の輝き',description:'思い出の詳細ではAIの評価理由を読めます。砂の色と大きさはAIの評価、金色の輝きはあなたがその思い出を見返した回数を表します。',selector:null,demo:'detail'},
+ {label:'表示期間・設定',title:'表示する時間を切り替えよう',description:'ホーム下部の「月・年・人生」で思い出を表示する範囲を選べます。年月をタップして表示先を選ぶこともできます。人生の残り時間や期間指定は、砂時計の上部または設定画面の「砂時計設定」から変更できます。',selector:'#homeView .hourglass-period-box',demo:'end'}
 ];
 let kyotoTutorialSelected=0;
 let kyotoTutorialShowingSand=false;
@@ -90,6 +90,15 @@ function kyotoDemoIllustration(scene){
  };
  return '<svg viewBox="0 0 200 150" class="kyoto-demo-art" role="img" aria-label="京都の観光地のイラスト"><rect width="200" height="150" rx="12" fill="'+(scene==='bamboo'?'#e6f2db':'#faebd1')+'"/><circle cx="166" cy="30" r="18" fill="#efc67b" opacity=".7"/>'+drawings[scene]+'</svg>';
 }
+function renderTutorialSandLegend(){
+ const colors=[['emotion','感情'],['learning','学び'],['rarity','希少性'],['relationship','人間関係'],['future','将来への影響']];
+ const colorGuide='<div class="tutorial-sand-section-title">色：その思い出で最も強い価値</div><div class="tutorial-sand-color-list">'+colors.map(([key,label])=>'<span><i class="kyoto-demo-dot '+key+'"></i>'+label+'</span>').join('')+'</div>';
+ const sizeGuide='<div class="tutorial-sand-section-title">大きさ：AIによる5項目の合計（25点満点）</div><div class="tutorial-sand-size-list">'+[[4,'1〜5点'],[5,'6〜10点'],[10,'11〜15点'],[15,'16〜20点'],[20,'21〜25点']].map(([size,label])=>'<span><i class="tutorial-size-dot" style="width:'+size+'px;height:'+size+'px"></i><small>'+label+'</small></span>').join('')+'</div><small>※0点はごく小さい灰色の粒です。粒はすべて円形です。</small>';
+ return '<div class="tutorial-sand-guide">'+colorGuide+sizeGuide+'</div>';
+}
+function renderTutorialGlowLegend(){
+ return '<div class="tutorial-sand-guide"><div class="tutorial-sand-section-title">輝き：直近30日間に思い出を見返した回数</div><div class="tutorial-sand-glow-list"><span><i class="kyoto-demo-dot relationship demo-muted"></i><small>0回：くすんだ色</small></span><span><i class="kyoto-demo-dot relationship"></i><small>1〜4回：通常の色</small></span><span><i class="kyoto-demo-dot relationship glowing"></i><small>5回以上：金色の輪で輝く</small></span></div><small>輝きはAIの点数ではなく、利用者自身が思い出に向けた関心を示します。</small></div>';
+}
 function renderKyotoTutorialDemo(step){
  const holder=document.getElementById('tutorialDemoContent');
  if(!holder)return;
@@ -97,18 +106,18 @@ function renderKyotoTutorialDemo(step){
  holder.hidden=false;
  const m=KYOTO_TUTORIAL_MEMORIES[kyotoTutorialSelected];
  const tiles=KYOTO_TUTORIAL_MEMORIES.map((item,i)=>'<button type="button" class="kyoto-demo-tile'+(i===kyotoTutorialSelected?' selected':'')+'" onclick="selectKyotoTutorialMemory('+i+')">'+kyotoDemoIllustration(item.demoScene)+'<span>'+item.memoryTitle.replace('京都旅行・','')+'</span></button>').join('');
- const dots=KYOTO_TUTORIAL_MEMORIES.map(item=>'<span class="kyoto-demo-dot '+item.primaryCriterion+(item.viewCount>=3?' glowing':'')+'" title="'+item.memoryTitle+'"></span>').join('');
+ const dots=KYOTO_TUTORIAL_MEMORIES.map(item=>'<span class="kyoto-demo-dot '+item.primaryCriterion+((item.viewHistory||[]).filter(t=>t>=Date.now()-30*86400000).length>=5?' glowing':'')+'" title="'+item.memoryTitle+'"></span>').join('');
  const example='<div class="kyoto-demo-scene">'+kyotoDemoIllustration(m.demoScene)+'<div><strong>'+m.memoryTitle+'</strong><small>'+m.date+'｜'+m.category+'</small><p>'+m.memo+'</p></div></div>';
- if(step.demo==='intro')holder.innerHTML='<div class="kyoto-demo-label">京都旅行｜デモデータ（架空）</div><div class="kyoto-demo-tiles">'+tiles+'</div>';
+ if(step.demo==='intro')holder.innerHTML='<div class="kyoto-demo-label">京都旅行｜思い出を選択（架空データ）</div><div class="kyoto-demo-tiles">'+tiles+'</div><small>選択した思い出：'+m.memoryTitle+' ／ 他の2件も後半で表示します</small>';
  if(step.demo==='input')holder.innerHTML='<div class="kyoto-demo-label">登録する思い出の例</div>'+example+'<small>※ 実際の写真・AI通信は使用しません</small>';
- if(step.demo==='analysis')holder.innerHTML='<div class="kyoto-demo-label">AI判定のサンプル</div>'+example+'<div class="kyoto-demo-analysis">代表的な価値：<b>人間関係</b><p>友人と感動を共有することで、関係が深まった点を評価します。</p><small>※ 判定内容は説明用に作成した例です</small></div>';
- if(step.demo==='sand')holder.innerHTML='<div class="kyoto-demo-label">下の砂時計に3粒のデモ砂を表示中</div><div class="kyoto-demo-dots">'+dots+'</div><small>緑：人間関係 ／ 黄：希少性 ／ 青：学び</small>';
+ if(step.demo==='analysis')holder.innerHTML='<div class="kyoto-demo-label">AI判定のサンプル</div>'+example+'<div class="kyoto-demo-analysis">代表的な価値：<b>'+CRITERIA_LABELS[m.primaryCriterion]+'</b><p>'+m.valueReason+'</p><div class="kyoto-demo-scores">'+(['emotion','learning','rarity','relationship','future'].map(k=>'<span>'+CRITERIA_LABELS[k]+'：'+m[k]+'/5</span>').join(''))+'</div><strong>合計：'+m.totalScore+'/25</strong><br><small>※ 事前に用意した説明用の判定例です</small></div>';
+ if(step.demo==='sand')holder.innerHTML='<div class="kyoto-demo-label">京都旅行の3つの思い出の砂（見本）</div><div class="kyoto-demo-dots">'+dots+'</div>'+renderTutorialSandLegend();
  if(step.demo==='list')holder.innerHTML='<div class="kyoto-demo-label">京都旅行の思い出一覧（タップで詳細へ）</div>'+KYOTO_TUTORIAL_MEMORIES.map((item,i)=>'<button type="button" class="kyoto-demo-list-item" onclick="openKyotoTutorialDetail('+i+')"><span class="kyoto-demo-list-art">'+kyotoDemoIllustration(item.demoScene)+'</span><span><b>'+item.memoryTitle+'</b><small>'+CRITERIA_LABELS[item.primaryCriterion]+'｜'+item.date+'</small></span><span>›</span></button>').join('');
- if(step.demo==='detail')holder.innerHTML='<div class="kyoto-demo-label">思い出を選んで詳細を確認</div><div class="kyoto-demo-tiles">'+tiles+'</div>'+example+'<div class="kyoto-demo-analysis"><b>AIが読み取った意味（例）</b><p>'+m.contextMeaning+'</p><b>時間価値の理由（例）</b><p>'+m.valueReason+'</p><small>主な価値：'+CRITERIA_LABELS[m.primaryCriterion]+'　｜　※デモ用の判定例</small></div>';
- if(step.demo==='end')holder.innerHTML='<div class="kyoto-demo-label">京都旅行の3つの思い出</div><div class="kyoto-demo-dots">'+dots+'</div><small>輝く砂＝見返した回数が多い思い出。終了後は通常のデータだけに戻ります。</small>';
+ if(step.demo==='detail')holder.innerHTML='<div class="kyoto-demo-label">思い出を選んで詳細と輝きを確認</div><div class="kyoto-demo-tiles">'+tiles+'</div>'+example+'<div class="kyoto-demo-analysis"><b>AIが読み取った意味（例）</b><p>'+m.contextMeaning+'</p><b>時間価値の理由（例）</b><p>'+m.valueReason+'</p><small>主な価値：'+CRITERIA_LABELS[m.primaryCriterion]+'　｜　合計：'+m.totalScore+'/25（デモ）</small></div><div class="kyoto-demo-glow-guide"><span class="kyoto-demo-dot '+m.primaryCriterion+((m.viewHistory||[]).length>=5?' glowing':((m.viewHistory||[]).length===0?' demo-muted':''))+'"></span><span>この思い出を直近30日で見返した回数：'+((m.viewHistory||[]).length)+'回</span></div>'+renderTutorialGlowLegend();
+ if(step.demo==='end')holder.innerHTML='<div class="kyoto-demo-label">思い出の表示期間</div><div class="kyoto-demo-period-guide"><span>月</span><span>年</span><span>人生</span></div><small>表示範囲の切り替えは、思い出の砂の表示だけに適用します。上の金色の砂の残り時間は「砂時計設定」で設定します。</small><div class="kyoto-demo-finish">思い出を振り返りながら、これからの時間も大切にしましょう。<br>「完了」でアプリへ戻ります。</div>';
 }
-function selectKyotoTutorialMemory(index){kyotoTutorialSelected=index;renderKyotoTutorialDemo(hourglassTutorialSteps[hourglassTutorialIndex]);positionTutorialPanel([]);}
-function openKyotoTutorialDetail(index){kyotoTutorialSelected=index;hourglassTutorialIndex=7;renderHourglassTutorial();}
+function selectKyotoTutorialMemory(index){kyotoTutorialSelected=index;renderHourglassTutorial();}
+function openKyotoTutorialDetail(index){kyotoTutorialSelected=index;hourglassTutorialIndex=tutorialPages.findIndex(p=>p.stepIndex===7&&p.kind==='explain');renderHourglassTutorial();}
 function syncKyotoTutorialSand(step){
  const shouldShow=Boolean(step.demo && ['sand','list','detail','end'].includes(step.demo));
  if(shouldShow){
@@ -119,6 +128,16 @@ function syncKyotoTutorialSand(step){
   if(typeof renderValueSand==='function')renderValueSand();
  }
 }
+// 9つのテーマを維持し、強調案内と詳細説明は別ページに分ける。
+const tutorialPages=hourglassTutorialSteps.flatMap((step,stepIndex)=>
+ step.selector ? [{stepIndex,kind:'guide'},{stepIndex,kind:'explain'}] : [{stepIndex,kind:'explain'}]
+);
+const tutorialGuideDescriptions={
+ 2:'砂時計の上の金色の部分が、未来の残り時間です。',
+ 3:'中央のくびれが、思い出を記録する入口です。',
+ 5:'砂時計の下側に、過去の思い出が粒になってたまります。',
+ 8:'ここで「月・年・人生」を切り替えられます。'
+};
 let hourglassTutorialIndex=0;
 function startHourglassTutorial(){
   if(typeof switchAppView==='function')switchAppView('home');
@@ -134,62 +153,55 @@ function finishHourglassTutorial(){
   document.getElementById('tutorialOverlay').classList.remove('is-open');
   document.body.style.overflow='';
   document.getElementById('tutorialPanel').classList.remove('tutorial-panel-top');
+  document.getElementById('tutorialOverlay').classList.remove('tutorial-explanation-page','tutorial-guide-page');
 }
 function changeHourglassTutorial(direction){
   const next=hourglassTutorialIndex+direction;
-  if(next>=hourglassTutorialSteps.length){finishHourglassTutorial();return}
+  if(next>=tutorialPages.length){finishHourglassTutorial();return}
   hourglassTutorialIndex=Math.max(0,next);renderHourglassTutorial();
 }
 function renderHourglassTutorial(){
-  const step=hourglassTutorialSteps[hourglassTutorialIndex];
+  const page=tutorialPages[hourglassTutorialIndex];
+  const originalStep=hourglassTutorialSteps[page.stepIndex];
+  const isGuide=page.kind==='guide';
+  const step=isGuide
+    ? {...originalStep,demo:null,description:tutorialGuideDescriptions[page.stepIndex]||originalStep.description}
+    : {...originalStep,selector:null,secondSelector:null};
+  const overlay=document.getElementById('tutorialOverlay');
   const panel=document.getElementById('tutorialPanel');
-  document.getElementById('tutorialOverlay').classList.remove('tutorial-step-upper');
+  overlay.classList.toggle('tutorial-guide-page',isGuide);
+  overlay.classList.toggle('tutorial-explanation-page',!isGuide);
+  overlay.classList.remove('tutorial-step-upper');
   panel.classList.remove('tutorial-panel-top');
-  panel.style.removeProperty('top'); panel.style.removeProperty('bottom'); panel.style.removeProperty('max-height');
-  document.getElementById('tutorialCount').textContent='STEP '+(hourglassTutorialIndex+1)+' / '+hourglassTutorialSteps.length;
-  document.getElementById('tutorialTitle').textContent=step.title;
+  panel.style.removeProperty('top');panel.style.removeProperty('bottom');panel.style.removeProperty('max-height');
+  panel.scrollTop=0;
+  document.getElementById('tutorialCount').textContent='STEP '+(page.stepIndex+1)+' / '+hourglassTutorialSteps.length+(isGuide?' ・ 場所の案内':' ・ 説明');
+  document.getElementById('tutorialTitle').textContent=isGuide ? 'ここを見てください' : step.title;
   document.getElementById('tutorialDescription').textContent=step.description;
   renderKyotoTutorialDemo(step);
-  syncKyotoTutorialSand(step);
+  // 下側の強調案内時も、京都旅行のサンプル砂を見せる。
+  syncKyotoTutorialSand(originalStep);
   document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
-  document.getElementById('tutorialNext').textContent=hourglassTutorialIndex===hourglassTutorialSteps.length-1?'完了':'次へ';
-  document.getElementById('tutorialProgress').innerHTML=hourglassTutorialSteps.map((_,i)=>'<span class="'+(i===hourglassTutorialIndex?'current':'')+'"></span>').join('');
-  document.getElementById('tutorialDim').style.display=step.selector?'none':'block';
+  document.getElementById('tutorialNext').textContent=hourglassTutorialIndex===tutorialPages.length-1?'完了':'次へ';
+  document.getElementById('tutorialProgress').innerHTML=hourglassTutorialSteps.map((_,i)=>'<span class="'+(i===page.stepIndex?'current':'')+'"></span>').join('');
+  document.getElementById('tutorialDim').style.display=isGuide?'none':'block';
   const spot=document.getElementById('tutorialSpot');
   const spot2=document.getElementById('tutorialSpotSecond');
   const shade=document.getElementById('tutorialDualShade');
-  const el=step.selector?document.querySelector(step.selector):null;
-  const el2=step.secondSelector?document.querySelector(step.secondSelector):null;
-  const dual=Boolean(el&&el2);
   spot2.style.display='none';shade.style.display='none';
-  spot.classList.toggle('tutorial-dual-spot',dual);
-  if(!el){spot.style.display='none';positionTutorialPanel([]);return}
-  function place(target,element){
-    const bounds=element.getBoundingClientRect();
-    // 砂時計設定の案内は、砂時計全体ではなく上半分だけを囲む。
-    const isUpperGlass=element.classList.contains('sand-top-clip');
-    const r=isUpperGlass ? {left:bounds.left+bounds.width*0.10,top:bounds.top+bounds.height*0.025,width:bounds.width*0.80,height:bounds.height*0.47} : bounds;
-    const pad=isUpperGlass?3:8;
-    const left=Math.max(4,r.left-pad),top=Math.max(4,r.top-pad);
-    const width=Math.min(innerWidth-left-4,r.width+pad*2);
-    const height=Math.min(innerHeight-top-4,r.height+pad*2);
-    target.style.display='block';target.style.left=left+'px';target.style.top=top+'px';
-    target.style.width=width+'px';target.style.height=height+'px';
-    return {left,top,width,height};
-  }
-  const first=place(spot,el);
-  if(dual){
-    const second=place(spot2,el2);
-    shade.style.display='block';
-    shade.setAttribute('viewBox','0 0 '+innerWidth+' '+innerHeight);
-    shade.querySelector('#tutorialDualBackdrop').setAttribute('width',innerWidth);
-    shade.querySelector('#tutorialDualBackdrop').setAttribute('height',innerHeight);
-    [first,second].forEach((r,i)=>{
-      const hole=shade.querySelector(i===0?'#tutorialHoleOne':'#tutorialHoleTwo');
-      ['x','y','width','height'].forEach((attr,j)=>hole.setAttribute(attr,[r.left,r.top,r.width,r.height][j]));
-    });
-  }
-  positionTutorialPanel(dual?[first,second]:[first]);
+  spot.classList.remove('tutorial-dual-spot');
+  const el=isGuide?document.querySelector(step.selector):null;
+  if(!el){spot.style.display='none';positionTutorialPanel([]);return;}
+  const bounds=el.getBoundingClientRect();
+  const isUpperGlass=el.classList.contains('sand-top-clip');
+  const r=isUpperGlass ? {left:bounds.left+bounds.width*.10,top:bounds.top+bounds.height*.025,width:bounds.width*.80,height:bounds.height*.47} : bounds;
+  const pad=isUpperGlass?3:8;
+  const left=Math.max(4,r.left-pad),top=Math.max(4,r.top-pad);
+  const width=Math.min(innerWidth-left-4,r.width+pad*2);
+  const height=Math.min(innerHeight-top-4,r.height+pad*2);
+  spot.style.display='block';spot.style.left=left+'px';spot.style.top=top+'px';
+  spot.style.width=width+'px';spot.style.height=height+'px';
+  positionTutorialPanel([{left,top,width,height}]);
 }
 // 説明パネルを強調枠の上下の空きスペースへ自動配置する。
 function positionTutorialPanel(rects){
@@ -198,7 +210,9 @@ function positionTutorialPanel(rects){
   if(!panel)return;
   const viewport=window.visualViewport;
   const topLimit=Math.max(8,viewport ? viewport.offsetTop+8 : 8);
-  const bottomLimit=Math.min(window.innerHeight-8,viewport ? viewport.offsetTop+viewport.height-8 : window.innerHeight-8);
+  const controlRect=document.querySelector('#tutorialOverlay > .tutorial-controls')?.getBoundingClientRect();
+  const footerTop=controlRect?.top || window.innerHeight-80;
+  const bottomLimit=Math.min(footerTop-12,viewport ? viewport.offsetTop+viewport.height-12 : window.innerHeight-12);
   const gap=12; // オレンジ枠と説明カードの間隔
 
   panel.classList.remove('tutorial-panel-top');
@@ -213,7 +227,7 @@ function positionTutorialPanel(rects){
   const desired=panel.scrollHeight;
   const viewportHeight=Math.max(60,bottomLimit-topLimit);
   if(!rects.length){
-    const height=Math.min(desired,viewportHeight*0.78);
+    const height=overlay.classList.contains('tutorial-explanation-page') ? Math.min(desired,viewportHeight) : Math.min(desired,viewportHeight*0.78);
     panel.style.setProperty('max-height',height+'px','important');
     panel.style.setProperty('top',Math.max(topLimit,topLimit+(viewportHeight-height)/2)+'px','important');
     panel.dataset.placement='center';
@@ -1855,7 +1869,7 @@ body.home-fit-mode #homeView .score-box #timeText {
 }
 </style>
 <style id="remaining-time-two-line-20261113">
-/* 残り時間：大きな単位を上段、時・分・秒を下段に表示。 */
+/* 残り時間：年・月・週・日を上段、時・分・秒を下段に固定表示。 */
 #homeView .score-box,
 body.home-fit-mode #homeView .score-box {
   display:flex!important;
@@ -1903,11 +1917,59 @@ body.home-fit-mode #homeView .score-box #timeText {
 @media(max-width:360px){#homeView #timeMajor{font-size:clamp(13px,4.2vw,18px)!important;}#homeView #timeMinor{font-size:clamp(11px,3.3vw,14px)!important;}}
 </style>
 <style id="remaining-time-tap-switch-20261113">
-/* 残り時間をタップし、年/週/日などの表記だけ切り替える */
-#homeView #remainingTimeTap {cursor:pointer!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
+/* 残り時間は固定表示で、タップ切替なし */
+#homeView #remainingTimeTap {cursor:default!important;user-select:text;}
 #homeView #remainingTimeTap:focus-visible {outline:2px solid #b58a40!important;outline-offset:3px!important;border-radius:12px!important;}
 #homeView #remainingTimeModeLabel {font-size:11px;color:#a07946;font-weight:600;letter-spacing:0;white-space:nowrap;}
-#homeView #remainingTimeTap:active {opacity:.72;}
+#homeView #remainingTimeTap:active {opacity:1;}
+</style>
+
+<style id="calendar-in-input-design">
+/* 思い出入力のカレンダー。設定画面の連携管理カードとは独立 */
+#addView .input-calendar-card{margin:15px 0;padding:14px;border:1px solid #e4dccf;border-radius:14px;background:#fffdfa;box-shadow:0 2px 8px rgba(70,53,31,.05)}
+#addView .input-calendar-heading{display:flex;gap:7px;align-items:center;font-size:15px;color:#4e4030}
+#addView .input-calendar-badge{margin-left:auto;border-radius:99px;padding:4px 9px;font-size:11px;font-weight:700;background:#f1ece4;color:#776855}
+#addView .input-calendar-badge.connected{background:#e7f4e8;color:#387343}
+#addView .input-calendar-note{font-size:12px;line-height:1.6;margin:8px 0;color:#716b63}
+#addView .input-calendar-connect{display:block;width:100%;padding:10px 12px;border:1px solid #cfa85e;border-radius:10px;background:#fff7e9;color:#77521f;font-size:13px;font-weight:700;cursor:pointer}
+#addView .input-calendar-section{margin-top:12px;padding:12px;border-radius:11px;background:#fff;border:1px solid #eee9df}
+#addView .input-calendar-section h3{margin:0 0 7px;font-size:13px;color:#554b3f}
+#addView .input-calendar-section h3 small{font-size:11px;font-weight:400;color:#8d8172;margin-left:3px}
+#addView #inputCalendarToday,#addView #inputCalendarPhotoDates{font-size:12px;color:#564e43;line-height:1.65;overflow-wrap:anywhere}
+#addView .input-calendar-event{padding:6px 0;border-top:1px solid #f0eae1}
+#addView .input-calendar-event:first-child{border-top:0;padding-top:0}
+#addView .input-calendar-event-time{font-size:11px;color:#8c7760;margin-right:6px}
+#addView .input-calendar-date-group{padding:9px 0;border-top:1px solid #f0eae1}
+#addView .input-calendar-date-group:first-child{border-top:0;padding-top:0}
+#addView .input-calendar-date-group>strong{display:block;font-size:12px;color:#876335;margin-bottom:6px}
+#addView .input-calendar-empty{color:#8c8277;font-size:12px}
+</style>
+<style id="compact-memory-detail-20261119">
+.memory-detail-dialog{padding:18px!important;max-height:82dvh!important}
+.memory-compact-title{margin:0 0 10px!important;font-size:21px;line-height:1.45;color:#302c28;overflow-wrap:anywhere}
+.memory-compact-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:#81796e;font-size:12px;margin-bottom:12px}
+.memory-compact-meta .tag{margin:0}
+.memory-primary-box{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f8f0df;border-radius:10px;padding:11px 13px;font-size:13px;color:#735728}
+.memory-primary-box strong{font-size:15px}
+.memory-compact-heading{margin:0 0 12px;font-size:16px;color:#302c28}
+.memory-detail-section{padding:16px 0!important}
+.memory-eval-items{display:grid;gap:14px}
+.memory-eval-total{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:17px;padding:12px 14px;background:#faf3e6;border:1px solid #e9d8b9;border-radius:11px;color:#61471f;font-weight:700}
+.memory-eval-total strong{font-size:21px;font-variant-numeric:tabular-nums}
+.memory-eval-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#3f3932}
+.memory-eval-bar{display:flex;gap:4px;margin:7px 0 5px}
+.memory-eval-segment{flex:1;height:7px;border-radius:6px;background:#ece8e2}
+.memory-eval-segment.filled{background:#b58a40}
+.memory-eval-reason{font-size:13px!important;line-height:1.65!important;margin:5px 0 0!important;color:#675f55!important}
+.memory-eval-fallback{margin-top:13px;padding:12px;background:#f8f7f5;border-radius:10px;font-size:13px;line-height:1.65}
+.memory-eval-fallback p{font-size:13px;line-height:1.65}
+.memory-detail-photo-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.memory-detail-photo-grid img{height:auto!important;aspect-ratio:1/1;object-fit:cover}
+.memory-reflection-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.memory-reflection-grid>div{display:flex;flex-direction:column;gap:6px;background:#f7f5f1;border-radius:11px;padding:12px}
+.memory-reflection-grid small{color:#716b62;font-size:11px}
+.memory-reflection-grid strong{font-size:17px;color:#40382e}
+.memory-behavior-note{line-height:1.6!important}
 </style>
 </head>
 
@@ -1922,8 +1984,8 @@ body.home-fit-mode #homeView .score-box #timeText {
     <div class="main" id="appMain">
       <section class="app-view active" id="homeView" data-view="home">
 
-        <div class="score-box" id="remainingTimeTap" role="button" tabindex="0" aria-label="残り時間をタップして表示単位を切り替える" title="タップして表示単位を切り替え" onclick="cycleRemainingTimeDisplay()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();cycleRemainingTimeDisplay();}">
-        <span class="remaining-time-label">◷ 残り時間 <span id="remainingTimeModeLabel"></span></span>
+        <div class="score-box" id="remainingTimeTap" aria-label="残り時間">
+        <span class="remaining-time-label">◷ 残り時間</span>
         <h2 id="timeText">10:00</h2>
         <!-- 評価処理用の要素は非表示で保持 -->
         <span id="totalScore" hidden>0</span>
@@ -1980,6 +2042,15 @@ body.home-fit-mode #homeView .score-box #timeText {
 
         <div class="photo-count" id="photoCount">選択された写真：0枚</div>
         <div class="preview-area" id="previewArea"></div>
+
+        <!-- カレンダー連携は任意。予定はAI分析用の撮影日文脈にも活用する -->
+        <div class="input-calendar-card" aria-label="Googleカレンダーの予定">
+          <div class="input-calendar-heading"><span aria-hidden="true">📅</span><strong>Googleカレンダー</strong><span id="inputCalendarBadge" class="input-calendar-badge">未連携</span></div>
+          <p class="input-calendar-note">写真の撮影日の予定を確認し、思い出のAI分析の参考にします。連携しなくても記録できます。</p>
+          <button type="button" class="input-calendar-connect" id="inputCalendarConnect" onclick="connectCalendar()">Googleカレンダーと連携する</button>
+          <div class="input-calendar-section"><h3>今日の予定 <small id="inputCalendarTodayDate"></small></h3><div id="inputCalendarToday">連携すると今日の予定を表示します。</div></div>
+          <div class="input-calendar-section"><h3>写真の日付の予定</h3><div id="inputCalendarPhotoDates">写真を選択すると、撮影日に登録された予定を表示します。</div></div>
+        </div>
 
         <label>カテゴリ</label>
         <select id="category" onchange="handleMemoryCategoryChange(this)">
@@ -2102,7 +2173,7 @@ body.home-fit-mode #homeView .score-box #timeText {
         <div class="settings-card">
           <h3>砂時計設定</h3>
           <p>人生の目標年齢や、砂時計に表示する期間を変更できます。</p>
-          <ons-button modifier="large" onclick="switchAppView('timer-settings')">砂時計設定を開く</ons-button>
+          <ons-button modifier="large" onclick="openHourglassTimerSettings('settings')">砂時計設定を開く</ons-button>
         </div>
         <div class="settings-card">
           <h3>プロフィール</h3>
@@ -2122,7 +2193,7 @@ body.home-fit-mode #homeView .score-box #timeText {
         <div class="settings-card" id="systemSettingsCard"><h3>データ・動作確認</h3></div>
       </section>
       <section class="app-view" id="timerSettingsView" data-view="timer-settings">
-        <button type="button" class="view-back-button" onclick="switchAppView('settings')">← 設定に戻る</button>
+        <button type="button" id="timerSettingsBackButton" class="view-back-button" onclick="returnFromHourglassTimerSettings()">← ホームに戻る</button>
         <div class="timer-settings-heading">
           <h2 class="view-heading">砂時計設定</h2>
         </div>
@@ -2453,6 +2524,8 @@ body.home-fit-mode #homeView .score-box #timeText {
       updateDisplay();
       startTimer();
       initializeGoogleCalendarApi();
+      updateInputCalendarConnectionState();
+      renderPhotoDateCalendarEvents();
     };
 
     // ==============================
@@ -2489,8 +2562,24 @@ body.home-fit-mode #homeView .score-box #timeText {
       switchAppView("home", false);
     }
 
-    function openHourglassTimerSettings() {
+    // 砂時計設定を開いた場所に応じて戻り先を切り替える。
+    let hourglassTimerReturnView = "home";
+
+    function openHourglassTimerSettings(source = "home") {
+      hourglassTimerReturnView = source === "settings" ? "settings" : "home";
+      updateHourglassTimerBackButton();
       switchAppView("timer-settings");
+    }
+
+    function updateHourglassTimerBackButton() {
+      const button = document.getElementById("timerSettingsBackButton");
+      if (!button) return;
+      button.textContent = hourglassTimerReturnView === "settings"
+        ? "← 設定に戻る" : "← ホームに戻る";
+    }
+
+    function returnFromHourglassTimerSettings() {
+      switchAppView(hourglassTimerReturnView);
     }
 
     function switchAppView(viewName, scrollToTop = true) {
@@ -2537,6 +2626,18 @@ body.home-fit-mode #homeView .score-box #timeText {
       if (customField) customField.style.display = mode === "custom" ? "block" : "none";
     }
 
+    // カレンダーどおりに月・年を足す（月末はその月の最終日へ丸める）。
+    // 例: 1/31 + 1か月 = 2/28（うるう年は2/29）
+    function addCalendarMonthsClamped(base, count) {
+      const result = new Date(base.getTime());
+      const originalDay = result.getDate();
+      result.setDate(1);
+      result.setMonth(result.getMonth() + count);
+      const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+      result.setDate(Math.min(originalDay, lastDay));
+      return result;
+    }
+
     function saveTimerSettings() {
       const mode = document.getElementById("timerModeSelect")?.value || "life";
       currentTimerMode = mode;
@@ -2570,8 +2671,8 @@ body.home-fit-mode #homeView .score-box #timeText {
 
         const startDate = new Date();
         const endDate = new Date(startDate);
-        if (periodUnit === "year") endDate.setFullYear(endDate.getFullYear() + periodValue);
-        if (periodUnit === "month") endDate.setMonth(endDate.getMonth() + periodValue);
+        if (periodUnit === "year") endDate.setTime(addCalendarMonthsClamped(startDate, periodValue * 12).getTime());
+        if (periodUnit === "month") endDate.setTime(addCalendarMonthsClamped(startDate, periodValue).getTime());
         if (periodUnit === "week") endDate.setDate(endDate.getDate() + periodValue * 7);
         if (periodUnit === "day") endDate.setDate(endDate.getDate() + periodValue);
 
@@ -2638,11 +2739,8 @@ body.home-fit-mode #homeView .score-box #timeText {
 
     function applyLifeTimer(saveState) {
       const birthday = new Date(userProfile.birthday + "T00:00:00");
-      const targetDate = new Date(
-        birthday.getFullYear() + targetLifeAge,
-        birthday.getMonth(),
-        birthday.getDate()
-      );
+      // 2月29日生まれの目標年が平年なら、誕生日の対応日は2月28日とする。
+      const targetDate = addCalendarMonthsClamped(birthday, targetLifeAge * 12);
 
       if (isNaN(birthday.getTime()) || targetDate <= new Date()) return false;
 
@@ -2848,16 +2946,23 @@ function syncBirthdaySelects(){
             gapi.client.setToken(response);
             isCalendarConnected = true;
 
-            document.getElementById("calendarStatus").innerHTML = "連携済み";
+            document.getElementById("calendarStatus").textContent = "連携済み";
+            updateInputCalendarConnectionState();
 
-            const events = await getTodayEvents();
-            latestCalendarEvents = events;
-
-            displayCalendarEvents(events);
+            try {
+              const events = await getTodayEvents();
+              latestCalendarEvents = events;
+              displayCalendarEvents(events);
+            } catch (calendarError) {
+              console.error("今日の予定取得エラー:", calendarError);
+              document.getElementById("calendarStatus").textContent = "連携済み（今日の予定は取得できませんでした）";
+              document.getElementById("inputCalendarToday").textContent = "今日の予定を取得できませんでした。";
+            }
 
             if (selectedPhotoContexts.length > 0) {
               await refreshSelectedPhotoCalendarEvents();
             }
+            await renderPhotoDateCalendarEvents();
 
             ons.notification.toast(
               "Googleカレンダーと連携しました",
@@ -3053,7 +3158,7 @@ function syncBirthdaySelects(){
         html += "今日の予定はありません";
       } else {
         events.forEach(function(event) {
-          const title = event.summary || "タイトルなし";
+          const title = escapeHtml(event.summary || "タイトルなし");
 
           html += "・" + title + "<br>";
 
@@ -3071,6 +3176,57 @@ function syncBirthdaySelects(){
       }
 
       document.getElementById("calendarStatus").innerHTML = html;
+      const todayBox = document.getElementById("inputCalendarToday");
+      if (todayBox) todayBox.innerHTML = buildInputCalendarEventsHtml(events, "今日の予定はありません。");
+      updateInputCalendarConnectionState();
+    }
+
+    // 入力画面：予定の一覧を日付ごとに表示する（予定名はHTMLとして解釈しない）
+    function buildInputCalendarEventsHtml(events, emptyMessage) {
+      if (!events || !events.length) return '<span class="input-calendar-empty">' + escapeHtml(emptyMessage) + '</span>';
+      return events.map(function(event) {
+        const title = escapeHtml(event.summary || 'タイトルなし');
+        const start = event.start?.dateTime ? formatTime(event.start.dateTime) : '終日';
+        const end = event.end?.dateTime ? formatTime(event.end.dateTime) : '';
+        const time = start === '終日' ? '終日' : start + (end ? '〜' + end : '');
+        return '<div class="input-calendar-event"><span class="input-calendar-event-time">' + escapeHtml(time) + '</span><span>' + title + '</span></div>';
+      }).join('');
+    }
+
+    function updateInputCalendarConnectionState() {
+      const badge = document.getElementById('inputCalendarBadge');
+      const button = document.getElementById('inputCalendarConnect');
+      const connected = isCalendarConnected && Boolean(gapi?.client?.getToken?.());
+      if (badge) {badge.textContent = connected ? '連携済み' : '未連携';badge.classList.toggle('connected', connected);}
+      if (button) button.textContent = connected ? 'Googleカレンダーを再連携' : 'Googleカレンダーと連携する';
+      const label = document.getElementById('inputCalendarTodayDate');
+      if (label) label.textContent = '(' + new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'numeric',day:'numeric'}) + ')';
+    }
+
+    let photoDateCalendarRenderVersion = 0;
+    async function renderPhotoDateCalendarEvents() {
+      const box = document.getElementById('inputCalendarPhotoDates');
+      if (!box) return;
+      const version = ++photoDateCalendarRenderVersion;
+      if (!selectedPhotoContexts.length) {
+        box.innerHTML = '<span class="input-calendar-empty">写真を選択すると、撮影日の予定を表示します。</span>';
+        return;
+      }
+      const dates = [...new Set(selectedPhotoContexts.filter(photo => photo.takenDate).map(photo => createDateKey(photo.takenDate)))].sort();
+      if (!dates.length) {
+        box.innerHTML = '<span class="input-calendar-empty">写真から撮影日を取得できませんでした。撮影日時が記録された写真を選択してください。</span>';
+        return;
+      }
+      if (!isCalendarConnected || !gapi?.client?.getToken?.()) {
+        box.innerHTML = '<span class="input-calendar-empty">撮影日：' + dates.map(escapeHtml).join('、') + '<br>Googleカレンダーを連携すると、この日の予定を表示します。</span>';
+        return;
+      }
+      box.textContent = '撮影日の予定を取得中…';
+      const groups = await Promise.all(dates.map(async function(dateKey) {
+        const events = await getEventsForDate(new Date(dateKey + 'T12:00:00'));
+        return '<div class="input-calendar-date-group"><strong>' + escapeHtml(dateKey.replace(/-/g,'/')) + '</strong>' + buildInputCalendarEventsHtml(events, 'この日の予定はありません。') + '</div>';
+      }));
+      if (version === photoDateCalendarRenderVersion) box.innerHTML = groups.join('');
     }
 
     function formatTime(dateTime) {
@@ -3219,6 +3375,7 @@ function syncBirthdaySelects(){
 
       previewArea.innerHTML = "";
       selectedPhotoContexts = [];
+      renderPhotoDateCalendarEvents();
 
       if (photoDebug) {
         photoDebug.innerHTML = "写真情報を取得中...";
@@ -3265,6 +3422,7 @@ function syncBirthdaySelects(){
         updatePhotoDebug();
         previewPhoto(file, previewArea);
       }
+      await renderPhotoDateCalendarEvents();
     });
 
     function previewPhoto(file, previewArea) {
@@ -4696,7 +4854,7 @@ function showAIResult(result) {
       if (score >= 16) return 15; // 16〜20点：大
       if (score >= 11) return 10; // 11〜15点：中
       if (score >= 6)  return 5;  // 6〜10点：小
-      return 6;                   // 0〜5点：最小
+      return 4;                   // 1〜5点：最小
     }
 
     function getMemoryShape(memory) { return "sand"; }
@@ -5615,102 +5773,100 @@ function showAIResult(result) {
       });
     }
 
+    // 評価理由を5つの項目ごとに分割して表示する（既存のAI結果に対応）
+    function getMemoryReasonByCriterion(reason) {
+      const source = String(reason || "")
+        .replace(/\bfutureImpact\b\s*[:：]?/gi, "将来への影響：")
+        .replace(/\bemotion\b\s*[:：]?/gi, "感情：")
+        .replace(/\blearning\b\s*[:：]?/gi, "学び：")
+        .replace(/\bmeaning\b\s*[:：]?/gi, "学び：")
+        .replace(/\brarity\b\s*[:：]?/gi, "希少性：")
+        .replace(/\brelationship\b\s*[:：]?/gi, "人間関係：")
+        .replace(/\bfuture\b\s*[:：]?/gi, "将来への影響：");
+      const keys = CRITERIA_ORDER;
+      const labels = keys.map(key => CRITERIA_LABELS[key]);
+      const pattern = new RegExp('(' + labels.map(escapeRegExp).join('|') + ')\\s*[:：]\\s*', 'g');
+      const matches = [...source.matchAll(pattern)];
+      const mapped = {};
+      matches.forEach((match, index) => {
+        const from = match.index + match[0].length;
+        const to = index + 1 < matches.length ? matches[index + 1].index : source.length;
+        const value = source.slice(from, to).trim();
+        if (value) mapped[keys[labels.indexOf(match[1])]] = value;
+      });
+      return {mapped, raw: source.trim()};
+    }
+
     function openMemoryDetail(index) {
       const memory = memories[index];
       const dialog = document.getElementById("memoryDetailDialog");
       const content = document.getElementById("memoryDetailContent");
-
       if (!memory || !dialog || !content) return;
+
       recordMemoryView(index);
-
       const scores = getMemoryCriterionScores(memory);
-      const score =
-        scores.emotion +
-        scores.learning +
-        scores.rarity +
-        scores.relationship +
-        scores.future;
-
-      const primaryCriterion =
-        memory.primaryCriterion ||
+      const primaryCriterion = memory.primaryCriterion ||
         getPrimaryCriterion(scores, memory.userPriority || "");
-
       const memoryDate = getMemoryDate(memory);
-      const displayDate =
-        memoryDate && !Number.isNaN(memoryDate.getTime())
-          ? memoryDate.toLocaleString("ja-JP")
-          : String(memory.date || "");
-
-
+      const displayDate = memoryDate && !Number.isNaN(memoryDate.getTime())
+        ? memoryDate.toLocaleDateString("ja-JP") : String(memory.date || "");
+      const reasons = getMemoryReasonByCriterion(memory.reason);
+      const hasItemReasons = Object.keys(reasons.mapped).length > 0;
       const viewCount = Math.max(0, Number(memory.viewCount || 0));
+      const recentViews = (Array.isArray(memory.viewHistory) ? memory.viewHistory : [])
+        .filter(t => Number(t) <= Date.now() && Number(t) >= Date.now() - 30 * 86400000).length;
       const glowLevel = getMemoryGlowLevel(memory);
+      const glowText = glowLevel >= 2 ? "金色のリング" : recentViews > 0 ? "通常" : "控えめ";
+      const photos = Array.isArray(memory.photos)
+        ? memory.photos.filter(photo => typeof photo === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(photo))
+        : [];
+
+      const evaluationTotal = CRITERIA_ORDER.reduce((sum, key) =>
+        sum + Math.max(0, Math.min(5, Number(scores[key]) || 0)), 0);
+
+      const evaluationHtml = CRITERIA_ORDER.map(key => {
+        const point = Math.max(0, Math.min(5, Number(scores[key]) || 0));
+        const level = Math.round(point);
+        const bar = Array.from({length:5}, (_,i) =>
+          `<span class="memory-eval-segment ${i < level ? 'filled' : ''}"></span>`).join('');
+        const reason = reasons.mapped[key];
+        return `<div class="memory-eval-item">
+          <div class="memory-eval-heading"><b>${CRITERIA_LABELS[key]}</b><b>${point} / 5</b></div>
+          <div class="memory-eval-bar" aria-hidden="true">${bar}</div>
+          ${reason ? `<p class="memory-eval-reason">${escapeHtml(reason)}</p>` : ''}
+        </div>`;
+      }).join('');
 
       content.innerHTML = `
-        <h3>${escapeHtml(memory.memoryTitle || memory.summary || "思い出")}</h3>
-
-        <div class="memory-detail-section">
+        <h3 class="memory-compact-title">${escapeHtml(memory.memoryTitle || memory.summary || "思い出")}</h3>
+        <div class="memory-compact-meta">
           <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
-          <p><small>${escapeHtml(displayDate)}</small></p>
-          <p><b>主な評価：</b>${escapeHtml(
-            CRITERIA_LABELS[primaryCriterion] || "未分類"
-          )}</p>
-          <p><b>思い出価値：</b>${score} / 25</p>
+          <span>${escapeHtml(displayDate)}</span>
         </div>
-
-        <div class="memory-detail-section">
-          <p><b>思い出メモ</b></p>
-          <p>${escapeHtml(memory.memo || "なし")}</p>
-
-          <p><b>思い出の概要</b></p>
-          <p>${escapeHtml(memory.memorySummary || memory.summary || "なし")}</p>
-
-          <p><b>文脈的な意味</b></p>
-          <p>${escapeHtml(memory.contextMeaning || "なし")}</p>
-
-          <p><b>時間価値の理由</b></p>
-          <p>${escapeHtml(memory.valueReason || "なし")}</p>
-
-          <p><b>判断に使用した写真：</b>${Number(memory.photoCount || 0)}枚</p>
+        <div class="memory-primary-box"><span>主な評価</span><strong>${escapeHtml(CRITERIA_LABELS[primaryCriterion] || "未分類")}</strong></div>
+        <section class="memory-detail-section">
+          <h4 class="memory-compact-heading">5項目のAI評価と理由</h4>
+          <div class="memory-eval-items">${evaluationHtml}</div>
+          <div class="memory-eval-total"><span>5項目の合計評価</span><strong>${evaluationTotal} / 25点</strong></div>
+          ${!hasItemReasons ? `<div class="memory-eval-fallback"><b>AIの評価理由</b>${formatScoreReason(memory.reason)}</div>` : ''}
+        </section>
+        <section class="memory-detail-section">
+          <h4 class="memory-compact-heading">判断に使用した写真（${Number(memory.photoCount ?? photos.length)}枚）</h4>
           <div class="memory-detail-photo-grid">
-            ${Array.isArray(memory.photos) && memory.photos.length
-              ? memory.photos.map((photo, photoIndex) =>
-                  `<img src="${photo}" alt="思い出の写真 ${photoIndex + 1}" loading="lazy">`
-                ).join('')
-              : '<p class="memory-detail-photo-note">この思い出には表示できる写真が保存されていません。以前の記録は写真データが保存されていないため、再表示できません。</p>'}
+            ${photos.length
+              ? photos.map((photo, i) => `<img src="${photo}" alt="判断に使用した写真 ${i + 1}" loading="lazy">`).join('')
+              : '<p class="memory-detail-photo-note">保存された写真データがないため、表示できません。</p>'}
           </div>
-        </div>
-
-        <div class="memory-detail-section">
-          <p><b>5項目の評価</b></p>
-          <div class="memory-detail-score-grid">
-            <span>感情</span><b>${scores.emotion} / 5</b>
-            <span>学び</span><b>${scores.learning} / 5</b>
-            <span>希少性</span><b>${scores.rarity} / 5</b>
-            <span>人間関係</span><b>${scores.relationship} / 5</b>
-            <span>将来への影響</span><b>${scores.future} / 5</b>
+        </section>
+        <section class="memory-detail-section">
+          <h4 class="memory-compact-heading">思い出の振り返り</h4>
+          <div class="memory-reflection-grid">
+            <div><small>閲覧回数（累計）</small><strong>${viewCount}回</strong></div>
+            <div><small>砂の輝き</small><strong>${glowText}</strong></div>
           </div>
-
-          <p><b>点数評価の理由</b></p>
-          <div>${formatScoreReason(memory.reason || "なし")}</div>
-        </div>
-
-        <div class="memory-detail-section">
-          <p><b>ユーザーが重視した要素：</b>${escapeHtml(
-            memory.userPriorityLabel ||
-            CRITERIA_LABELS[memory.userPriority] ||
-            "未選択"
-          )}</p>
-
-
-
-          <p class="memory-behavior-note">
-            閲覧回数：${viewCount}回 ／ 直近30日の光り方：${glowLevel >= 3 ? "リング" : "通常"}<br>
-            砂の大きさはAI評価（変更不可）、輝きは閲覧回数で決まります。<br>
-            この思い出を開くと閲覧回数が1回増えます。
-          </p>
-        </div>
+          <p class="memory-behavior-note">直近30日：${recentViews}回閲覧。砂の大きさはAI評価、輝きは閲覧回数で変化します。</p>
+        </section>
       `;
-
       dialog.show();
     }
 
@@ -5759,113 +5915,77 @@ function showAIResult(result) {
       }, 1000);
     }
 
-    // 残り時間の表示モードをタップで切り替える（タイマーの残り秒数は変えない）。
-    let remainingDisplayMode = null;
-    let remainingDisplaySettingsKey = '';
-    function availableRemainingDisplayModes() {
-      const setting = currentTimerMode === 'life' ? 'life' : shortTimerMode;
-      if (setting === 'life') return ['life', 'week', 'day'];
-      if (setting === 'year') return ['year', 'week', 'day'];
-      if (setting === 'month') return ['month', 'week', 'day'];
-      if (setting === 'week') return ['week', 'day'];
-      return ['day', 'week'];
-    }
-    function ensureRemainingDisplayMode() {
-      const setting = currentTimerMode === 'life' ? 'life' : shortTimerMode;
-      const modes = availableRemainingDisplayModes();
-      if (remainingDisplaySettingsKey !== setting || !modes.includes(remainingDisplayMode)) {
-        remainingDisplaySettingsKey = setting;
-        remainingDisplayMode = modes[0];
-      }
-      return remainingDisplayMode;
-    }
-    function cycleRemainingTimeDisplay() {
-      const modes = availableRemainingDisplayModes();
-      const current = ensureRemainingDisplayMode();
-      remainingDisplayMode = modes[(modes.indexOf(current) + 1) % modes.length];
-      updateTimeDisplay();
+    // 残り時間は設定時の単位に応じて固定表示する。
+    // 年／人生: 年・月・週・日、月: 月・週・日、週: 週・日、日: 日
+    // 下段は共通で時間・分・秒。表示モードのタップ切替はなし。
+    function remainingTimeUnit() {
+      return currentTimerMode === 'life' ? 'life' : shortTimerMode;
     }
 
-    // 砂時計設定の単位で、主要な残り期間と時・分・秒を分けて表示する。
-    // 年・月の長さは暦に合わせて計算し、1秒ごとに更新する。
     function calendarPeriodBreakdown(seconds, unit) {
       const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
-      const DAY = 86400, WEEK = 7 * DAY;
+      const DAY_MS = 86400000;
       const endMillis = timerEndAt > 0 ? timerEndAt : Date.now() + safeSeconds * 1000;
-      // カウントダウン値と実時間のずれ（秒未満）を避ける
-      const startMillis = endMillis - safeSeconds * 1000;
-      const start = new Date(startMillis);
+      // 元のタイマーの残り秒を基準にして秒未満のずれを避ける。
+      const start = new Date(endMillis - safeSeconds * 1000);
       const end = new Date(endMillis);
       let cursor = start;
       const pad = n => String(n).padStart(2, '0');
 
-      // 基準日からNか月後。月末は対象月の最終日に丸める。
-      function addMonths(base, count) {
-        const result = new Date(base.getTime());
-        const originalDay = result.getDate();
-        result.setDate(1);
-        result.setMonth(result.getMonth() + count);
-        const finalDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
-        result.setDate(Math.min(originalDay, finalDay));
-        return result;
-      }
-      function fullMonths(from, to) {
-        let count = (to.getFullYear() - from.getFullYear()) * 12 + to.getMonth() - from.getMonth();
-        count = Math.max(0, count);
-        while (count > 0 && addMonths(from, count) > to) count--;
-        while (addMonths(from, count + 1) <= to) count++;
+      // 暦に従って満了した「月」の個数を数える。
+      // 元の基準日から毎回計算するので、1/31→2/28→3/28 という月末ずれを防ぐ。
+      function fullCalendarMonths(from, to) {
+        let count = Math.max(0, (to.getFullYear() - from.getFullYear()) * 12 + to.getMonth() - from.getMonth());
+        while (count > 0 && addCalendarMonthsClamped(from, count) > to) count--;
+        while (addCalendarMonthsClamped(from, count + 1) <= to) count++;
         return count;
       }
 
-      let primary = '';
+      let years = 0, months = 0;
       if (unit === 'life' || unit === 'year') {
-        const years = Math.floor(fullMonths(start, end) / 12);
-        cursor = addMonths(start, years * 12);
-        if (unit === 'life') {
-          const months = fullMonths(cursor, end);
-          cursor = addMonths(cursor, months);
-          const days = Math.floor((end - cursor) / (DAY * 1000));
-          primary = years + '年 ' + months + 'か月 ' + days + '日';
-        } else {
-          let left = Math.max(0, Math.floor((end - cursor) / 1000));
-          const weeks = Math.floor(left / WEEK); left %= WEEK;
-          const days = Math.floor(left / DAY);
-          primary = years + '年 ' + weeks + '週 ' + days + '日';
-        }
+        const monthCount = fullCalendarMonths(start, end);
+        years = Math.floor(monthCount / 12);
+        months = monthCount % 12;
+        cursor = addCalendarMonthsClamped(start, monthCount);
       } else if (unit === 'month') {
-        const months = fullMonths(start, end);
-        cursor = addMonths(start, months);
-        const days = Math.floor((end - cursor) / (DAY * 1000));
-        primary = months + 'か月 ' + days + '日';
-      } else if (unit === 'week') {
-        const weeks = Math.floor(safeSeconds / WEEK);
-        const days = Math.floor((safeSeconds % WEEK) / DAY);
-        primary = weeks + '週 ' + days + '日';
-      } else {
-        primary = Math.floor(safeSeconds / DAY) + '日';
+        months = fullCalendarMonths(start, end);
+        cursor = addCalendarMonthsClamped(start, months);
       }
 
-      // 下段は全モードで HH時間 MM分 SS秒（人生だけ非表示）。
-      // 「日未満」の余りを表示し、00:00:00で終了する。
-      const subDay = safeSeconds % DAY;
-      const hours = Math.floor(subDay / 3600);
-      const minutes = Math.floor((subDay % 3600) / 60);
-      const sec = subDay % 60;
-      return { primary, secondary: pad(hours) + '時間 ' + pad(minutes) + '分 ' + pad(sec) + '秒' };
+      // 残りを週・日・時・分・秒に分解。国内利用を想定した現地暦ベース。
+      let left = Math.max(0, Math.floor((end - cursor) / 1000));
+      let weeks = 0;
+      if (unit !== 'day') {
+        weeks = Math.floor(left / (7 * 86400));
+        left %= 7 * 86400;
+      }
+      const days = Math.floor(left / 86400);
+      left %= 86400;
+      const hours = Math.floor(left / 3600); left %= 3600;
+      const minutes = Math.floor(left / 60);
+      const secs = left % 60;
+
+      let primary;
+      if (unit === 'life' || unit === 'year') {
+        primary = years + '年 ' + months + 'か月 ' + weeks + '週 ' + days + '日';
+      } else if (unit === 'month') {
+        primary = months + 'か月 ' + weeks + '週 ' + days + '日';
+      } else if (unit === 'week') {
+        primary = weeks + '週 ' + days + '日';
+      } else {
+        primary = days + '日';
+      }
+      return {
+        primary,
+        secondary: pad(hours) + '時間 ' + pad(minutes) + '分 ' + pad(secs) + '秒'
+      };
     }
 
     function updateTimeDisplay() {
       if (remainingTime < 0) remainingTime = 0;
       const timeText = document.getElementById('timeText');
       if (timeText) {
-        const unit = ensureRemainingDisplayMode();
-        const parts = calendarPeriodBreakdown(remainingTime, unit);
-        const modeLabel = document.getElementById('remainingTimeModeLabel');
-        if (modeLabel) {
-          const names = {life:'人生',year:'年',month:'月',week:'週',day:'日'};
-          modeLabel.textContent = '｜'+names[unit]+'表示 ↻';
-        }
-        // 静的な要素を再利用し、毎秒書き換える文字列だけ更新。
+        const parts = calendarPeriodBreakdown(remainingTime, remainingTimeUnit());
         let major = document.getElementById('timeMajor');
         let minor = document.getElementById('timeMinor');
         if (!major || !minor) {
@@ -5875,7 +5995,7 @@ function showAIResult(result) {
         }
         major.textContent = parts.primary;
         minor.textContent = parts.secondary;
-        minor.hidden = unit === 'life';
+        minor.hidden = false;
       }
 
       const lostPercent = Math.max(0, Math.min(100,
@@ -6015,11 +6135,11 @@ function showAIResult(result) {
     <div class="tutorial-count" id="tutorialCount"></div>
     <h3 id="tutorialTitle"></h3><p id="tutorialDescription"></p>
     <div id="tutorialDemoContent" class="kyoto-demo-content" hidden></div>
-    <div class="tutorial-controls">
-      <button type="button" class="tutorial-skip" onclick="finishHourglassTutorial()">スキップ</button>
-      <button type="button" id="tutorialPrev" onclick="changeHourglassTutorial(-1)">戻る</button>
-      <button type="button" class="tutorial-primary" id="tutorialNext" onclick="changeHourglassTutorial(1)">次へ</button>
-    </div>
+  </div>
+  <div class="tutorial-controls" aria-label="チュートリアルの操作">
+    <button type="button" class="tutorial-skip" onclick="finishHourglassTutorial()">スキップ</button>
+    <button type="button" id="tutorialPrev" onclick="changeHourglassTutorial(-1)">戻る</button>
+    <button type="button" class="tutorial-primary" id="tutorialNext" onclick="changeHourglassTutorial(1)">次へ</button>
   </div>
 </div>
 
@@ -6053,6 +6173,13 @@ function showAIResult(result) {
 #tutorialPanel .kyoto-demo-list-item>b{font-size:13px}
 #tutorialPanel .kyoto-demo-list-item>span:nth-child(2){flex:1;font-size:12px}
 #tutorialPanel .kyoto-demo-list-item>span:last-child{font-size:22px;color:#987e55}
+#tutorialPanel .kyoto-demo-scores{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin:9px 0;font-size:11px;color:#5c5247}
+#tutorialPanel .kyoto-demo-glow-guide{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px;border-radius:10px;background:#fff8e8;font-size:12px;line-height:1.6}
+#tutorialPanel .kyoto-demo-glow-guide .kyoto-demo-dot{flex:0 0 20px}
+#tutorialPanel .kyoto-demo-glow-guide small{color:#817360}
+#tutorialPanel .kyoto-demo-period-guide{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;margin:8px 0 11px}
+#tutorialPanel .kyoto-demo-period-guide span{padding:9px 7px;border:1px solid #e3d5ba;border-radius:20px;background:#fff8ea;font-weight:700;font-size:12px;color:#826032}
+#tutorialPanel .kyoto-demo-finish{margin-top:12px;padding:10px;border-radius:10px;background:#f8f4ec;color:#624b30;font-size:12px;line-height:1.7;text-align:center}
 @media(max-height:640px){#tutorialPanel .kyoto-demo-content{max-height:21dvh}}
 </style>
 
@@ -6082,7 +6209,8 @@ function showAIResult(result) {
     if(!overlay || !overlay.classList.contains('is-open')) return;
     const panel=document.getElementById('tutorialPanel');
     // 説明枠内の操作は許可（戻る・次へ・スキップ・完了）。
-    if(panel && panel.contains(event.target)) return;
+    const controls=overlay.querySelector(':scope > .tutorial-controls');
+    if((panel && panel.contains(event.target)) || (controls && controls.contains(event.target))) return;
     if(event.cancelable) event.preventDefault();
     event.stopImmediatePropagation();
   }
@@ -6091,7 +6219,8 @@ function showAIResult(result) {
     const overlay=document.getElementById('tutorialOverlay');
     if(!overlay?.classList.contains('is-open'))return;
     const panel=document.getElementById('tutorialPanel');
-    if(panel?.contains(document.activeElement) && (event.key==='Enter'||event.key===' '||event.key==='Tab'||event.key==='Shift'))return;
+    const controls=overlay.querySelector(':scope > .tutorial-controls');
+    if((panel?.contains(document.activeElement) || controls?.contains(document.activeElement)) && (event.key==='Enter'||event.key===' '||event.key==='Tab'||event.key==='Shift'))return;
     if(event.cancelable)event.preventDefault();
     event.stopImmediatePropagation();
   },true);
@@ -6125,6 +6254,131 @@ function showAIResult(result) {
 }
 #tutorialOverlay.is-open #tutorialPanel .kyoto-demo-content {
   max-height:none;
+}
+</style>
+<style id="tutorial-bottom-controls-and-sand-guide-20261119">
+/* チュートリアル操作は説明カードから独立して画面下部に固定 */
+#tutorialOverlay.is-open > .tutorial-controls{
+ position:fixed!important;left:0!important;right:0!important;
+ bottom:0!important;z-index:100010!important;
+ box-sizing:border-box;display:flex!important;align-items:center;gap:10px;
+ width:100%;margin:0!important;padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+ background:#fff!important;border-top:1px solid #e8e1d6;
+ box-shadow:0 -5px 24px rgba(0,0,0,.15);pointer-events:auto!important;
+}
+#tutorialOverlay.is-open > .tutorial-controls button{min-height:42px;border:0;border-radius:11px;padding:9px 16px;font-size:14px;background:#edeae5;color:#453b2d;cursor:pointer}
+#tutorialOverlay.is-open > .tutorial-controls .tutorial-primary{background:#b58a40!important;color:white!important;font-weight:700;min-width:92px}
+#tutorialOverlay.is-open > .tutorial-controls .tutorial-skip{margin-right:auto;background:transparent!important;color:#746b60;padding-left:0}
+#tutorialOverlay.is-open #tutorialPanel{overscroll-behavior:contain;padding-bottom:14px}
+#tutorialPanel .tutorial-sand-guide{margin-top:12px;padding:10px 9px;border:1px solid #e8dfd0;background:#fffaf2;border-radius:12px}
+#tutorialPanel .tutorial-sand-section-title{font-size:12px;font-weight:700;color:#76542b;margin:4px 0 10px}
+#tutorialPanel .tutorial-sand-color-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 7px;margin-bottom:13px}
+#tutorialPanel .tutorial-sand-color-list span{font-size:11px;color:#514639;display:flex;align-items:center;gap:7px}
+#tutorialPanel .tutorial-sand-color-list .kyoto-demo-dot{flex-shrink:0;width:14px;height:14px}
+#tutorialPanel .kyoto-demo-dot.emotion{background:#ef5350}
+#tutorialPanel .kyoto-demo-dot.future{background:#ab47bc}
+#tutorialPanel .tutorial-sand-size-list{display:flex;justify-content:space-between;align-items:end;gap:4px;margin:8px 0 10px}
+#tutorialPanel .tutorial-sand-size-list>span{display:flex;flex-direction:column;justify-content:end;align-items:center;min-width:0;gap:6px;flex:1}
+#tutorialPanel .tutorial-size-dot{display:block;flex:0 0 auto;border-radius:50%;background:#b58a40;box-shadow:inset 0 1px 2px #fff9,0 1px 3px #0002}
+#tutorialPanel .tutorial-sand-size-list small{white-space:nowrap;font-size:9px;color:#71614d}
+#tutorialPanel .tutorial-sand-glow-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+#tutorialPanel .tutorial-sand-glow-list>span{display:flex;flex-direction:column;align-items:center;justify-content:start;gap:9px;text-align:center}
+#tutorialPanel .tutorial-sand-glow-list small{font-size:10px;line-height:1.5;color:#655748}
+#tutorialPanel .kyoto-demo-dot.demo-muted{filter:saturate(.4) brightness(.8);opacity:.8;box-shadow:none}
+#tutorialPanel .tutorial-sand-guide>small{display:block;font-size:10px;line-height:1.6;color:#776b5b}
+@media(max-height:650px){#tutorialOverlay.is-open > .tutorial-controls{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))}}
+</style>
+
+<style id="tutorial-separated-pages-20261119">
+/* 説明画面はオレンジ枠を完全に消し、文章とデモに領域を譲る */
+#tutorialOverlay.is-open.tutorial-explanation-page #tutorialPanel {
+  left:12px!important;right:12px!important;
+  width:auto!important;max-width:580px!important;
+  box-sizing:border-box!important;
+  padding:22px 18px!important;
+  border-radius:18px!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+#tutorialOverlay.is-open.tutorial-explanation-page #tutorialPanel .kyoto-demo-content {
+  max-height:none!important;overflow:visible!important;
+}
+#tutorialOverlay.is-open.tutorial-guide-page #tutorialPanel {
+  padding:12px 15px!important;border-radius:13px!important;
+  max-width:350px!important;
+  overflow-y:auto!important;
+}
+#tutorialOverlay.is-open.tutorial-guide-page #tutorialPanel h3 {font-size:16px!important;margin:2px 0 5px!important}
+#tutorialOverlay.is-open.tutorial-guide-page #tutorialPanel p {font-size:12px!important;margin:0!important;line-height:1.5!important}
+#tutorialOverlay.is-open.tutorial-guide-page #tutorialPanel .tutorial-progress {margin-bottom:6px!important}
+#tutorialOverlay.is-open > .tutorial-controls {z-index:100010!important;pointer-events:auto!important}
+@media(max-width:360px){
+ #tutorialOverlay.is-open.tutorial-explanation-page #tutorialPanel{padding:16px 13px!important}
+}
+</style>
+
+<style id="tutorial-footer-warm-glass-20261119">
+/* 全画面チュートリアル：真っ白ではなく、砂時計と統一した柔らかいガラス風の固定操作バー */
+#tutorialOverlay.is-open > .tutorial-controls {
+  position:fixed!important;
+  inset:auto 0 0!important;
+  z-index:100010!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  gap:9px!important;
+  width:100%!important;
+  min-height:76px;
+  padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))!important;
+  background:linear-gradient(180deg,rgba(247,243,236,.91),rgba(236,226,210,.96))!important;
+  border-top:1px solid rgba(181,138,64,.22)!important;
+  box-shadow:0 -6px 25px rgba(80,61,36,.08)!important;
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+  pointer-events:auto!important;
+}
+#tutorialOverlay.is-open > .tutorial-controls button {
+  box-sizing:border-box;
+  min-height:44px!important;
+  padding:10px 18px!important;
+  border:1px solid transparent!important;
+  border-radius:13px!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  white-space:nowrap;
+  touch-action:manipulation;
+  pointer-events:auto!important;
+  transition:background .15s ease,transform .15s ease,box-shadow .15s ease;
+}
+#tutorialOverlay.is-open > .tutorial-controls #tutorialPrev {
+  background:rgba(255,253,248,.70)!important;
+  border-color:rgba(162,139,103,.38)!important;
+  color:#5a4a38!important;
+  box-shadow:0 2px 8px rgba(80,61,36,.04);
+}
+#tutorialOverlay.is-open > .tutorial-controls .tutorial-primary {
+  min-width:100px!important;
+  background:linear-gradient(135deg,#c49c57,#a97932)!important;
+  color:#fff!important;
+  border-color:rgba(126,87,31,.18)!important;
+  box-shadow:0 3px 10px rgba(151,107,47,.20)!important;
+}
+#tutorialOverlay.is-open > .tutorial-controls .tutorial-skip {
+  margin-right:auto!important;
+  padding-left:6px!important;
+  padding-right:8px!important;
+  background:transparent!important;
+  color:#756b5f!important;
+  border:0!important;
+  font-weight:500!important;
+}
+#tutorialOverlay.is-open > .tutorial-controls button:active {transform:scale(.97)}
+#tutorialOverlay.is-open > .tutorial-controls button:focus-visible {outline:3px solid #a97e43!important;outline-offset:2px}
+@media(max-width:360px){
+  #tutorialOverlay.is-open > .tutorial-controls{gap:6px!important;padding-left:11px!important;padding-right:11px!important}
+  #tutorialOverlay.is-open > .tutorial-controls button{padding:10px 12px!important;font-size:13px!important}
+  #tutorialOverlay.is-open > .tutorial-controls .tutorial-primary{min-width:82px!important}
 }
 </style>
 </body>

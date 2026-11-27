@@ -41,44 +41,23 @@ const KYOTO_TUTORIAL_MEMORIES = [
     memorySummary:'友人と清水寺を散策し、美しい京都の景色を楽しんだ。',
     contextMeaning:'一緒に旅行を計画して過ごしたことで、友人とのつながりを深めた。',
     valueReason:'日常とは異なる場所で、大切な人と感動を共有できた時間だから。',
-    primaryCriterion:'relationship', userPriority:'relationship',
+    primaryCriterion:'relationship',
     emotion:5,learning:2,rarity:4,relationship:5,future:2,
     totalScore:18,score:18,viewCount:5,viewHistory:[Date.now()-86400000,Date.now()-7200000,Date.now()-3600000,Date.now()-1800000,Date.now()-600000],favorite:true,
     memoryDate:'2026-11-05T14:00:00+09:00',date:'2026/11/05',demoScene:'temple'
-  },
-  {
-    memoryTitle:'京都旅行・嵐山', category:'遊び・趣味',
-    memo:'嵐山の竹林を歩き、普段とは違う静かな自然に触れた。',
-    memorySummary:'京都・嵐山で竹林の小径を散策した。',
-    contextMeaning:'忙しい日常から離れ、心を落ち着ける時間になった。',
-    valueReason:'見慣れない景色との出会いが印象に残り、特別な体験となったから。',
-    primaryCriterion:'rarity',userPriority:'rarity',
-    emotion:4,learning:2,rarity:5,relationship:3,future:1,
-    totalScore:15,score:15,viewCount:1,favorite:false,
-    memoryDate:'2026-11-06T10:30:00+09:00',date:'2026/11/06',demoScene:'bamboo'
-  },
-  {
-    memoryTitle:'京都旅行・伏見稲荷', category:'遊び・趣味',
-    memo:'伏見稲荷大社の千本鳥居を歩き、日本の文化や歴史への興味が深まった。',
-    memorySummary:'伏見稲荷大社で朱色の鳥居が続く景観を見学した。',
-    contextMeaning:'現地で文化に触れ、旅行先への理解が深まった。',
-    valueReason:'実際に現地を訪れた経験から、新しい知識や関心を得られたから。',
-    primaryCriterion:'learning',userPriority:'learning',
-    emotion:4,learning:5,rarity:4,relationship:3,future:2,
-    totalScore:18,score:18,viewCount:0,favorite:false,
-    memoryDate:'2026-11-06T15:00:00+09:00',date:'2026/11/06',demoScene:'torii'
   }
 ];
+
 const hourglassTutorialSteps=[
- {label:'コンセプト',title:'過去の思い出と、未来の時間を大切に',description:'写真とコメントなどの情報からAIが思い出の意味や価値を判定し、砂時計に可視化します。下の砂は過去の思い出、上の金色の砂は未来に残された時間です。',selector:null},
- {label:'デモ選択',title:'京都旅行のデモを選ぼう',description:'架空の京都旅行から、気になる思い出を1つ選んでください。選んだ思い出を使って記録とAI判定を体験します。デモデータは実際の記録には保存されません。',selector:null,demo:'intro'},
- {label:'砂時計・上',title:'上の砂は、未来の残り時間',description:'金色の砂は、これから過ごせる時間を表します。残り時間は実際の時間経過に合わせて減少します。上部をタップすると、人生の目標年齢や期間を設定できます。',selector:'#homeView .sand-top-clip'},
- {label:'砂時計・中央',title:'中央から思い出を記録',description:'砂時計のくびれをタップすると入力画面が開きます。写真・コメント・撮影日時や場所などを使って、ひとつの出来事をひとつの思い出として記録します。',selector:'#homeView .hourglass-neck-action',demo:'input'},
- {label:'AI判定',title:'AIが思い出の価値を判定',description:'AIは感情・学び・希少性・人間関係・将来への影響の5項目から思い出を分析します。下は選んだ思い出の説明用サンプルです。実際のAI通信は行いません。',selector:null,demo:'analysis'},
- {label:'砂時計・下',title:'砂の色と大きさを知る',description:'思い出1件が1粒の丸い砂になります。色は5項目のうち最も強い価値を示し、大きさはAIによる5項目の合計（25点満点）に対応します。下の見本で確認しましょう。',selector:'#homeView .sand-bottom-clip',demo:'sand'},
- {label:'価値を見る',title:'一覧から思い出を振り返る',description:'「価値を見る」では、記録した思い出を一覧で確認できます。カテゴリや代表的な価値で絞り込みもできます。下の京都旅行の思い出をタップしてみましょう。',selector:null,demo:'list'},
- {label:'思い出詳細・輝き',title:'思い出の詳細と砂の輝き',description:'思い出の詳細ではAIの評価理由を読めます。砂の色と大きさはAIの評価、金色の輝きはあなたがその思い出を見返した回数を表します。',selector:null,demo:'detail'},
- {label:'表示期間・設定',title:'表示する時間を切り替えよう',description:'ホーム下部の「月・年・人生」で思い出を表示する範囲を選べます。年月をタップして表示先を選ぶこともできます。人生の残り時間や期間指定は、砂時計の上部または設定画面の「砂時計設定」から変更できます。',selector:'#homeView .hourglass-period-box',demo:'end'}
+ {label:'コンセプト',title:'大切な思い出を、砂時計にためよう',description:'写真やコメントからAIが思い出の価値を判定し、1つの思い出を1粒の砂にします。砂時計で過去の思い出と未来の時間を見つめましょう。',selector:null},
+ {label:'デモ紹介',title:'清水寺の思い出で体験しよう',description:'京都・清水寺の思い出を使って、記録から振り返りまでを体験します。※説明用のデータは保存されません。',selector:null,demo:'intro'},
+ {label:'砂時計・上',title:'未来の残り時間を見てみよう',description:'上の金色の砂は、未来の残り時間です。時間とともに減り、上部をタップすると期間を設定できます。',selector:'#homeView .sand-top-clip'},
+ {label:'砂時計・中央',title:'大切な思い出を記録しよう',description:'砂時計の中央をタップすると、思い出を記録できます。写真やコメントなどを入力すると、AIが価値を判定します。',selector:'#homeView .hourglass-neck-action',demo:'input'},
+ {label:'AI判定',title:'AIが思い出の価値を判定します',description:'AIが思い出を「感情・学び・希少性・人間関係・将来への影響」の5項目で評価します。各5点、合計25点満点です。',selector:null,demo:'analysis'},
+ {label:'砂時計・下',title:'思い出の価値を砂粒で表現しよう',description:'思い出は1件につき1粒の砂となり、下部にたまります。色は代表的な価値、大きさは評価点、輝きは見返した回数を表します。',selector:'#homeView .sand-bottom-clip',demo:'sand'},
+ {label:'価値を見る',title:'記録した思い出を振り返ろう',description:'「価値を見る」では、思い出を一覧で確認できます。カテゴリや価値で絞り込み、タップすると詳細を見られます。',selector:null,demo:'list'},
+ {label:'思い出詳細・輝き',title:'思い出の価値を詳しく見てみよう',description:'詳細画面では、AIの評価とその理由を確認できます。砂の輝きは、直近30日間に思い出を見返した回数で変わります。',selector:null,demo:'detail'},
+ {label:'表示期間・設定',title:'過去と未来の時間を見つめよう',description:'「月・年・人生」で、思い出を表示する期間を切り替えられます。上の砂の残り時間は、砂時計の上部から設定できます。',selector:'#homeView .hourglass-period-box',demo:'end'}
 ];
 let kyotoTutorialSelected=0;
 let kyotoTutorialShowingSand=false;
@@ -91,13 +70,21 @@ function kyotoDemoIllustration(scene){
  return '<svg viewBox="0 0 200 150" class="kyoto-demo-art" role="img" aria-label="京都の観光地のイラスト"><rect width="200" height="150" rx="12" fill="'+(scene==='bamboo'?'#e6f2db':'#faebd1')+'"/><circle cx="166" cy="30" r="18" fill="#efc67b" opacity=".7"/>'+drawings[scene]+'</svg>';
 }
 function renderTutorialSandLegend(){
- const colors=[['emotion','感情'],['learning','学び'],['rarity','希少性'],['relationship','人間関係'],['future','将来への影響']];
- const colorGuide='<div class="tutorial-sand-section-title">色：その思い出で最も強い価値</div><div class="tutorial-sand-color-list">'+colors.map(([key,label])=>'<span><i class="kyoto-demo-dot '+key+'"></i>'+label+'</span>').join('')+'</div>';
- const sizeGuide='<div class="tutorial-sand-section-title">大きさ：AIによる5項目の合計（25点満点）</div><div class="tutorial-sand-size-list">'+[[4,'1〜5点'],[5,'6〜10点'],[10,'11〜15点'],[15,'16〜20点'],[20,'21〜25点']].map(([size,label])=>'<span><i class="tutorial-size-dot" style="width:'+size+'px;height:'+size+'px"></i><small>'+label+'</small></span>').join('')+'</div><small>※0点はごく小さい灰色の粒です。粒はすべて円形です。</small>';
- return '<div class="tutorial-sand-guide">'+colorGuide+sizeGuide+'</div>';
+ const colors=[
+  ['emotion','感情','心が動いた経験'],
+  ['learning','学び','気付きや成長'],
+  ['rarity','希少性','特別な経験'],
+  ['relationship','人間関係','人とのつながり'],
+  ['future','将来への影響','未来につながる経験']
+ ];
+ const colorGuide='<section class="tutorial-sand-section"><div class="tutorial-sand-section-title">① 砂の色｜代表的な価値</div><p class="tutorial-sand-explain">AIが評価した5項目のうち、最も高い価値で色が決まります。</p><div class="tutorial-sand-color-list">'+colors.map(([key,label,meaning])=>'<span><i class="kyoto-demo-dot '+key+'"></i><span class="tutorial-color-text"><b>'+label+'</b><small>'+meaning+'</small></span></span>').join('')+'</div><small class="tutorial-sand-note">※最高点が同点なら、写真やコメントなどをもとにAIが代表的な価値を判断します。</small></section>';
+ const sizes=[[5,'0点'],[8,'1〜5点'],[11,'6〜10点'],[15,'11〜15点'],[19,'16〜20点'],[23,'21〜25点']];
+ const sizeGuide='<section class="tutorial-sand-section"><div class="tutorial-sand-section-title">② 砂の大きさ｜価値の高さ</div><p class="tutorial-sand-explain">5項目を各5点、合計25点満点で評価。合計が高いほど砂粒が大きくなります。</p><div class="tutorial-sand-size-list">'+sizes.map(([size,label],i)=>'<span><i class="tutorial-size-dot'+(i===0?' tutorial-zero-dot':'')+'" style="width:'+size+'px;height:'+size+'px"></i><small>'+label+'</small></span>').join('')+'</div><small class="tutorial-sand-note">※0点も小さな灰色の粒として表示します。砂粒の形はすべて円形です。</small></section>';
+ return '<div class="tutorial-sand-guide tutorial-sand-guide-complete">'+colorGuide+sizeGuide+renderTutorialGlowLegend()+'</div>';
 }
 function renderTutorialGlowLegend(){
- return '<div class="tutorial-sand-guide"><div class="tutorial-sand-section-title">輝き：直近30日間に思い出を見返した回数</div><div class="tutorial-sand-glow-list"><span><i class="kyoto-demo-dot relationship demo-muted"></i><small>0回：くすんだ色</small></span><span><i class="kyoto-demo-dot relationship"></i><small>1〜4回：通常の色</small></span><span><i class="kyoto-demo-dot relationship glowing"></i><small>5回以上：金色の輪で輝く</small></span></div><small>輝きはAIの点数ではなく、利用者自身が思い出に向けた関心を示します。</small></div>';
+ const levels=[[0,'光なし','0回'],[1,'ブロンズ','1〜2回'],[2,'シルバー','3〜4回'],[3,'ゴールド','5〜9回'],[4,'ダイヤモンド','10回以上']];
+ return '<section class="tutorial-sand-section"><div class="tutorial-sand-section-title">③ 輝きのリング｜見返した回数</div><p class="tutorial-sand-explain">思い出を見返した回数に応じて、砂の周囲のリングが5段階で変化します。</p><div class="tutorial-sand-glow-list">'+levels.map(([level,name,count])=>'<span><i class="kyoto-demo-dot relationship '+(level===0?'demo-muted':'demo-glow-'+level)+'"></i><strong>'+name+'</strong><small>'+count+'</small></span>').join('')+'</div><small class="tutorial-sand-note">※輝きはAIの点数とは無関係です。直近30日間に思い出を見返した回数を表します。</small></section>';
 }
 function renderKyotoTutorialDemo(step){
  const holder=document.getElementById('tutorialDemoContent');
@@ -105,16 +92,16 @@ function renderKyotoTutorialDemo(step){
  if(!step.demo){holder.hidden=true;holder.innerHTML='';return;}
  holder.hidden=false;
  const m=KYOTO_TUTORIAL_MEMORIES[kyotoTutorialSelected];
- const tiles=KYOTO_TUTORIAL_MEMORIES.map((item,i)=>'<button type="button" class="kyoto-demo-tile'+(i===kyotoTutorialSelected?' selected':'')+'" onclick="selectKyotoTutorialMemory('+i+')">'+kyotoDemoIllustration(item.demoScene)+'<span>'+item.memoryTitle.replace('京都旅行・','')+'</span></button>').join('');
- const dots=KYOTO_TUTORIAL_MEMORIES.map(item=>'<span class="kyoto-demo-dot '+item.primaryCriterion+((item.viewHistory||[]).filter(t=>t>=Date.now()-30*86400000).length>=5?' glowing':'')+'" title="'+item.memoryTitle+'"></span>').join('');
+ const tiles='<div class="kyoto-demo-single-memory">'+kyotoDemoIllustration(m.demoScene)+'<strong>'+m.memoryTitle+'</strong><small>チュートリアル用の思い出（1件）</small></div>';
+ const dots=KYOTO_TUTORIAL_MEMORIES.map(item=>'<span class="kyoto-demo-dot '+item.primaryCriterion+' demo-glow-'+getMemoryGlowLevel(item)+(getMemoryGlowLevel(item)===0?' demo-muted':'')+'" title="'+item.memoryTitle+'"></span>').join('');
  const example='<div class="kyoto-demo-scene">'+kyotoDemoIllustration(m.demoScene)+'<div><strong>'+m.memoryTitle+'</strong><small>'+m.date+'｜'+m.category+'</small><p>'+m.memo+'</p></div></div>';
- if(step.demo==='intro')holder.innerHTML='<div class="kyoto-demo-label">京都旅行｜思い出を選択（架空データ）</div><div class="kyoto-demo-tiles">'+tiles+'</div><small>選択した思い出：'+m.memoryTitle+' ／ 他の2件も後半で表示します</small>';
+ if(step.demo==='intro')holder.innerHTML='<div class="kyoto-demo-label">清水寺の思い出（架空のデモデータ1件）</div>'+tiles+'<small>以降の説明では、この1件だけを使います。</small>';
  if(step.demo==='input')holder.innerHTML='<div class="kyoto-demo-label">登録する思い出の例</div>'+example+'<small>※ 実際の写真・AI通信は使用しません</small>';
  if(step.demo==='analysis')holder.innerHTML='<div class="kyoto-demo-label">AI判定のサンプル</div>'+example+'<div class="kyoto-demo-analysis">代表的な価値：<b>'+CRITERIA_LABELS[m.primaryCriterion]+'</b><p>'+m.valueReason+'</p><div class="kyoto-demo-scores">'+(['emotion','learning','rarity','relationship','future'].map(k=>'<span>'+CRITERIA_LABELS[k]+'：'+m[k]+'/5</span>').join(''))+'</div><strong>合計：'+m.totalScore+'/25</strong><br><small>※ 事前に用意した説明用の判定例です</small></div>';
- if(step.demo==='sand')holder.innerHTML='<div class="kyoto-demo-label">京都旅行の3つの思い出の砂（見本）</div><div class="kyoto-demo-dots">'+dots+'</div>'+renderTutorialSandLegend();
- if(step.demo==='list')holder.innerHTML='<div class="kyoto-demo-label">京都旅行の思い出一覧（タップで詳細へ）</div>'+KYOTO_TUTORIAL_MEMORIES.map((item,i)=>'<button type="button" class="kyoto-demo-list-item" onclick="openKyotoTutorialDetail('+i+')"><span class="kyoto-demo-list-art">'+kyotoDemoIllustration(item.demoScene)+'</span><span><b>'+item.memoryTitle+'</b><small>'+CRITERIA_LABELS[item.primaryCriterion]+'｜'+item.date+'</small></span><span>›</span></button>').join('');
- if(step.demo==='detail')holder.innerHTML='<div class="kyoto-demo-label">思い出を選んで詳細と輝きを確認</div><div class="kyoto-demo-tiles">'+tiles+'</div>'+example+'<div class="kyoto-demo-analysis"><b>AIが読み取った意味（例）</b><p>'+m.contextMeaning+'</p><b>時間価値の理由（例）</b><p>'+m.valueReason+'</p><small>主な価値：'+CRITERIA_LABELS[m.primaryCriterion]+'　｜　合計：'+m.totalScore+'/25（デモ）</small></div><div class="kyoto-demo-glow-guide"><span class="kyoto-demo-dot '+m.primaryCriterion+((m.viewHistory||[]).length>=5?' glowing':((m.viewHistory||[]).length===0?' demo-muted':''))+'"></span><span>この思い出を直近30日で見返した回数：'+((m.viewHistory||[]).length)+'回</span></div>'+renderTutorialGlowLegend();
- if(step.demo==='end')holder.innerHTML='<div class="kyoto-demo-label">思い出の表示期間</div><div class="kyoto-demo-period-guide"><span>月</span><span>年</span><span>人生</span></div><small>表示範囲の切り替えは、思い出の砂の表示だけに適用します。上の金色の砂の残り時間は「砂時計設定」で設定します。</small><div class="kyoto-demo-finish">思い出を振り返りながら、これからの時間も大切にしましょう。<br>「完了」でアプリへ戻ります。</div>';
+ if(step.demo==='sand')holder.innerHTML='<div class="kyoto-demo-label">清水寺の思い出の砂（1粒の見本）</div><div class="kyoto-demo-dots">'+dots+'</div>'+renderTutorialSandLegend();
+ if(step.demo==='list')holder.innerHTML='<div class="kyoto-demo-label">清水寺の思い出（タップで詳細へ）</div>'+KYOTO_TUTORIAL_MEMORIES.map((item,i)=>'<button type="button" class="kyoto-demo-list-item" onclick="openKyotoTutorialDetail('+i+')"><span class="kyoto-demo-list-art">'+kyotoDemoIllustration(item.demoScene)+'</span><span><b>'+item.memoryTitle+'</b><small>'+CRITERIA_LABELS[item.primaryCriterion]+'｜'+item.date+'</small></span><span>›</span></button>').join('');
+ if(step.demo==='detail')holder.innerHTML='<div class="kyoto-demo-label">清水寺の思い出の詳細と輝きを確認</div>'+example+'<div class="kyoto-demo-analysis"><b>AIが読み取った意味（例）</b><p>'+m.contextMeaning+'</p><b>時間価値の理由（例）</b><p>'+m.valueReason+'</p><small>主な価値：'+CRITERIA_LABELS[m.primaryCriterion]+'　｜　合計：'+m.totalScore+'/25（デモ）</small></div><div class="kyoto-demo-glow-guide"><span class="kyoto-demo-dot '+m.primaryCriterion+' demo-glow-'+getMemoryGlowLevel(m)+(getMemoryGlowLevel(m)===0?' demo-muted':'')+'"></span><span>この思い出を直近30日で見返した回数：'+((m.viewHistory||[]).length)+'回</span></div>'+'<div class="tutorial-detail-reference">リングの5段階は「砂時計・下」の説明でも確認できます。</div>';
+ if(step.demo==='end')holder.innerHTML='<div class="kyoto-demo-label">思い出の表示期間を切り替えてみよう</div><div class="kyoto-demo-period-guide tutorial-period-demo-buttons" role="group" aria-label="思い出の表示期間">'+[['month','月'],['year','年'],['life','人生']].map(([mode,label])=>'<button type="button" class="tutorial-period-demo-button'+(hourglassPeriodMode===mode?' selected':'')+'" aria-pressed="'+(hourglassPeriodMode===mode)+'" onclick="setHourglassPeriod(\''+mode+'\');renderKyotoTutorialDemo(hourglassTutorialSteps[8]);">'+label+'</button>').join('')+'</div><small>切り替わるのは下部の思い出の砂です。上部の残り時間は「砂時計設定」から変更できます。</small><div class="kyoto-demo-finish">思い出を振り返りながら、これからの時間も大切にしましょう。<br>「完了」でアプリへ戻ります。</div>';
 }
 function selectKyotoTutorialMemory(index){kyotoTutorialSelected=index;renderHourglassTutorial();}
 function openKyotoTutorialDetail(index){kyotoTutorialSelected=index;hourglassTutorialIndex=tutorialPages.findIndex(p=>p.stepIndex===7&&p.kind==='explain');renderHourglassTutorial();}
@@ -133,27 +120,37 @@ const tutorialPages=hourglassTutorialSteps.flatMap((step,stepIndex)=>
  step.selector ? [{stepIndex,kind:'guide'},{stepIndex,kind:'explain'}] : [{stepIndex,kind:'explain'}]
 );
 const tutorialGuideDescriptions={
- 2:'砂時計の上の金色の部分が、未来の残り時間です。',
- 3:'中央のくびれが、思い出を記録する入口です。',
- 5:'砂時計の下側に、過去の思い出が粒になってたまります。',
- 8:'ここで「月・年・人生」を切り替えられます。'
+ 2:'上の砂は残り時間。デモでは3分から減っていきます。',
+ 3:'中央をタップすると、思い出を記録できます。',
+ 5:'下部には、記録した思い出が砂粒としてたまります。',
+ 8:'「月・年・人生」をタップして切り替えてみましょう。'
 };
 let hourglassTutorialIndex=0;
+// チュートリアル専用の3分タイマー。通常タイマーやlocalStorageは変更しない。
+const TUTORIAL_DEMO_SECONDS=180;
+let tutorialDemoEndsAt=0;
+function tutorialDemoRemainingSeconds(){
+  return tutorialDemoEndsAt ? Math.max(0, Math.ceil((tutorialDemoEndsAt-Date.now())/1000)) : 0;
+}
 function startHourglassTutorial(){
   if(typeof switchAppView==='function')switchAppView('home');
   hourglassTutorialIndex=0;
   kyotoTutorialSelected=0;
+  tutorialDemoEndsAt=Date.now()+TUTORIAL_DEMO_SECONDS*1000;
   document.getElementById('tutorialOverlay').classList.add('is-open');
+  if(typeof updateTimeDisplay==='function')updateTimeDisplay();
   document.body.style.overflow='hidden';
   requestAnimationFrame(renderHourglassTutorial);
 }
 function finishHourglassTutorial(){
+  tutorialDemoEndsAt=0;
   kyotoTutorialShowingSand=false;
   if(typeof renderValueSand==='function')renderValueSand();
   document.getElementById('tutorialOverlay').classList.remove('is-open');
   document.body.style.overflow='';
   document.getElementById('tutorialPanel').classList.remove('tutorial-panel-top');
-  document.getElementById('tutorialOverlay').classList.remove('tutorial-explanation-page','tutorial-guide-page');
+  document.getElementById('tutorialOverlay').classList.remove('tutorial-explanation-page','tutorial-guide-page','tutorial-period-interactive');
+  if(typeof updateTimeDisplay==='function')updateTimeDisplay();
 }
 function changeHourglassTutorial(direction){
   const next=hourglassTutorialIndex+direction;
@@ -170,16 +167,18 @@ function renderHourglassTutorial(){
   const overlay=document.getElementById('tutorialOverlay');
   const panel=document.getElementById('tutorialPanel');
   overlay.classList.toggle('tutorial-guide-page',isGuide);
+  // STEP 9 の場所案内だけ、背後の月・年・人生ボタンを操作可能にする。
+  overlay.classList.toggle('tutorial-period-interactive',isGuide && page.stepIndex===8);
   overlay.classList.toggle('tutorial-explanation-page',!isGuide);
   overlay.classList.remove('tutorial-step-upper');
   panel.classList.remove('tutorial-panel-top');
   panel.style.removeProperty('top');panel.style.removeProperty('bottom');panel.style.removeProperty('max-height');
   panel.scrollTop=0;
   document.getElementById('tutorialCount').textContent='STEP '+(page.stepIndex+1)+' / '+hourglassTutorialSteps.length+(isGuide?' ・ 場所の案内':' ・ 説明');
-  document.getElementById('tutorialTitle').textContent=isGuide ? 'ここを見てください' : step.title;
+  document.getElementById('tutorialTitle').textContent=isGuide ? 'この部分を見てみよう' : step.title;
   document.getElementById('tutorialDescription').textContent=step.description;
   renderKyotoTutorialDemo(step);
-  // 下側の強調案内時も、京都旅行のサンプル砂を見せる。
+  // 下側の強調案内時も、清水寺のサンプル砂1粒を見せる。
   syncKyotoTutorialSand(originalStep);
   document.getElementById('tutorialPrev').style.display=hourglassTutorialIndex===0?'none':'';
   document.getElementById('tutorialNext').textContent=hourglassTutorialIndex===tutorialPages.length-1?'完了':'次へ';
@@ -223,7 +222,7 @@ function positionTutorialPanel(rects){
   panel.style.setProperty('max-height','none','important');
   panel.style.setProperty('overflow-y','auto','important');
 
-  // 説明文や京都旅行デモの内容が増えても、必要な高さを測る。
+  // 説明文や清水寺デモの内容が増えても、必要な高さを測る。
   const desired=panel.scrollHeight;
   const viewportHeight=Math.max(60,bottomLimit-topLimit);
   if(!rects.length){
@@ -452,54 +451,55 @@ window.addEventListener('load',()=>{
       border-radius: 50% !important;
       clip-path: none !important;
     }
-    /* 光り方だけ変更：直近30日間の閲覧回数 */
-    /* 閲覧0回は評価項目の色を残しつつ、彩度を落としてくすませる */
+    /* 輝き：直近30日間の閲覧回数に応じた5段階 */
+    /* 0回は従来通り、代表評価の色をくすませる */
     .value-grain.memory-view-zero {
       box-shadow: none !important;
       filter: saturate(.4) brightness(.8) !important;
       opacity: .8 !important;
       animation: none !important;
     }
-    .value-grain.memory-glow-0 { filter: none; opacity: 1; }
-    .value-grain.memory-glow-1 { filter: none; }
-    /* 粒の塗りは光らせず、輪郭のリングだけを常時発光させる */
-    .value-grain.memory-glow-2, .value-grain.memory-glow-3 {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22), inset 0 0 2px rgba(255, 255, 255, 0.55);
-      animation: none !important;
+    .value-grain.memory-glow-0::before,
+    .value-grain.memory-glow-0::after { content: none !important; }
+
+    /* 砂そのものの評価色は維持。周囲にだけ色付きのリングを重ねる */
+    .value-grain.memory-glow-1 { --glow-ring:#b97946; --glow-light:rgba(181,111,55,.45); }
+    .value-grain.memory-glow-2 { --glow-ring:#d4e0eb; --glow-light:rgba(179,204,225,.68); }
+    .value-grain.memory-glow-3 { --glow-ring:#ffd34d; --glow-light:rgba(255,193,49,.84); }
+    .value-grain.memory-glow-4 { --glow-ring:#e3faff; --glow-light:rgba(111,226,255,.88); }
+    .value-grain.memory-glow-1::after,
+    .value-grain.memory-glow-2::after,
+    .value-grain.memory-glow-3::after,
+    .value-grain.memory-glow-4::after {
+      content:"";
+      position:absolute;
+      inset:-1.5px;
+      border-radius:50%;
+      border:1px solid var(--glow-ring);
+      background:transparent;
+      box-shadow:0 0 3px var(--glow-light),0 0 6px var(--glow-light);
+      pointer-events:none;
     }
-    /* 金色のリングだけがキラキラと常時発光。粒の色・明るさは変更しない */
-    .value-grain.memory-glow-2::after, .value-grain.memory-glow-3::after {
-      content: "";
-      position: absolute;
-      inset: -1.5px;
-      border-radius: 50%;
-      border: 0.5px solid #ffd34d;
-      background: transparent;
-      box-shadow:
-        0 0 2px .5px rgba(255, 246, 180, 1),
-        0 0 4px 1px rgba(255, 206, 44, .95),
-        0 0 7px 2px rgba(255, 174, 0, .55),
-        inset 0 0 2px rgba(255, 245, 170, .8);
-      pointer-events: none;
-      animation: none !important;
+    .value-grain.memory-glow-1::after { border-width:.8px; box-shadow:0 0 2px var(--glow-light); }
+    .value-grain.memory-glow-2::after { box-shadow:0 0 3px var(--glow-light),0 0 5px var(--glow-light); }
+    .value-grain.memory-glow-3::after { box-shadow:0 0 3px #fff3b4,0 0 7px var(--glow-light),0 0 10px rgba(255,174,0,.4); }
+    .value-grain.memory-glow-4::after {
+      border-color:#e8fcff;
+      box-shadow:0 0 3px #fff,0 0 7px #a3e9ff,0 0 12px rgba(120,194,255,.9),0 0 17px rgba(218,170,255,.58);
     }
-    /* 小さな金色の光点をリングの外側に固定表示 */
-    .value-grain.memory-glow-2::before, .value-grain.memory-glow-3::before {
-      content: "";
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      top: -3px;
-      right: -3px;
-      border-radius: 50%;
-      background: #fff6b0;
-      box-shadow:
-        0 0 3px 1px #ffdf60,
-        -6px 7px 0 -1px #fff0a0,
-        -6px 7px 4px 1px rgba(255, 202, 30, .85);
-      pointer-events: none;
-      animation: none !important;
+    /* ゴールド・ダイヤモンドのみ小さな固定光点を加える（点滅しない） */
+    .value-grain.memory-glow-3::before,
+    .value-grain.memory-glow-4::before {
+      content:"";
+      position:absolute;
+      width:3px;height:3px;
+      top:-3px;right:-3px;
+      border-radius:50%;
+      background:#fff9cf;
+      box-shadow:0 0 3px 1px var(--glow-light);
+      pointer-events:none;
     }
+    .value-grain.memory-glow-4::before {background:#fff;box-shadow:0 0 4px 2px #c5efff, -7px 7px 3px 1px rgba(222,190,255,.65);}
 
     /* ===== リアルな砂の質感・落下・堆積（表示のみ） ===== */
     .top-sand {
@@ -540,8 +540,10 @@ window.addEventListener('load',()=>{
       animation: realistic-grain-settle .55s cubic-bezier(.24,.68,.3,1) both;
       animation-delay: var(--settle-delay, 0ms);
     }
+    .value-grain.memory-glow-1.sand-settling,
     .value-grain.memory-glow-2.sand-settling,
-    .value-grain.memory-glow-3.sand-settling { animation: realistic-grain-settle .55s cubic-bezier(.24,.68,.3,1) both !important; animation-delay: var(--settle-delay, 0ms) !important; }
+    .value-grain.memory-glow-3.sand-settling,
+    .value-grain.memory-glow-4.sand-settling { animation: realistic-grain-settle .55s cubic-bezier(.24,.68,.3,1) both !important; animation-delay: var(--settle-delay, 0ms) !important; }
     @media (prefers-reduced-motion: reduce) {
       .value-grain.sand-settling { animation: none !important; }
     }
@@ -1197,7 +1199,7 @@ window.addEventListener('load',()=>{
     /* 砂時計の上下は独立したタップ領域 */
     #topSand, #bottomSand { cursor: pointer; }
     #topSand:focus-visible, #bottomSand:focus-visible { outline: 3px solid #3677d2; outline-offset: -3px; }
-    /* 砂時計のくびれをタップして「価値をためる」を開く */
+    /* 砂時計のくびれをタップして「思い出を記録」を開く */
     #homeView .hourglass-neck-action {
       position: absolute;
       left: 50%;
@@ -1971,6 +1973,44 @@ body.home-fit-mode #homeView .score-box #timeText {
 .memory-reflection-grid strong{font-size:17px;color:#40382e}
 .memory-behavior-note{line-height:1.6!important}
 </style>
+
+<style id="memory-detail-five-reasons-20261120">
+/* 5項目のAI評価理由は、必ずすべて最後まで表示する。行数で隠さない。 */
+.memory-eval-items{gap:15px!important}
+.memory-eval-bar{margin:5px 0 4px!important}
+.memory-eval-item .memory-eval-reason{
+  display:block!important;-webkit-line-clamp:unset!important;line-clamp:unset!important;
+  overflow:visible!important;max-height:none!important;
+  margin:5px 0 0!important;font-size:12px!important;line-height:1.6!important;
+  color:#746c60!important;overflow-wrap:anywhere;white-space:normal!important
+}
+.memory-eval-total{margin-top:17px!important}
+</style>
+<style id="tutorial-four-tier-glow">
+#tutorialPanel .kyoto-demo-dot.demo-glow-1{outline:1px solid #b97946;box-shadow:0 0 4px rgba(181,111,55,.5)}
+#tutorialPanel .kyoto-demo-dot.demo-glow-2{outline:2px solid #d4e0eb;box-shadow:0 0 6px rgba(179,204,225,.8)}
+#tutorialPanel .kyoto-demo-dot.demo-glow-3{outline:2px solid #ffd34d;box-shadow:0 0 10px rgba(255,193,49,.85)}
+#tutorialPanel .kyoto-demo-dot.demo-glow-4{outline:2px solid #e3faff;box-shadow:0 0 7px #9ceaff,0 0 13px rgba(218,170,255,.8)}
+#tutorialPanel .kyoto-demo-dot.demo-glow-0{box-shadow:none}
+#tutorialPanel .tutorial-sand-glow-list{flex-wrap:wrap;gap:10px 14px}
+#tutorialPanel .tutorial-sand-glow-list span{white-space:nowrap}
+</style>
+<style id="memory-current-sand-preview-20261120">
+/* 思い出詳細：砂時計内と同じ砂粒の色・相対サイズ・リングを表示する */
+.memory-current-sand-card{align-items:center;justify-content:flex-start;text-align:center;min-width:0}
+.memory-current-sand-card small{align-self:stretch;text-align:left}
+.memory-current-sand-stage{display:flex;align-items:center;justify-content:center;width:100%;height:62px;min-height:62px;overflow:visible;isolation:isolate}
+/* 砂時計の粒のピクセルサイズを保持し、見やすくするため見本のみ2倍拡大 */
+.memory-current-sand-stage .value-grain{
+  position:relative!important;left:auto!important;bottom:auto!important;
+  display:block;flex:none;transform:scale(2)!important;
+  transition:none!important;
+}
+.memory-current-sand-stage .value-grain.memory-view-zero{
+  filter:saturate(.4) brightness(.8)!important;opacity:.8!important;
+}
+.memory-current-sand-rank{font-size:12px!important;font-weight:600!important;color:#76644b!important;line-height:1.35;text-align:center}
+</style>
 </head>
 
 <body>
@@ -2025,16 +2065,16 @@ body.home-fit-mode #homeView .score-box #timeText {
 <path d="M34 308 Q95 312 156 308" fill="none" stroke="#fff" stroke-opacity=".26" stroke-width="1.2"/>
 <path d="M30 313 Q95 319 160 313" fill="none" stroke="#a78a69" stroke-opacity=".32" stroke-width="1.4"/>
 </svg>
-<button type="button" class="hourglass-neck-action" aria-label="価値をためる画面を開く" title="タップして価値をためる" onclick="switchAppView('add')"></button>
+<button type="button" class="hourglass-neck-action" aria-label="思い出を記録する画面を開く" title="タップして思い出を記録" onclick="switchAppView('add')"></button>
         <div class="sand-bottom-clip"><div class="bottom-sand" id="bottomSand" role="button" tabindex="0" aria-label="価値を見る一覧を開く" title="タップして価値を見る一覧へ" onclick="switchAppView('value')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchAppView('value');}"></div></div>
       </div>
 
       </section>
 
-    <!-- 価値をためる -->
+    <!-- 思い出を記録 -->
       <section class="app-view" id="addView" data-view="add">
         <button type="button" class="view-back-button" onclick="switchAppView('home')">← ホームに戻る</button>
-      <h2 class="view-heading">思い出をためる</h2>
+      <h2 class="view-heading">思い出を記録</h2>
       <p class="view-description">写真やメモから、思い出の価値をAIで評価します。</p>
       <div class="form-box">
         <label>写真を複数選択</label>
@@ -2060,38 +2100,6 @@ body.home-fit-mode #homeView .score-box #timeText {
         <label>思い出メモ</label>
         <textarea id="memo" placeholder="例：友達と旅行に行き、印象に残る時間を過ごした"></textarea>
 
-        <label>この思い出で最も大切な要素</label>
-        <p class="criteria-note">
-          AI評価だけでなく、あなた自身が重視した要素を選択してください。
-        </p>
-
-        <div class="priority-grid" id="priorityGrid">
-          <label class="priority-option">
-            <input type="radio" name="userPriority" value="emotion">
-            感情
-          </label>
-
-          <label class="priority-option">
-            <input type="radio" name="userPriority" value="learning">
-            学び
-          </label>
-
-          <label class="priority-option">
-            <input type="radio" name="userPriority" value="rarity">
-            希少性
-          </label>
-
-          <label class="priority-option">
-            <input type="radio" name="userPriority" value="relationship">
-            人間関係
-          </label>
-
-          <label class="priority-option">
-            <input type="radio" name="userPriority" value="future">
-            将来への影響
-          </label>
-        </div>
-
         <div class="history-item">
           <p><b>現在の状態</b></p>
           <p id="calendarStatus">未連携</p>
@@ -2106,7 +2114,7 @@ body.home-fit-mode #homeView .score-box #timeText {
         </ons-button>
 
         <ons-button modifier="large" class="main-button" onclick="addMemoryByAI()">
-          思い出を評価して砂に変える
+          思い出を記録
         </ons-button>
 
         <ons-button modifier="large quiet" class="main-button" onclick="resetValueData()">
@@ -2254,7 +2262,7 @@ body.home-fit-mode #homeView .score-box #timeText {
     <nav class="bottom-navigation" aria-label="メインメニュー">
       <button type="button" class="bottom-nav-button active" data-view-target="home" onclick="switchAppView('home')" aria-current="page"><ons-icon icon="md-home"></ons-icon><span>ホーム</span></button>
       <button type="button" class="bottom-nav-button" data-view-target="value" onclick="switchAppView('value')"><ons-icon icon="md-collection-image"></ons-icon><span>価値を見る</span></button>
-      <button type="button" class="bottom-nav-button" data-view-target="add" onclick="switchAppView('add')"><ons-icon icon="md-plus-circle"></ons-icon><span>入力</span></button>
+      <button type="button" class="bottom-nav-button" data-view-target="add" onclick="switchAppView('add')"><ons-icon icon="md-plus-circle"></ons-icon><span>思い出を記録</span></button>
       <button type="button" class="bottom-nav-button" data-view-target="settings" onclick="switchAppView('settings')"><ons-icon icon="md-settings"></ons-icon><span>設定</span></button>
     </nav>
   </ons-page>
@@ -3865,9 +3873,6 @@ function syncBirthdaySelects(){
       const files = document.getElementById("photoInput").files;
       const memo = document.getElementById("memo").value;
       const category = document.getElementById("category").value;
-      const selectedPriority = document.querySelector(
-        'input[name="userPriority"]:checked'
-      );
 
       if (files.length === 0) {
         ons.notification.alert("思い出を判断する写真を1枚以上選択してください");
@@ -3879,13 +3884,6 @@ function syncBirthdaySelects(){
         return;
       }
 
-      if (!selectedPriority) {
-        ons.notification.alert("最も大切な要素を1つ選択してください");
-        return;
-      }
-
-      const userPriority = selectedPriority.value;
-
       try {
         setLoading(true);
         updateDebug(
@@ -3896,8 +3894,7 @@ function syncBirthdaySelects(){
         const rawAIResult = await analyzeWithAI(
           files,
           category,
-          memo,
-          userPriority
+          memo
         );
 
         const aiResult = normalizeAIResult(rawAIResult);
@@ -3909,8 +3906,8 @@ function syncBirthdaySelects(){
           "AIサーバー：正常に評価しました<br>" +
           "思い出タイトル：" + escapeHtml(aiResult.memoryTitle) + "<br>" +
           "思い出価値：" + aiResult.totalScore + " / 25<br>" +
-          "重視した要素：" +
-          escapeHtml(CRITERIA_LABELS[userPriority])
+          "AIが選んだ代表価値：" +
+          escapeHtml(CRITERIA_LABELS[getPrimaryCriterion(aiResult)] || "未分類")
         );
 
         const memoryPhotos = await prepareMemoryPhotos(files);
@@ -3932,8 +3929,6 @@ function syncBirthdaySelects(){
             job: userProfile.job
           },
 
-          userPriority,
-          userPriorityLabel: CRITERIA_LABELS[userPriority],
 
           memoryTitle: aiResult.memoryTitle,
           memorySummary: aiResult.memorySummary,
@@ -3987,7 +3982,8 @@ function syncBirthdaySelects(){
           },
 
           // 5項目のうち最も高かった評価項目
-          primaryCriterion: getPrimaryCriterion(aiResult, userPriority),
+          primaryCriterion: getPrimaryCriterion(aiResult),
+          primaryCriterionReason: aiResult.primaryCriterionReason || "",
 
           photoContexts: selectedPhotoContexts,
           memoryDate: getPreferredMemoryDateForSave(selectedPhotoContexts),
@@ -4044,7 +4040,7 @@ function syncBirthdaySelects(){
       }
     }
 
-    async function analyzeWithAI(files, category, memo, userPriority) {
+    async function analyzeWithAI(files, category, memo) {
       refreshProfileAge();
 
       const formData = new FormData();
@@ -4055,14 +4051,11 @@ function syncBirthdaySelects(){
 
       formData.append("category", category);
       formData.append("memo", memo);
-      formData.append("userPriority", userPriority);
-      formData.append(
-        "userPriorityLabel",
-        CRITERIA_LABELS[userPriority] || userPriority
-      );
 
       formData.append("evaluationUnit", "memory");
       formData.append("maxMemoryScore", "25");
+      // サーバー側が対応している場合、同点の代表価値は写真とコメントからAIが判断する。
+      formData.append("primaryCriterionPolicy", "ai_context_tiebreak");
       formData.append(
         "userProfile",
         JSON.stringify(userProfile)
@@ -4114,9 +4107,6 @@ function syncBirthdaySelects(){
 
             primaryCriterion:
               memory.primaryCriterion || "",
-
-            userPriority:
-              memory.userPriority || "",
 historyReferenceReason:
               memory.historyReferenceReason || "",
 
@@ -4324,6 +4314,19 @@ historyReferenceReason:
         rarity,
         future,
         totalScore,
+
+        // サーバーが返すAIの代表価値・同点判定理由を受け取る。
+        primaryCriterion: String(
+          source.primaryCriterion ?? source.primary_criterion ??
+          rawResult?.primaryCriterion ?? ""
+        ).trim(),
+        primaryCriterionReason: getText(
+          source.primaryCriterionReason,
+          source.primary_criterion_reason,
+          source.tieBreakReason,
+          source.tie_break_reason,
+          rawResult?.primaryCriterionReason
+        ),
 
         reason: getText(
           source.reason,
@@ -4863,7 +4866,7 @@ function showAIResult(result) {
       const now = Date.now();
       const recent = (Array.isArray(memory?.viewHistory) ? memory.viewHistory : [])
         .filter(t => Number.isFinite(Number(t)) && Number(t) <= now && Number(t) >= now - 30 * 86400000).length;
-      return recent >= 5 ? 3 : recent >= 1 ? 1 : 0;
+      return recent >= 10 ? 4 : recent >= 5 ? 3 : recent >= 3 ? 2 : recent >= 1 ? 1 : 0;
     }
 
     /*
@@ -5104,6 +5107,10 @@ function showAIResult(result) {
       hourglassPeriodMode = mode;
       closeHourglassDatePicker();
       refreshHourglassMonth();
+      if (document.getElementById('tutorialOverlay')?.classList.contains('is-open') &&
+          tutorialPages[hourglassTutorialIndex]?.stepIndex === 8) {
+        renderValueSand(KYOTO_TUTORIAL_MEMORIES);
+      }
     }
     let hourglassPickerYear = new Date().getFullYear();
     function closeHourglassDatePicker() {
@@ -5234,10 +5241,7 @@ function showAIResult(result) {
             ? "zero"
             : (
               memory.primaryCriterion ||
-              getPrimaryCriterion(
-                memory,
-                memory.userPriority || ""
-              )
+              getPrimaryCriterion(memory)
             );
 
         const size =
@@ -5303,9 +5307,8 @@ function showAIResult(result) {
           totalValueScore +
           " / 25" +
           " ／ 形：円形" +
-          " ／ 見返し：" +
-          Number(memory.viewCount || 0) +
-          "回";
+          " ／ 直近30日の輝き：" +
+          ["光なし（くすんだ色）", "ブロンズ", "シルバー", "ゴールド", "ダイヤモンド"][getMemoryGlowLevel(memory)];
 
         // 積もった位置は既存の衝突判定で決定。初回のみ落下を演出する。
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && index >= memoriesOldestFirst.length - 18) {
@@ -5319,7 +5322,7 @@ function showAIResult(result) {
       });
     }
 
-    function getPrimaryCriterion(scoreData, preferredCriterion = "") {
+    function getPrimaryCriterion(scoreData) {
       const scores = {
         emotion: Number(scoreData?.emotion || 0),
         learning: Number(
@@ -5358,18 +5361,13 @@ function showAIResult(result) {
       const highestCriteria = criterionOrder.filter(function(key) {
         return scores[key] === highestScore;
       });
-
-      /*
-        同点の場合は、ユーザーが重視した項目が
-        最高点の中にあれば、その項目を代表項目にする。
-      */
-      if (
-        preferredCriterion &&
-        highestCriteria.includes(preferredCriterion)
-      ) {
-        return preferredCriterion;
-      }
-
+      // 同点の場合、サーバーAIが写真・コメントを踏まえて選んだ代表価値を優先。
+      // AIが選択していない場合は従来の順番に暫定フォールバックする。
+      // 本当にAI判定を必須にするにはサーバーのプロンプト・返却形式も変更すること。
+      const aiChoice = String(
+        scoreData?.primaryCriterion ?? scoreData?.primary_criterion ?? ""
+      ).trim().toLowerCase();
+      if (highestCriteria.includes(aiChoice)) return aiChoice;
       return highestCriteria[0] || "emotion";
     }
 
@@ -5690,10 +5688,7 @@ function showAIResult(result) {
 
         const primaryCriterion =
           memory.primaryCriterion ||
-          getPrimaryCriterion(
-            memory,
-            memory.userPriority || ""
-          );
+          getPrimaryCriterion(memory);
 
         const valueMatches =
           currentHistoryValueFilter === "all" ||
@@ -5721,7 +5716,7 @@ function showAIResult(result) {
         const scores = getMemoryCriterionScores(memory);
         const primaryCriterion =
           memory.primaryCriterion ||
-          getPrimaryCriterion(scores, memory.userPriority || "");
+          getPrimaryCriterion(scores);
 
         const memoryDate = getMemoryDate(memory);
         const displayDate =
@@ -5797,58 +5792,84 @@ function showAIResult(result) {
       return {mapped, raw: source.trim()};
     }
 
+    // 数字の二重表示やAI理由の長文化を防ぐ。AIの再判定はせず、保存済み文章を整形する。
+    function cleanMemoryEvaluationText(value) {
+      if (!value || String(value).trim() === '取得できません') return '';
+      return String(value)
+        .replace(/^[\s\u3000]*(?:[0-5](?:\s*\/\s*5)?\s*点(?:満点)?[。．、,:：\s]*)+/u, '')
+        .replace(/^[\s\u3000]*(?:感情|学び|希少性|人間関係|将来への影響)\s*[:：]\s*/u, '')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    // 保存済みのAI評価理由を、内容を残しつつ短い1文にする。
+    // CSSで文章を途中から隠すことはしない。長い文は句点・読点で区切り、
+    // 表示した文は必ず最後まで読めるようにする。
+    function shortMemoryEvaluationText(value) {
+      const text = cleanMemoryEvaluationText(value);
+      if (!text) return '';
+      const sentences = text.split(/(?<=[。！？!?])/u).map(s => s.trim()).filter(Boolean);
+      const first = sentences[0] || text;
+      // 先頭の一文を採用し、無理に文字数で切らない。
+      // 表示幅が狭い場合も全文を表示し、末尾を「…」で隠さない。
+      return first;
+
+    }
+
     function openMemoryDetail(index) {
       const memory = memories[index];
-      const dialog = document.getElementById("memoryDetailDialog");
-      const content = document.getElementById("memoryDetailContent");
+      const dialog = document.getElementById('memoryDetailDialog');
+      const content = document.getElementById('memoryDetailContent');
       if (!memory || !dialog || !content) return;
 
       recordMemoryView(index);
       const scores = getMemoryCriterionScores(memory);
       const primaryCriterion = memory.primaryCriterion ||
-        getPrimaryCriterion(scores, memory.userPriority || "");
+        getPrimaryCriterion(scores);
       const memoryDate = getMemoryDate(memory);
       const displayDate = memoryDate && !Number.isNaN(memoryDate.getTime())
-        ? memoryDate.toLocaleDateString("ja-JP") : String(memory.date || "");
+        ? memoryDate.toLocaleDateString('ja-JP') : String(memory.date || '');
       const reasons = getMemoryReasonByCriterion(memory.reason);
-      const hasItemReasons = Object.keys(reasons.mapped).length > 0;
       const viewCount = Math.max(0, Number(memory.viewCount || 0));
       const recentViews = (Array.isArray(memory.viewHistory) ? memory.viewHistory : [])
         .filter(t => Number(t) <= Date.now() && Number(t) >= Date.now() - 30 * 86400000).length;
       const glowLevel = getMemoryGlowLevel(memory);
-      const glowText = glowLevel >= 2 ? "金色のリング" : recentViews > 0 ? "通常" : "控えめ";
+      const glowText = ['光なし（くすんだ色）', 'ブロンズ', 'シルバー', 'ゴールド', 'ダイヤモンド'][glowLevel];
+      // 砂時計の描画と同じ判定を使う（色・大きさ・輝き）。
+      // プレビューのみ見やすいようCSSで2倍表示し、判定値は変更しない。
+      const sandScore = Number(memory.totalScore ?? memory.score ?? CRITERIA_ORDER.reduce((sum, key) => sum + Math.max(0, Math.min(5, Number(scores[key]) || 0)), 0));
+      const sandCriterion = sandScore === 0 ? 'zero' : primaryCriterion;
+      const sandSize = getTotalScoreGrainSize(sandScore);
+      const sandClasses = 'value-grain ' + (CRITERIA_ORDER.includes(sandCriterion) || sandCriterion === 'zero' ? sandCriterion : 'zero') +
+        ' shape-sand memory-glow-' + glowLevel + (glowLevel === 0 ? ' memory-view-zero' : '');
       const photos = Array.isArray(memory.photos)
-        ? memory.photos.filter(photo => typeof photo === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(photo))
+        ? memory.photos.filter(photo => typeof photo === 'string' && /^data:image\/(?:jpeg|png|webp|gif);base64,/i.test(photo))
         : [];
-
       const evaluationTotal = CRITERIA_ORDER.reduce((sum, key) =>
         sum + Math.max(0, Math.min(5, Number(scores[key]) || 0)), 0);
-
       const evaluationHtml = CRITERIA_ORDER.map(key => {
         const point = Math.max(0, Math.min(5, Number(scores[key]) || 0));
         const level = Math.round(point);
-        const bar = Array.from({length:5}, (_,i) =>
+        const bar = Array.from({length: 5}, (_, i) =>
           `<span class="memory-eval-segment ${i < level ? 'filled' : ''}"></span>`).join('');
-        const reason = reasons.mapped[key];
+        const reason = shortMemoryEvaluationText(reasons.mapped[key]);
         return `<div class="memory-eval-item">
           <div class="memory-eval-heading"><b>${CRITERIA_LABELS[key]}</b><b>${point} / 5</b></div>
           <div class="memory-eval-bar" aria-hidden="true">${bar}</div>
-          ${reason ? `<p class="memory-eval-reason">${escapeHtml(reason)}</p>` : ''}
+          <p class="memory-eval-reason">${escapeHtml(reason || '評価理由の記録がありません。')}</p>
         </div>`;
       }).join('');
 
       content.innerHTML = `
-        <h3 class="memory-compact-title">${escapeHtml(memory.memoryTitle || memory.summary || "思い出")}</h3>
+        <h3 class="memory-compact-title">${escapeHtml(memory.memoryTitle || memory.summary || '思い出')}</h3>
         <div class="memory-compact-meta">
-          <span class="tag">${escapeHtml(memory.category || "未分類")}</span>
+          <span class="tag">${escapeHtml(memory.category || '未分類')}</span>
           <span>${escapeHtml(displayDate)}</span>
         </div>
-        <div class="memory-primary-box"><span>主な評価</span><strong>${escapeHtml(CRITERIA_LABELS[primaryCriterion] || "未分類")}</strong></div>
+        <div class="memory-primary-box"><span>主な評価</span><strong>${escapeHtml(CRITERIA_LABELS[primaryCriterion] || '未分類')}</strong></div>
         <section class="memory-detail-section">
-          <h4 class="memory-compact-heading">5項目のAI評価と理由</h4>
+          <h4 class="memory-compact-heading" id="memoryEvaluationTitle">5項目のAI評価と理由</h4>
           <div class="memory-eval-items">${evaluationHtml}</div>
           <div class="memory-eval-total"><span>5項目の合計評価</span><strong>${evaluationTotal} / 25点</strong></div>
-          ${!hasItemReasons ? `<div class="memory-eval-fallback"><b>AIの評価理由</b>${formatScoreReason(memory.reason)}</div>` : ''}
         </section>
         <section class="memory-detail-section">
           <h4 class="memory-compact-heading">判断に使用した写真（${Number(memory.photoCount ?? photos.length)}枚）</h4>
@@ -5862,7 +5883,13 @@ function showAIResult(result) {
           <h4 class="memory-compact-heading">思い出の振り返り</h4>
           <div class="memory-reflection-grid">
             <div><small>閲覧回数（累計）</small><strong>${viewCount}回</strong></div>
-            <div><small>砂の輝き</small><strong>${glowText}</strong></div>
+            <div class="memory-current-sand-card">
+              <small>現在の砂</small>
+              <div class="memory-current-sand-stage" aria-label="現在の砂の状態：${escapeHtml(glowText)}">
+                <span class="${sandClasses}" style="width:${sandSize}px;height:${sandSize}px" aria-hidden="true"></span>
+              </div>
+              <strong class="memory-current-sand-rank">${glowText}</strong>
+            </div>
           </div>
           <p class="memory-behavior-note">直近30日：${recentViews}回閲覧。砂の大きさはAI評価、輝きは閲覧回数で変化します。</p>
         </section>
@@ -5983,9 +6010,21 @@ function showAIResult(result) {
 
     function updateTimeDisplay() {
       if (remainingTime < 0) remainingTime = 0;
+      // チュートリアル中だけ3分のカウントダウンを画面に描画する。
+      // 実際のremainingTime、timerEndAt、保存データは一切書き換えない。
+      const tutorialActive = tutorialDemoEndsAt > 0 &&
+        document.getElementById('tutorialOverlay')?.classList.contains('is-open');
+      const displayRemaining = tutorialActive ? tutorialDemoRemainingSeconds() : remainingTime;
+      const displayDuration = tutorialActive ? TUTORIAL_DEMO_SECONDS : totalLifeTime;
+      const timeLabel = document.querySelector('#remainingTimeTap .remaining-time-label');
+      if(timeLabel) timeLabel.textContent = tutorialActive ? '◷ デモの残り時間（3分）' : '◷ 残り時間';
       const timeText = document.getElementById('timeText');
       if (timeText) {
-        const parts = calendarPeriodBreakdown(remainingTime, remainingTimeUnit());
+        const parts = tutorialActive ? {
+          primary: '3分間の体験',
+          secondary: String(Math.floor(displayRemaining/60)).padStart(2,'0')+'分 '+
+            String(displayRemaining%60).padStart(2,'0')+'秒'
+        } : calendarPeriodBreakdown(remainingTime, remainingTimeUnit());
         let major = document.getElementById('timeMajor');
         let minor = document.getElementById('timeMinor');
         if (!major || !minor) {
@@ -5999,7 +6038,7 @@ function showAIResult(result) {
       }
 
       const lostPercent = Math.max(0, Math.min(100,
-        100 - (remainingTime / Math.max(1, totalLifeTime)) * 100
+        100 - (displayRemaining / Math.max(1, displayDuration)) * 100
       ));
 
       document.getElementById("topSand").style.clipPath =
@@ -6007,7 +6046,7 @@ function showAIResult(result) {
 
       const neckSand = document.getElementById("neckSand");
 
-      if (remainingTime === 0) {
+      if (displayRemaining === 0) {
         neckSand.classList.add("stop");
       } else {
         neckSand.classList.remove("stop");
@@ -6058,12 +6097,6 @@ function showAIResult(result) {
       document.getElementById("previewArea").innerHTML = "";
       document.getElementById("photoCount").textContent =
         "選択された写真：0枚";
-
-      document
-        .querySelectorAll('input[name="userPriority"]')
-        .forEach(function(input) {
-          input.checked = false;
-        });
 
       selectedPhotoContexts = [];
 
@@ -6183,6 +6216,14 @@ function showAIResult(result) {
 @media(max-height:640px){#tutorialPanel .kyoto-demo-content{max-height:21dvh}}
 </style>
 
+<style id="kiyomizudera-one-memory-demo-style">
+/* 清水寺のデモは1件だけ。選択式の3枚組ではなく、1件の見本を広く表示する。 */
+#tutorialPanel .kyoto-demo-single-memory{display:flex;flex-direction:column;align-items:center;gap:7px;margin:8px auto 12px;padding:12px;border:1px solid #e9dfcf;border-radius:14px;background:#fffaf2;text-align:center;max-width:340px}
+#tutorialPanel .kyoto-demo-single-memory .kyoto-demo-art{max-width:220px;aspect-ratio:4/3}
+#tutorialPanel .kyoto-demo-single-memory strong{font-size:15px;color:#55422c}
+#tutorialPanel .kyoto-demo-single-memory small{font-size:11px;color:#81735f}
+</style>
+
 <style id="tutorial-interaction-lock">
 /* 画面全体を透明な操作遮断レイヤーにし、白い説明枠のボタンだけ操作可能にする。 */
 #tutorialOverlay.is-open { pointer-events: auto !important; }
@@ -6211,6 +6252,10 @@ function showAIResult(result) {
     // 説明枠内の操作は許可（戻る・次へ・スキップ・完了）。
     const controls=overlay.querySelector(':scope > .tutorial-controls');
     if((panel && panel.contains(event.target)) || (controls && controls.contains(event.target))) return;
+    // STEP 9 の場所案内中だけ、月・年・人生の切り替えタップを許可。
+    if(overlay.classList.contains('tutorial-period-interactive') &&
+       event.target instanceof Element &&
+       event.target.closest('#homeView .hourglass-period-tabs button[data-hourglass-period]')) return;
     if(event.cancelable) event.preventDefault();
     event.stopImmediatePropagation();
   }
@@ -6221,6 +6266,9 @@ function showAIResult(result) {
     const panel=document.getElementById('tutorialPanel');
     const controls=overlay.querySelector(':scope > .tutorial-controls');
     if((panel?.contains(document.activeElement) || controls?.contains(document.activeElement)) && (event.key==='Enter'||event.key===' '||event.key==='Tab'||event.key==='Shift'))return;
+    if(overlay.classList.contains('tutorial-period-interactive') &&
+       document.activeElement?.matches?.('#homeView .hourglass-period-tabs button[data-hourglass-period]') &&
+       ['Enter',' ','Tab','Shift'].includes(event.key))return;
     if(event.cancelable)event.preventDefault();
     event.stopImmediatePropagation();
   },true);
@@ -6380,6 +6428,48 @@ function showAIResult(result) {
   #tutorialOverlay.is-open > .tutorial-controls button{padding:10px 12px!important;font-size:13px!important}
   #tutorialOverlay.is-open > .tutorial-controls .tutorial-primary{min-width:82px!important}
 }
+</style>
+
+<style id="tutorial-sand-three-meanings-20261126">
+/* 色・大きさ・リングを一続きの説明として見せる */
+#tutorialPanel .tutorial-sand-guide-complete{padding:0!important;background:transparent!important;border:0!important;display:grid;gap:12px}
+#tutorialPanel .tutorial-sand-section{background:#fffaf2;border:1px solid #e8dfd0;border-radius:14px;padding:13px 12px;text-align:left}
+#tutorialPanel .tutorial-sand-section-title{font-size:14px!important;line-height:1.45;margin:0 0 7px!important;color:#745123}
+#tutorialPanel .tutorial-sand-explain{font-size:12px!important;line-height:1.6!important;margin:0 0 13px!important;color:#574f44!important}
+#tutorialPanel .tutorial-sand-color-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;margin-bottom:11px!important}
+#tutorialPanel .tutorial-sand-color-list>span{min-width:0;align-items:center!important;gap:8px!important}
+#tutorialPanel .tutorial-sand-color-list .kyoto-demo-dot{width:19px!important;height:19px!important}
+#tutorialPanel .tutorial-color-text{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.4}
+#tutorialPanel .tutorial-color-text b{font-size:12px;color:#3d352b}
+#tutorialPanel .tutorial-color-text small{font-size:10px;color:#756a5b;white-space:normal}
+#tutorialPanel .tutorial-sand-note{display:block;font-size:10px;line-height:1.6;color:#827563}
+#tutorialPanel .tutorial-sand-size-list{align-items:end!important;margin:10px 0 12px!important;gap:3px!important}
+#tutorialPanel .tutorial-sand-size-list>span{min-height:54px;justify-content:flex-end!important;gap:8px!important}
+#tutorialPanel .tutorial-sand-size-list small{font-size:9px!important}
+#tutorialPanel .tutorial-zero-dot{background:#9e9e9e!important}
+#tutorialPanel .tutorial-sand-glow-list{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;margin:10px 0 14px!important}
+#tutorialPanel .tutorial-sand-glow-list>span{min-width:0;gap:7px!important;white-space:normal!important}
+#tutorialPanel .tutorial-sand-glow-list .kyoto-demo-dot{width:20px!important;height:20px!important;flex-shrink:0}
+#tutorialPanel .tutorial-sand-glow-list strong{font-size:9px;line-height:1.35;color:#514539;overflow-wrap:anywhere}
+#tutorialPanel .tutorial-sand-glow-list small{font-size:9px!important;line-height:1.35!important;white-space:normal!important}
+#tutorialPanel .tutorial-detail-reference{font-size:11px;line-height:1.6;color:#7b6a50;margin-top:10px}
+@media(max-width:360px){
+ #tutorialPanel .tutorial-sand-section{padding:11px 9px}
+ #tutorialPanel .tutorial-sand-glow-list strong{font-size:8px}
+ #tutorialPanel .tutorial-sand-glow-list small{font-size:8px!important}
+}
+</style>
+
+<style id="tutorial-period-tap-20261127">
+/* STEP 9 の案内だけ背後の月・年・人生ボタンへのタップを通す。
+   ほかのアプリ操作は document のガードで従来どおり遮断する。 */
+#tutorialOverlay.is-open.tutorial-period-interactive { pointer-events:none!important; }
+#tutorialOverlay.is-open.tutorial-period-interactive::before { display:none!important; }
+#tutorialOverlay.is-open.tutorial-period-interactive #tutorialPanel,
+#tutorialOverlay.is-open.tutorial-period-interactive > .tutorial-controls { pointer-events:auto!important; }
+#tutorialPanel .tutorial-period-demo-buttons { display:flex;gap:8px;justify-content:center;margin:10px 0; }
+#tutorialPanel .tutorial-period-demo-button {flex:1;min-height:42px;border-radius:999px;border:1px solid #dbcab0;background:#fff;color:#5a4a35;font-weight:650;cursor:pointer;touch-action:manipulation;}
+#tutorialPanel .tutorial-period-demo-button.selected {background:#f4e3bd;border-color:#c59d5a;color:#80551c;box-shadow:inset 0 0 0 1px #d9b779;}
 </style>
 </body>
 </html>
